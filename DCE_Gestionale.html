@@ -538,6 +538,11 @@
       <span class="nav-dot" style="background:#d4883a"></span>
       Dashboard
     </button>
+    <button class="nav-item" onclick="showModule('charter')">
+      <span class="nav-dot" style="background:#d4883a"></span>
+      Project Charter
+      <span class="nav-badge tag-orange">⭐ start</span>
+    </button>
   </div>
 
   <div class="sidebar-section">
@@ -611,8 +616,11 @@
       <span style="color:var(--text)">Dashboard</span>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost" onclick="exportData()">Esporta dati</button>
+      <span id="topbar-user" style="font-size:12px;color:var(--text3);margin-right:8px"></span>
+      <button class="btn btn-ghost" onclick="showAuditLog()" title="Solo admin">📋 Log</button>
+      <button class="btn btn-ghost" onclick="exportData()">Esporta</button>
       <button class="btn btn-primary" onclick="saveAll()">Salva tutto</button>
+      <button class="btn btn-ghost" onclick="doLogout()" style="color:var(--red)">Esci</button>
     </div>
   </div>
 
@@ -686,6 +694,213 @@
           <div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--green)"></div></div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- PROJECT CHARTER -->
+    <div class="module" id="mod-charter">
+      <div class="section-header">
+        <h1>Project Charter — Documento di Avvio Progetto</h1>
+        <p>Documento formale che definisce obiettivi, scope, responsabilità e autorizzazione del progetto. Da condividere e firmare con la direzione.</p>
+      </div>
+
+      <div class="info-box">
+        📋 Questo documento formalizza il progetto e ne legittima l'esecuzione. Una volta compilato e approvato dalla direzione, costituisce il riferimento ufficiale per tutte le fasi successive.
+      </div>
+
+      <!-- Intestazione -->
+      <div class="form-card">
+        <div class="form-card-title">Intestazione documento</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Azienda</label>
+            <input type="text" id="ch-azienda" placeholder="es. DCE Carpenteria Metallica S.r.l.">
+          </div>
+          <div class="form-group">
+            <label>Sede</label>
+            <input type="text" id="ch-sede" placeholder="es. Vidigulfo (PV)">
+          </div>
+          <div class="form-group">
+            <label>Data documento</label>
+            <input type="date" id="ch-data">
+          </div>
+          <div class="form-group">
+            <label>Titolo progetto</label>
+            <input type="text" id="ch-titolo" placeholder="es. Riorganizzazione e ottimizzazione magazzino e flussi operativi">
+          </div>
+          <div class="form-group">
+            <label>Responsabile progetto</label>
+            <input type="text" id="ch-responsabile" placeholder="es. Danilo Iacovone">
+          </div>
+          <div class="form-group">
+            <label>Committente / Approvatore</label>
+            <input type="text" id="ch-committente" placeholder="es. Titolare DCE">
+          </div>
+        </div>
+      </div>
+
+      <!-- Obiettivi -->
+      <div class="form-card">
+        <div class="form-card-title">Obiettivi del progetto</div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label>Obiettivo principale</label>
+            <textarea id="ch-obiettivo" placeholder="es. Riorganizzare completamente il magazzino e i flussi di materiali in entrata e uscita, garantire la conformità normativa in materia di sicurezza e gestione rifiuti, digitalizzare i processi operativi e strutturare le procedure interne."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Benefici attesi</label>
+            <textarea id="ch-benefici" placeholder="es. Riduzione tempi di ricerca materiali, eliminazione sprechi, conformità D.Lgs. 81/2008, tracciabilità completa flussi, maggiore efficienza produttiva, riduzione rischi normativi."></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:4px">
+          <label style="display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:var(--text3);text-transform:uppercase">Obiettivi specifici per fase</label>
+          <div class="checklist">
+            <label class="check-item" id="ch-ob0"><input type="checkbox" onchange="toggleCheck('ch-ob0')"><span class="check-item-text"><strong>Fase 0</strong> — Censimento completo della situazione iniziale: spazi, attrezzature, mezzi, criticità</span></label>
+            <label class="check-item" id="ch-ob1"><input type="checkbox" onchange="toggleCheck('ch-ob1')"><span class="check-item-text"><strong>Fase 1</strong> — Messa a norma sicurezza: gestione rifiuti CER, segnaletica, DPI, aspirazione fumi</span></label>
+            <label class="check-item" id="ch-ob2"><input type="checkbox" onchange="toggleCheck('ch-ob2')"><span class="check-item-text"><strong>Fase 2</strong> — Riorganizzazione fisica: layout, scaffalature, zone funzionali, etichettatura</span></label>
+            <label class="check-item" id="ch-ob3"><input type="checkbox" onchange="toggleCheck('ch-ob3')"><span class="check-item-text"><strong>Fase 3</strong> — Strutturazione flussi: procedure ricezione, movimentazione interna, spedizioni</span></label>
+            <label class="check-item" id="ch-ob4"><input type="checkbox" onchange="toggleCheck('ch-ob4')"><span class="check-item-text"><strong>Fase 4</strong> — Gestione scorte: inventario, scorte minime, punti di riordino, inventario ciclico</span></label>
+            <label class="check-item" id="ch-ob5"><input type="checkbox" onchange="toggleCheck('ch-ob5')"><span class="check-item-text"><strong>Fase 5</strong> — Digitalizzazione: implementazione gestionale ARCA Evolution, KPI, reportistica</span></label>
+            <label class="check-item" id="ch-ob6"><input type="checkbox" onchange="toggleCheck('ch-ob6')"><span class="check-item-text"><strong>Fase 6</strong> — Organizzazione personale: mansioni, SOP scritte, formazione operatori</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scope -->
+      <div class="form-card">
+        <div class="form-card-title">Scope — Perimetro del progetto</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Incluso nel progetto</label>
+            <textarea id="ch-incluso" placeholder="es. Magazzino principale, Box 1-3, area produzione, gestione automezzi aziendali, flussi materiali, gestione rifiuti speciali, segnaletica, digitalizzazione processi..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Escluso dal progetto</label>
+            <textarea id="ch-escluso" placeholder="es. Gestione commerciale, contabilità, risorse umane, progettazione prodotti, rapporti con clienti finali..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cronoprogramma -->
+      <div class="form-card">
+        <div class="form-card-title">Cronoprogramma — Date indicative</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Data avvio progetto</label>
+            <input type="date" id="ch-avvio">
+          </div>
+          <div class="form-group">
+            <label>Completamento Fase 0-1 (sicurezza)</label>
+            <input type="date" id="ch-f01">
+          </div>
+          <div class="form-group">
+            <label>Completamento Fase 2 (layout)</label>
+            <input type="date" id="ch-f2">
+          </div>
+          <div class="form-group">
+            <label>Completamento Fase 3-4 (flussi/scorte)</label>
+            <input type="date" id="ch-f34">
+          </div>
+          <div class="form-group">
+            <label>Completamento Fase 5 (digitale)</label>
+            <input type="date" id="ch-f5">
+          </div>
+          <div class="form-group">
+            <label>Completamento totale progetto</label>
+            <input type="date" id="ch-fine">
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="form-card">
+        <div class="form-card-title">Budget e risorse</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Budget totale approvato (€)</label>
+            <input type="number" id="ch-budget" placeholder="es. 5000">
+          </div>
+          <div class="form-group">
+            <label>Budget Fase 1 — Sicurezza (€)</label>
+            <input type="number" id="ch-bud1" placeholder="es. 800">
+          </div>
+          <div class="form-group">
+            <label>Budget Fase 2 — Layout/Scaff. (€)</label>
+            <input type="number" id="ch-bud2" placeholder="es. 2500">
+          </div>
+          <div class="form-group">
+            <label>Budget Fase 3-4 — Procedure (€)</label>
+            <input type="number" id="ch-bud34" placeholder="es. 200">
+          </div>
+          <div class="form-group">
+            <label>Budget Fase 5 — Digitale (€)</label>
+            <input type="number" id="ch-bud5" placeholder="es. 500">
+          </div>
+          <div class="form-group">
+            <label>Budget Fase 6 — Formazione (€)</label>
+            <input type="number" id="ch-bud6" placeholder="es. 300">
+          </div>
+        </div>
+        <div class="form-grid full" style="margin-top:4px">
+          <div class="form-group">
+            <label>Risorse umane coinvolte</label>
+            <textarea id="ch-risorse" placeholder="es. Responsabile magazzino (Danilo Iacovone), operatori magazzino, ufficio tecnico, amministrazione, RSPP esterno..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rischi -->
+      <div class="form-card">
+        <div class="form-card-title">Rischi e vincoli</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Rischi identificati</label>
+            <textarea id="ch-rischi" placeholder="es. Resistenza al cambiamento da parte degli operatori, interruzioni produzione durante riorganizzazione, tempi di fornitura scaffalature, aggiornamento software gestionale..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Vincoli e dipendenze</label>
+            <textarea id="ch-vincoli" placeholder="es. Continuità produttiva da garantire, budget soggetto ad approvazione direzione, interventi strutturali richiedono verifica tecnica..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approvazione -->
+      <div class="form-card" style="border-color:rgba(212,136,58,0.3)">
+        <div class="form-card-title">Approvazione formale</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Approvato da</label>
+            <input type="text" id="ch-approv-nome" placeholder="Nome e cognome titolare/direzione">
+          </div>
+          <div class="form-group">
+            <label>Ruolo</label>
+            <input type="text" id="ch-approv-ruolo" placeholder="es. Titolare / Amministratore">
+          </div>
+          <div class="form-group">
+            <label>Data approvazione</label>
+            <input type="date" id="ch-approv-data">
+          </div>
+        </div>
+        <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:32px;text-transform:uppercase;letter-spacing:0.06em">Firma Responsabile Progetto</div>
+            <div style="border-top:1px solid var(--border2);padding-top:6px;font-size:12px;color:var(--text2)" id="ch-firma-resp">___________________________</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:32px;text-transform:uppercase;letter-spacing:0.06em">Firma Approvatore / Direzione</div>
+            <div style="border-top:1px solid var(--border2);padding-top:6px;font-size:12px;color:var(--text2)">___________________________</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div id="ch-approv-status" style="font-size:13px;color:var(--text3);font-style:italic">Stato: in attesa di approvazione</div>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveCharter()">Salva Charter</button>
+        <button class="btn btn-ghost" onclick="printCharter()">🖨 Stampa / PDF</button>
+        <button class="btn btn-ghost" onclick="showModule('fase0')">Vai a Fase 0 →</button>
       </div>
     </div>
 
@@ -1248,9 +1463,10 @@
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg">Salvato</span></div>
 
 <script>
-const MODULES = ['dashboard','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi'];
+const MODULES = ['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi'];
 const BREADCRUMBS = {
   dashboard: 'Dashboard',
+  charter: 'Project Charter',
   fase0: 'Fase 0 — Fotografia iniziale',
   fase1: 'Fase 1 — Sicurezza',
   fase2: 'Fase 2 — Magazzino',
@@ -1356,7 +1572,55 @@ function updateCerStatus(sel) {
   sel.style.color = sel.value === 'Fatto' ? 'var(--green)' : sel.value === 'In corso' ? 'var(--accent)' : 'var(--text2)';
 }
 
-// ============ MEZZI ============
+// ============ CHARTER ============
+function saveCharter() {
+  const data = {};
+  document.querySelectorAll('#mod-charter input, #mod-charter select, #mod-charter textarea').forEach(el => {
+    if (el.id) data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  try {
+    localStorage.setItem('dce-charter', JSON.stringify(data));
+    // Update approval status display
+    const nome = document.getElementById('ch-approv-nome').value;
+    const data_approv = document.getElementById('ch-approv-data').value;
+    const status = document.getElementById('ch-approv-status');
+    if (nome && data_approv) {
+      const fmt = new Date(data_approv).toLocaleDateString('it-IT');
+      status.innerHTML = `<span style="color:var(--green)">✓ Approvato da ${nome} in data ${fmt}</span>`;
+      document.getElementById('ch-firma-resp').textContent = document.getElementById('ch-responsabile').value || '___________________________';
+    }
+    showToast('Project Charter salvato');
+  } catch(e) { showToast('Errore salvataggio'); }
+}
+
+function loadCharter() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('dce-charter') || '{}');
+    Object.entries(saved).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox') { el.checked = val; if(val) toggleCheck(el.closest('.check-item')?.id); }
+      else el.value = val;
+    });
+    const nome = document.getElementById('ch-approv-nome')?.value;
+    const data_approv = document.getElementById('ch-approv-data')?.value;
+    if (nome && data_approv) {
+      const fmt = new Date(data_approv).toLocaleDateString('it-IT');
+      const status = document.getElementById('ch-approv-status');
+      if (status) status.innerHTML = `<span style="color:var(--green)">✓ Approvato da ${nome} in data ${fmt}</span>`;
+      const resp = document.getElementById('ch-responsabile')?.value;
+      const firma = document.getElementById('ch-firma-resp');
+      if (firma && resp) firma.textContent = resp;
+    }
+  } catch(e) {}
+}
+
+function printCharter() {
+  window.print();
+}
+// ============ END CHARTER ============
+
+
 let mezziDB = [];
 let interventiDB = [];
 
@@ -1646,7 +1910,228 @@ function renderAssegnazioni() {
 
 // ============ END MEZZI ============
 
-window.addEventListener('load', () => {
+// ============ SUPABASE INTEGRATION ============
+const SUPABASE_URL = 'https://oejkxzxnqhyiwchqsdmh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dM77qMw1j8H_H2T6qZ6h5A_cwVXBl6J';
+
+let currentUser = null;
+
+// HTTP helper
+async function sbFetch(path, method = 'GET', body = null, extra = {}) {
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+    ...extra
+  };
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + path, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+// ---- LOGIN ----
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  if (!email || !pass) { errEl.textContent = 'Compila email e password.'; return; }
+
+  try {
+    // Check utenti table
+    const rows = await sbFetch(`/rest/v1/utenti?email=eq.${encodeURIComponent(email)}&select=*`);
+    if (!rows.length) { errEl.textContent = 'Utente non trovato.'; return; }
+
+    const u = rows[0];
+    // Simple hash check (password stored as sha256-like — for now plaintext match, upgrade later)
+    if (u.password_hash !== btoa(pass)) {
+      errEl.textContent = 'Password errata.';
+      return;
+    }
+
+    currentUser = { email: u.email, nome: u.nome, ruolo: u.ruolo };
+    sessionStorage.setItem('dce-user', JSON.stringify(currentUser));
+
+    await auditLog('login', 'sistema', `Accesso effettuato da ${u.nome} (${u.ruolo})`);
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('topbar-user').textContent = `${u.nome} · ${u.ruolo}`;
+
+    // Load data from cloud
+    await loadAllFromCloud();
+    showToast(`Benvenuto ${u.nome}!`);
+
+  } catch(e) {
+    errEl.textContent = 'Errore di connessione. Riprova.';
+    console.error(e);
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('dce-user');
+  currentUser = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ---- AUDIT LOG ----
+async function auditLog(azione, sezione, dettaglio = '') {
+  if (!currentUser) return;
+  try {
+    await sbFetch('/rest/v1/audit_log', 'POST', {
+      utente_email: currentUser.email,
+      utente_nome: currentUser.nome,
+      azione, sezione, dettaglio
+    });
+  } catch(e) { console.warn('Audit log error:', e); }
+}
+
+// ---- CLOUD SAVE/LOAD ----
+async function saveToCloud(sezione, dati) {
+  try {
+    await sbFetch('/rest/v1/dati_progetto', 'POST', {
+      sezione,
+      dati,
+      aggiornato_da: currentUser?.nome || 'sistema',
+      updated_at: new Date().toISOString()
+    }, { 'Prefer': 'resolution=merge-duplicates,return=representation' });
+    await auditLog('salvataggio', sezione, `Dati sezione "${sezione}" aggiornati`);
+  } catch(e) { console.warn('Cloud save error:', e); }
+}
+
+async function loadFromCloud(sezione) {
+  try {
+    const rows = await sbFetch(`/rest/v1/dati_progetto?sezione=eq.${sezione}&select=dati`);
+    return rows.length ? rows[0].dati : null;
+  } catch(e) { return null; }
+}
+
+async function loadAllFromCloud() {
+  try {
+    // Load charter
+    const charter = await loadFromCloud('charter');
+    if (charter) {
+      Object.entries(charter).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.type === 'checkbox') { el.checked = val; if(val && el.closest('.check-item')) toggleCheck(el.closest('.check-item').id); }
+        else el.value = val;
+      });
+    }
+    // Load fase0
+    const f0 = await loadFromCloud('fase0');
+    if (f0) Object.entries(f0).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val; });
+    // Load fase1
+    const f1 = await loadFromCloud('fase1');
+    if (f1) Object.entries(f1).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val; });
+
+    // Load mezzi
+    const mezziRows = await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');
+    mezziDB = mezziRows.map(r => r.dati);
+    const intRows = await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');
+    interventiDB = intRows.map(r => r.dati);
+    const assRows = await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc');
+    assegnazioniDB = assRows.map(r => r.dati);
+
+    calcF0();
+    renderMezzi();
+    renderInterventi();
+    renderAssegnazioni();
+    renderAlerts();
+  } catch(e) { console.warn('Load error:', e); }
+}
+
+// Override saveModule to also sync to cloud
+const _origSaveModule = saveModule;
+window.saveModule = async function(name) {
+  _origSaveModule(name);
+  const data = {};
+  document.querySelectorAll('#mod-' + name + ' input, #mod-' + name + ' select, #mod-' + name + ' textarea').forEach(el => {
+    if (el.id) data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  await saveToCloud(name, data);
+};
+
+// Override saveCharter
+const _origSaveCharter = saveCharter;
+window.saveCharter = async function() {
+  _origSaveCharter();
+  const data = {};
+  document.querySelectorAll('#mod-charter input, #mod-charter select, #mod-charter textarea').forEach(el => {
+    if (el.id) data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  await saveToCloud('charter', data);
+};
+
+// ---- AUDIT LOG VIEWER ----
+async function showAuditLog() {
+  if (currentUser?.ruolo !== 'admin') { showToast('Accesso riservato all\'amministratore'); return; }
+  try {
+    const rows = await sbFetch('/rest/v1/audit_log?select=*&order=created_at.desc&limit=100');
+    const modal = document.getElementById('audit-modal');
+    const body = document.getElementById('audit-body');
+    body.innerHTML = rows.length ? rows.map(r => `
+      <tr>
+        <td style="white-space:nowrap;font-size:11px">${new Date(r.created_at).toLocaleString('it-IT')}</td>
+        <td style="font-weight:500;color:var(--text)">${r.utente_nome||'—'}</td>
+        <td><span class="tag tag-gray" style="font-size:10px">${r.utente_email||'—'}</span></td>
+        <td><span class="tag ${r.azione==='login'?'tag-green':r.azione==='salvataggio'?'tag-blue':'tag-gray'}" style="font-size:10px">${r.azione}</span></td>
+        <td style="color:var(--text2)">${r.sezione||'—'}</td>
+        <td style="color:var(--text3);font-size:12px">${r.dettaglio||'—'}</td>
+      </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nessuna attività registrata</td></tr>';
+    modal.style.display = 'flex';
+  } catch(e) { showToast('Errore caricamento log'); }
+}
+
+function closeAuditModal() {
+  document.getElementById('audit-modal').style.display = 'none';
+}
+
+// ---- ADD FIRST ADMIN (setup) ----
+async function setupAdmin() {
+  // Creates admin user if not exists
+  try {
+    const existing = await sbFetch(`/rest/v1/utenti?email=eq.danilo%40dce.it&select=id`);
+    if (!existing.length) {
+      await sbFetch('/rest/v1/utenti', 'POST', {
+        email: 'danilo@dce.it',
+        nome: 'Danilo Iacovone',
+        ruolo: 'admin',
+        password_hash: btoa('DCE2024admin!')
+      });
+      console.log('Admin created');
+    }
+  } catch(e) { console.warn('Setup admin error:', e); }
+}
+
+// ============ END SUPABASE ============
+
+window.addEventListener('load', async () => {
+  // Setup admin user on first load
+  await setupAdmin();
+
+  // Check if already logged in this session
+  const saved = sessionStorage.getItem('dce-user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('topbar-user').textContent = `${currentUser.nome} · ${currentUser.ruolo}`;
+    await loadAllFromCloud();
+  }
+
+  loadCharter();
   loadModule('fase0');
   loadModule('fase1');
   loadMezziDB();
@@ -1658,5 +2143,45 @@ window.addEventListener('load', () => {
   calcF0();
 });
 </script>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9998">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:36px;width:360px;max-width:90vw">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">DCE</div>
+      <div style="font-size:18px;font-weight:500;color:var(--text)">Gestionale Operativo</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">DCE Carpenteria Metallica S.r.l.</div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Email</label>
+      <input type="text" id="login-email" placeholder="es. danilo@dce.it" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group" style="margin-bottom:20px">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-error" style="color:var(--red);font-size:12px;margin-bottom:12px;min-height:16px"></div>
+    <button class="btn btn-primary" style="width:100%;padding:10px" onclick="doLogin()">Accedi</button>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--text3)">Accesso riservato al personale autorizzato</div>
+  </div>
+</div>
+
+<!-- AUDIT LOG MODAL -->
+<div id="audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9997;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:900px;max-height:80vh;display:flex;flex-direction:column">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:15px;font-weight:500;color:var(--text)">📋 Audit Log — Attività utenti</div>
+      <button onclick="closeAuditModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div style="overflow-y:auto;padding:16px">
+      <table class="data-table">
+        <thead><tr>
+          <th>Data / Ora</th><th>Utente</th><th>Email</th><th>Azione</th><th>Sezione</th><th>Dettaglio</th>
+        </tr></thead>
+        <tbody id="audit-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
