@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCE Gestionale — Carpenteria Metallica</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #161616;
+    --bg3: #1e1e1e;
+    --bg4: #252525;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8e6e0;
+    --text2: #9a9890;
+    --text3: #5a5856;
+    --accent: #d4883a;
+    --accent2: #b06820;
+    --accent-bg: rgba(212,136,58,0.1);
+    --accent-border: rgba(212,136,58,0.25);
+    --green: #4a9e6a;
+    --green-bg: rgba(74,158,106,0.1);
+    --blue: #4a7eb5;
+    --blue-bg: rgba(74,126,181,0.1);
+    --red: #b55a4a;
+    --red-bg: rgba(181,90,74,0.1);
+    --purple: #7a68b5;
+    --purple-bg: rgba(122,104,181,0.1);
+    --radius: 6px;
+    --radius-lg: 10px;
+    --font: 'Helvetica Neue', 'Arial', sans-serif;
+    --font-mono: 'Courier New', monospace;
+    --sidebar-w: 240px;
+    --header-h: 52px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .co-name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .sidebar-logo .co-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .sidebar-section {
+    padding: 12px 8px 4px;
+  }
+
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s;
+    color: var(--text2);
+    font-size: 13px;
+    user-select: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+
+  .nav-badge {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: auto;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .nav-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    height: var(--header-h);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .topbar-breadcrumb {
+    font-size: 12px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .topbar-breadcrumb span { color: var(--text3); }
+
+  .topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  .btn {
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+    font-family: var(--font);
+  }
+
+  .btn:hover { opacity: 0.85; }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+
+  /* CONTENT */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+  }
+
+  /* MODULES */
+  .module { display: none; }
+  .module.active { display: block; }
+
+  /* DASHBOARD */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  .stat-accent { color: var(--accent); }
+  .stat-green { color: var(--green); }
+  .stat-blue { color: var(--blue); }
+
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .phase-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .phase-card:hover { border-color: var(--border2); background: var(--bg3); }
+
+  .phase-card.done { border-color: rgba(74,158,106,0.3); }
+  .phase-card.in-progress { border-color: rgba(212,136,58,0.3); }
+
+  .phase-num {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .phase-title { font-size: 12px; color: var(--text2); line-height: 1.4; margin-bottom: 8px; }
+
+  .phase-bar {
+    height: 3px;
+    background: var(--bg4);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .phase-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+  .section-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header h1 {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .section-header p { font-size: 13px; color: var(--text2); }
+
+  /* FORMS */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group.span-2 { grid-column: span 2; }
+
+  label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  select option { background: var(--bg3); }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .form-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .form-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: middle;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--bg3); }
+
+  /* TAGS */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .tag-orange { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
+  .tag-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74,158,106,0.2); }
+  .tag-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(74,126,181,0.2); }
+  .tag-red { background: var(--red-bg); color: var(--red); border: 1px solid rgba(181,90,74,0.2); }
+  .tag-gray { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(122,104,181,0.2); }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg3);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .check-item.checked {
+    border-color: rgba(74,158,106,0.3);
+    background: rgba(74,158,106,0.04);
+  }
+
+  .check-item input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+
+  .check-item-text { font-size: 13px; color: var(--text2); line-height: 1.4; }
+  .check-item.checked .check-item-text { color: var(--text3); text-decoration: line-through; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text3);
+    font-size: 13px;
+  }
+
+  .empty-state .icon { font-size: 28px; margin-bottom: 8px; opacity: 0.4; }
+
+  h2 { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 12px; }
+
+  .row { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+  .col { flex: 1; }
+
+  .info-box {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 16px;
+  }
+
+  .actions-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="co-name">DCE</div>
+    <div class="co-sub">Carpenteria Metallica S.r.l.</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Navigazione</div>
+    <button class="nav-item active" onclick="showModule('dashboard')">
+      <span class="nav-dot" style="background:#d4883a"></span>
+      Dashboard
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Fasi del progetto</div>
+
+    <button class="nav-item" onclick="showModule('fase0')">
+      <span class="nav-dot" style="background:#9a9890"></span>
+      Fase 0 — Fotografia iniziale
+      <span class="nav-badge tag-orange">attiva</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase1')">
+      <span class="nav-dot" style="background:#4a7eb5"></span>
+      Fase 1 — Sicurezza
+      <span class="nav-badge tag-orange">attiva</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase2')">
+      <span class="nav-dot" style="background:#4a9e6a"></span>
+      Fase 2 — Magazzino
+      <span class="nav-badge tag-gray">prossima</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase3')">
+      <span class="nav-dot" style="background:#b5943a"></span>
+      Fase 3 — Flusso materiali
+      <span class="nav-badge tag-gray">prossima</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase4')">
+      <span class="nav-dot" style="background:#7a68b5"></span>
+      Fase 4 — Scorte
+      <span class="nav-badge tag-gray">prossima</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase5')">
+      <span class="nav-dot" style="background:#b55a4a"></span>
+      Fase 5 — Digitalizzazione
+      <span class="nav-badge tag-gray">prossima</span>
+    </button>
+
+    <button class="nav-item" onclick="showModule('fase6')">
+      <span class="nav-dot" style="background:#4a9e6a"></span>
+      Fase 6 — Personale & SOP
+      <span class="nav-badge tag-gray">prossima</span>
+    </button>
+
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Registri operativi</div>
+    <button class="nav-item" onclick="showModule('mezzi')">
+      <span class="nav-dot" style="background:#4a7eb5"></span>
+      Automezzi e Muletti
+      <span class="nav-badge tag-blue">attivo</span>
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    Danilo Iacovone<br>
+    Resp. Magazzino e Logistica
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-breadcrumb" id="breadcrumb">
+      <span>DCE Gestionale</span>
+      <span>›</span>
+      <span style="color:var(--text)">Dashboard</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="exportData()">Esporta dati</button>
+      <button class="btn btn-primary" onclick="saveAll()">Salva tutto</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="module active" id="mod-dashboard">
+      <div class="section-header">
+        <h1>Panoramica progetto</h1>
+        <p>DCE Carpenteria Metallica — Vidigulfo (PV) — aggiornato oggi</p>
+      </div>
+
+      <div class="dash-grid">
+        <div class="stat-card">
+          <div class="stat-label">Avanzamento globale</div>
+          <div class="stat-value stat-accent">12%</div>
+          <div class="stat-sub">2 fasi avviate su 6</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Documenti prodotti</div>
+          <div class="stat-value stat-green">3</div>
+          <div class="stat-sub">Report, planimetria, guida</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Checklist sicurezza</div>
+          <div class="stat-value stat-blue">0 / 9</div>
+          <div class="stat-sub">Azioni da completare</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fasi completate</div>
+          <div class="stat-value stat-green">0 / 6</div>
+          <div class="stat-sub">Progressione del progetto</div>
+        </div>
+      </div>
+
+      <h2>Stato fasi</h2>
+      <div class="phases-grid">
+        <div class="phase-card in-progress" onclick="showModule('fase0')">
+          <div class="phase-num" style="color:var(--text3)">Fase 0</div>
+          <div class="phase-title">Fotografia iniziale</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:30%;background:var(--text3)"></div></div>
+        </div>
+        <div class="phase-card in-progress" onclick="showModule('fase1')">
+          <div class="phase-num" style="color:var(--blue)">Fase 1</div>
+          <div class="phase-title">Sicurezza e conformità</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:45%;background:var(--blue)"></div></div>
+        </div>
+        <div class="phase-card" onclick="showModule('fase2')">
+          <div class="phase-num" style="color:var(--green)">Fase 2</div>
+          <div class="phase-title">Riorganizzazione magazzino</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:5%;background:var(--green)"></div></div>
+        </div>
+        <div class="phase-card" onclick="showModule('fase3')">
+          <div class="phase-num" style="color:var(--accent)">Fase 3</div>
+          <div class="phase-title">Flusso materiali</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--accent)"></div></div>
+        </div>
+        <div class="phase-card" onclick="showModule('fase4')">
+          <div class="phase-num" style="color:var(--purple)">Fase 4</div>
+          <div class="phase-title">Scorte e inventario</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--purple)"></div></div>
+        </div>
+        <div class="phase-card" onclick="showModule('fase5')">
+          <div class="phase-num" style="color:var(--red)">Fase 5</div>
+          <div class="phase-title">Digitalizzazione ARCA</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--red)"></div></div>
+        </div>
+        <div class="phase-card" onclick="showModule('fase6')">
+          <div class="phase-num" style="color:var(--green)">Fase 6</div>
+          <div class="phase-title">Personale e SOP</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--green)"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FASE 0 -->
+    <div class="module" id="mod-fase0">
+      <div class="section-header">
+        <h1>Fase 0 — Fotografia iniziale</h1>
+        <p>Profilo aziendale, struttura operativa e rilievo dello stato iniziale dell'officina.</p>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f0-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f0-fill" style="width:0%"></div></div>
+      </div>
+
+      <!-- 0.1 Profilo aziendale -->
+      <div class="form-card">
+        <div class="form-card-title">0.1 · Profilo aziendale</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Ragione sociale</label>
+            <input type="text" id="f0-ragione" placeholder="es. DCE Carpenteria Metallica S.r.l." oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>Sede operativa</label>
+            <input type="text" id="f0-sede" placeholder="es. Vidigulfo (PV)" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>Codice ATECO</label>
+            <input type="text" id="f0-ateco" placeholder="es. 25.11" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>N° dipendenti (stimato)</label>
+            <input type="number" id="f0-dip" placeholder="es. 15" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>CCNL applicato</label>
+            <input type="text" id="f0-ccnl" placeholder="es. CCNL Metalmeccanici Artigianato" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>Data avvio progetto</label>
+            <input type="date" id="f0-data" oninput="calcF0()">
+          </div>
+          <div class="form-group span-2">
+            <label>Attività produttive principali</label>
+            <textarea id="f0-attivita" placeholder="es. Carpenteria leggera e pesante, taglio laser, saldatura MIG/MAG e TIG, assemblaggio strutture metalliche..." oninput="calcF0()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 0.3 Sopralluogo -->
+      <div class="form-card">
+        <div class="form-card-title">0.3 · Sopralluogo e rilievo iniziale</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Superficie officina (mq)</label>
+            <input type="number" id="f0-mq" placeholder="es. 1500" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>N° portoni</label>
+            <input type="number" id="f0-portoni" placeholder="es. 2" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>N° postazioni saldatura</label>
+            <input type="number" id="f0-saldatura" placeholder="es. 6" oninput="calcF0()">
+          </div>
+          <div class="form-group">
+            <label>Presenza taglio laser</label>
+            <select id="f0-laser" onchange="calcF0()">
+              <option value="">— seleziona —</option>
+              <option>Sì</option><option>No</option><option>Da verificare</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Planimetria prodotta</label>
+            <select id="f0-planimetria" onchange="calcF0()">
+              <option value="">— seleziona —</option>
+              <option>Sì — AutoCAD 2D</option>
+              <option>Sì — AutoCAD 2D + 3D</option>
+              <option>Sì — Sweet Home 3D</option>
+              <option>In corso</option>
+              <option>No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gestionale aziendale</label>
+            <input type="text" id="f0-gestionale" placeholder="es. ARCA Evolution" oninput="calcF0()">
+          </div>
+        </div>
+
+        <div style="margin-top:4px">
+          <label style="display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:var(--text3);text-transform:uppercase">Criticità immediate rilevate</label>
+          <div class="checklist" id="criticita-list">
+            <label class="check-item" id="ci-1">
+              <input type="checkbox" onchange="toggleCheck('ci-1'); calcF0()">
+              <span class="check-item-text">Spazio magazzino insufficiente per la quantità di materiali</span>
+            </label>
+            <label class="check-item" id="ci-2">
+              <input type="checkbox" onchange="toggleCheck('ci-2'); calcF0()">
+              <span class="check-item-text">Assenza zona buffer per materiale in entrata non verificato</span>
+            </label>
+            <label class="check-item" id="ci-3">
+              <input type="checkbox" onchange="toggleCheck('ci-3'); calcF0()">
+              <span class="check-item-text">Nessuna etichettatura sistematica delle posizioni</span>
+            </label>
+            <label class="check-item" id="ci-4">
+              <input type="checkbox" onchange="toggleCheck('ci-4'); calcF0()">
+              <span class="check-item-text">Gestione rifiuti speciali non conforme o assente</span>
+            </label>
+            <label class="check-item" id="ci-5">
+              <input type="checkbox" onchange="toggleCheck('ci-5'); calcF0()">
+              <span class="check-item-text">Segnaletica di sicurezza a pavimento usurata o incompleta</span>
+            </label>
+            <label class="check-item" id="ci-6">
+              <input type="checkbox" onchange="toggleCheck('ci-6'); calcF0()">
+              <span class="check-item-text">Percorsi di transito non delimitati o ostruiti</span>
+            </label>
+            <label class="check-item" id="ci-7">
+              <input type="checkbox" onchange="toggleCheck('ci-7'); calcF0()">
+              <span class="check-item-text">Assenza inventario utensili e attrezzature</span>
+            </label>
+            <label class="check-item" id="ci-8">
+              <input type="checkbox" onchange="toggleCheck('ci-8'); calcF0()">
+              <span class="check-item-text">Flusso materiali non strutturato (entrata/uscita non tracciata)</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <div class="form-group">
+            <label>Note aggiuntive sopralluogo</label>
+            <textarea id="f0-note" placeholder="Qualsiasi altra osservazione rilevante dal primo sopralluogo..." oninput="calcF0()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase0')">Salva Fase 0</button>
+        <button class="btn btn-ghost" onclick="showModule('fase1')">Vai a Fase 1 →</button>
+      </div>
+    </div>
+
+    <!-- FASE 1 -->
+    <div class="module" id="mod-fase1">
+      <div class="section-header">
+        <h1>Fase 1 — Sicurezza e conformità normativa</h1>
+        <p>Gestione rifiuti speciali, segnaletica, DPI e interfaccia con RSPP. Priorità immediata.</p>
+      </div>
+
+      <div class="info-box">
+        Hai già prodotto il <strong>Report Sicurezza Rifiuti DCE</strong> — carica qui i dati per tenerli tracciati nel gestionale.
+      </div>
+
+      <!-- Tabella CER -->
+      <div class="form-card">
+        <div class="form-card-title">1.1 · Rifiuti speciali — Codici CER per postazione</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Materiale di scarto</th>
+              <th>Codice CER</th>
+              <th>Pericoloso</th>
+              <th>Contenitore dedicato</th>
+              <th>Stato</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dischi da taglio / mole esauriti</td>
+              <td style="font-family:var(--font-mono);font-size:12px">12 01 21</td>
+              <td><span class="tag tag-green">No</span></td>
+              <td>Contenitore rigido separato</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Limatura e trucioli metallici</td>
+              <td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td>
+              <td><span class="tag tag-green">No</span></td>
+              <td>Cestello / cassone scarrabile</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Scorie e residui di saldatura</td>
+              <td style="font-family:var(--font-mono);font-size:12px">12 01 13</td>
+              <td><span class="tag tag-green">No</span></td>
+              <td>Bidone metallico autoestinguente</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Bombolette spray esauste</td>
+              <td style="font-family:var(--font-mono);font-size:12px">15 01 11*</td>
+              <td><span class="tag tag-red">Sì ⚠</span></td>
+              <td>Contenitore chiuso etichettato</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Stracci / DPI contaminati (oli, solventi)</td>
+              <td style="font-family:var(--font-mono);font-size:12px">15 02 02*</td>
+              <td><span class="tag tag-red">Sì ⚠</span></td>
+              <td>Contenitore con coperchio</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Sfridi e ritagli di lamiera</td>
+              <td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td>
+              <td><span class="tag tag-green">No</span></td>
+              <td>Cassone scarrabile / recupero</td>
+              <td>
+                <select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)">
+                  <option>Da fare</option><option>In corso</option><option>Fatto</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Checklist sicurezza -->
+      <div class="form-card">
+        <div class="form-card-title">1.2-1.4 · Checklist azioni prioritarie</div>
+        <div class="checklist">
+          <label class="check-item" id="s-1">
+            <input type="checkbox" onchange="toggleCheck('s-1')">
+            <span class="check-item-text"><strong>Contenitori postazioni:</strong> posizionare contenitori dedicati a ogni postazione di saldatura (scorie, dischi, stracci, sfridi)</span>
+          </label>
+          <label class="check-item" id="s-2">
+            <input type="checkbox" onchange="toggleCheck('s-2')">
+            <span class="check-item-text"><strong>Punti raccolta centralizzati:</strong> allestire area rifiuti pericolosi (pavimento impermeabile, contenitori chiusi, registro C/S)</span>
+          </label>
+          <label class="check-item" id="s-3">
+            <input type="checkbox" onchange="toggleCheck('s-3')">
+            <span class="check-item-text"><strong>Segnaletica orizzontale:</strong> verificare stato percorso giallo e mantenerlo libero da ostacoli</span>
+          </label>
+          <label class="check-item" id="s-4">
+            <input type="checkbox" onchange="toggleCheck('s-4')">
+            <span class="check-item-text"><strong>Segnaletica verticale:</strong> cartellonistica UNI EN ISO 7010 — portoni A/B, zona laser, postazioni saldatura</span>
+          </label>
+          <label class="check-item" id="s-5">
+            <input type="checkbox" onchange="toggleCheck('s-5')">
+            <span class="check-item-text"><strong>Aspirazione fumi:</strong> verificare presenza e efficienza bracci aspiranti alle 6 postazioni</span>
+          </label>
+          <label class="check-item" id="s-6">
+            <input type="checkbox" onchange="toggleCheck('s-6')">
+            <span class="check-item-text"><strong>Schermature UV:</strong> valutare tende protettive ignifughe tra postazioni ravvicinate</span>
+          </label>
+          <label class="check-item" id="s-7">
+            <input type="checkbox" onchange="toggleCheck('s-7')">
+            <span class="check-item-text"><strong>Estintori:</strong> verificare posizionamento e idoneità (classe ABC) in prossimità postazioni e zona laser</span>
+          </label>
+          <label class="check-item" id="s-8">
+            <input type="checkbox" onchange="toggleCheck('s-8')">
+            <span class="check-item-text"><strong>DPI:</strong> censire maschere saldatura, guanti, grembiali, calzature, lavaocchi</span>
+          </label>
+          <label class="check-item" id="s-9">
+            <input type="checkbox" onchange="toggleCheck('s-9')">
+            <span class="check-item-text"><strong>RSPP:</strong> condividere report per validazione e integrazione nel DVR aziendale</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">Note e stato coordinamento RSPP</div>
+        <div class="form-group">
+          <label>Note operative</label>
+          <textarea id="f1-note" placeholder="Stato avanzamento azioni, contatti con RSPP, criticità aperte..."></textarea>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase1')">Salva Fase 1</button>
+        <button class="btn btn-ghost" onclick="showModule('fase0')">← Fase 0</button>
+        <button class="btn btn-ghost" onclick="showModule('fase2')">Fase 2 →</button>
+      </div>
+    </div>
+
+    <!-- FASI 2-7 placeholder -->
+    <div class="module" id="mod-fase2">
+      <div class="section-header">
+        <h1>Fase 2 — Riorganizzazione fisica del magazzino</h1>
+        <p>Layout, sistemi di stoccaggio, classificazione materiali, etichettatura.</p>
+      </div>
+      <div class="empty-state">
+        <div class="icon">🏗</div>
+        <p>Modulo in costruzione — prossima sessione di lavoro</p>
+        <p style="margin-top:6px;font-size:12px">Includerà: layout proposto, accorpamento Box 1-3, scaffalature, analisi ABC, mappa posizioni fisse</p>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-ghost" onclick="showModule('fase1')">← Fase 1</button>
+        <button class="btn btn-ghost" onclick="showModule('fase3')">Fase 3 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="mod-fase3">
+      <div class="section-header"><h1>Fase 3 — Flusso materiali in entrata e uscita</h1><p>Ricezione merci, movimentazione interna, spedizioni, gestione fornitori.</p></div>
+      <div class="empty-state"><div class="icon">🔄</div><p>Modulo in costruzione</p></div>
+      <div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase2')">← Fase 2</button><button class="btn btn-ghost" onclick="showModule('fase4')">Fase 4 →</button></div>
+    </div>
+
+    <div class="module" id="mod-fase4">
+      <div class="section-header"><h1>Fase 4 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div>
+      <div class="empty-state"><div class="icon">📦</div><p>Modulo in costruzione</p></div>
+      <div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase3')">← Fase 3</button><button class="btn btn-ghost" onclick="showModule('fase5')">Fase 5 →</button></div>
+    </div>
+
+    <div class="module" id="mod-fase5">
+      <div class="section-header"><h1>Fase 5 — Digitalizzazione ARCA Evolution</h1><p>Mappatura funzionalità, implementazione, KPI, formazione personale.</p></div>
+      <div class="empty-state"><div class="icon">💻</div><p>Modulo in costruzione</p></div>
+      <div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase4')">← Fase 4</button><button class="btn btn-ghost" onclick="showModule('fase6')">Fase 6 →</button></div>
+    </div>
+
+    <div class="module" id="mod-fase6">
+      <div class="section-header"><h1>Fase 6 — Personale e SOP</h1><p>Struttura operativa, interfacce interne, procedure standard scritte.</p></div>
+      <div class="empty-state"><div class="icon">👥</div><p>Modulo in costruzione</p></div>
+      <div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase5')">← Fase 5</button></div>
+    </div>
+
+
+
+    <!-- MEZZI -->
+    <div class="module" id="mod-mezzi">
+      <div class="section-header">
+        <h1>Automezzi e Muletti — Registro operativo</h1>
+        <p>Censimento, stato, scadenze assicurative/revisioni, storico danni e interventi per ogni mezzo aziendale.</p>
+      </div>
+
+      <!-- ALERT SCADENZE -->
+      <div id="mezzi-alerts"></div>
+
+      <!-- AGGIUNGI MEZZO -->
+      <div class="form-card">
+        <div class="form-card-title">Aggiungi / Modifica mezzo</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Tipo mezzo</label>
+            <select id="mz-tipo">
+              <option value="">— seleziona —</option>
+              <option>Muletto elettrico</option>
+              <option>Muletto a gas/diesel</option>
+              <option>Transpallet elettrico</option>
+              <option>Transpallet manuale</option>
+              <option>Autovettura aziendale</option>
+              <option>Autocarro</option>
+              <option>Furgone</option>
+              <option>Carrello elevatore</option>
+              <option>Altro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Marca / Modello</label>
+            <input type="text" id="mz-modello" placeholder="es. Toyota 8FBE15">
+          </div>
+          <div class="form-group">
+            <label>Targa / Matricola</label>
+            <input type="text" id="mz-targa" placeholder="es. AB123CD o MAT-001">
+          </div>
+          <div class="form-group">
+            <label>Anno immatricolazione</label>
+            <input type="number" id="mz-anno" placeholder="es. 2018">
+          </div>
+          <div class="form-group">
+            <label>Assegnatario attuale</label>
+            <input type="text" id="mz-assegnatario" placeholder="es. Mario Rossi / uso condiviso">
+          </div>
+          <div class="form-group">
+            <label>Portata (kg) — se applicabile</label>
+            <input type="number" id="mz-portata" placeholder="es. 1500">
+          </div>
+          <div class="form-group">
+            <label>Stato generale</label>
+            <select id="mz-stato">
+              <option value="">— seleziona —</option>
+              <option>Ottimo</option>
+              <option>Buono</option>
+              <option>Accettabile</option>
+              <option>Da revisionare</option>
+              <option>Fuori servizio</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:4px">
+          <div class="form-card-title" style="margin-top:12px">Scadenze</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Scad. Assicurazione</label>
+              <input type="date" id="mz-assic">
+            </div>
+            <div class="form-group">
+              <label>Scad. Revisione / Collaudo</label>
+              <input type="date" id="mz-revisione">
+            </div>
+            <div class="form-group">
+              <label>Scad. Verifica INAIL (muletti)</label>
+              <input type="date" id="mz-inail">
+            </div>
+            <div class="form-group">
+              <label>Prossimo tagliando</label>
+              <input type="date" id="mz-tagliando">
+            </div>
+            <div class="form-group">
+              <label>Scad. estintore a bordo</label>
+              <input type="date" id="mz-estintore">
+            </div>
+            <div class="form-group">
+              <label>Altra scadenza</label>
+              <input type="date" id="mz-altra-scad">
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:4px">
+          <div class="form-group">
+            <label>Note generali mezzo</label>
+            <textarea id="mz-note" placeholder="Condizioni particolari, anomalie note, accessori..."></textarea>
+          </div>
+        </div>
+
+        <div class="actions-bar" style="border:none;padding:12px 0 0;margin:0">
+          <button class="btn btn-primary" onclick="addMezzo()">Aggiungi mezzo</button>
+          <button class="btn btn-ghost" onclick="clearMezzoForm()">Pulisci</button>
+        </div>
+      </div>
+
+      <!-- LISTA MEZZI -->
+      <div class="form-card" id="mezzi-lista-card">
+        <div class="form-card-title">Parco mezzi censito</div>
+        <div id="mezzi-lista"><div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito — aggiungine uno sopra</p></div></div>
+      </div>
+
+      <!-- REGISTRO INTERVENTI -->
+      <div class="form-card">
+        <div class="form-card-title">Registro danni, riparazioni e interventi</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Mezzo (targa/matricola)</label>
+            <input type="text" id="int-targa" placeholder="es. MAT-001">
+          </div>
+          <div class="form-group">
+            <label>Data evento</label>
+            <input type="date" id="int-data">
+          </div>
+          <div class="form-group">
+            <label>Tipo evento</label>
+            <select id="int-tipo">
+              <option value="">— seleziona —</option>
+              <option>Danno rilevato</option>
+              <option>Riparazione</option>
+              <option>Tagliando / Manutenzione ordinaria</option>
+              <option>Revisione periodica</option>
+              <option>Verifica INAIL</option>
+              <option>Sostituzione componente</option>
+              <option>Incidente</option>
+              <option>Altro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Stato</label>
+            <select id="int-stato">
+              <option>Aperto</option>
+              <option>In corso</option>
+              <option>Risolto</option>
+            </select>
+          </div>
+          <div class="form-group span-2">
+            <label>Descrizione</label>
+            <textarea id="int-desc" placeholder="Descrivi il danno, l'intervento eseguito, il fornitore/officina..." style="min-height:60px"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Costo (€)</label>
+            <input type="number" id="int-costo" placeholder="es. 250">
+          </div>
+          <div class="form-group">
+            <label>Eseguito da</label>
+            <input type="text" id="int-eseguito" placeholder="es. Officina Rossi, interno">
+          </div>
+        </div>
+
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+          <button class="btn btn-primary" onclick="addIntervento()">Registra intervento</button>
+        </div>
+
+        <div style="margin-top:16px" id="interventi-lista">
+          <div class="empty-state"><div class="icon">🔧</div><p>Nessun intervento registrato</p></div>
+        </div>
+      </div>
+
+      <!-- REGISTRO ASSEGNAZIONI -->
+      <div class="form-card">
+        <div class="form-card-title">Storico assegnazioni / utilizzo mezzi</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Mezzo (targa/matricola)</label>
+            <input type="text" id="ass-targa" placeholder="es. AB123CD">
+          </div>
+          <div class="form-group">
+            <label>Assegnato a</label>
+            <input type="text" id="ass-nome" placeholder="es. Mario Rossi">
+          </div>
+          <div class="form-group">
+            <label>Tipo utilizzo</label>
+            <select id="ass-tipo">
+              <option>In dotazione fissa</option>
+              <option>Uso temporaneo</option>
+              <option>Uso condiviso</option>
+              <option>Restituzione</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data inizio</label>
+            <input type="date" id="ass-inizio">
+          </div>
+          <div class="form-group">
+            <label>Data fine (se applicabile)</label>
+            <input type="date" id="ass-fine">
+          </div>
+          <div class="form-group">
+            <label>Km alla consegna</label>
+            <input type="number" id="ass-km" placeholder="es. 45200">
+          </div>
+          <div class="form-group span-2">
+            <label>Note</label>
+            <input type="text" id="ass-note" placeholder="es. Uso trasferte, consegnato con pieno, ecc.">
+          </div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+          <button class="btn btn-primary" onclick="addAssegnazione()">Registra assegnazione</button>
+        </div>
+        <div style="margin-top:16px" id="assegnazioni-lista">
+          <div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div>
+        </div>
+      </div>
+
+    </div><!-- /mod-mezzi -->
+
+  </div><!-- /content -->
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg">Salvato</span></div>
+
+<script>
+const MODULES = ['dashboard','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi'];
+const BREADCRUMBS = {
+  dashboard: 'Dashboard',
+  fase0: 'Fase 0 — Fotografia iniziale',
+  fase1: 'Fase 1 — Sicurezza',
+  fase2: 'Fase 2 — Magazzino',
+  fase3: 'Fase 3 — Flusso materiali',
+  fase4: 'Fase 4 — Scorte',
+  fase5: 'Fase 5 — Digitalizzazione',
+  fase6: 'Fase 6 — Personale & SOP',
+  mezzi: 'Automezzi e Muletti',
+};
+
+function showModule(id) {
+  MODULES.forEach(m => {
+    document.getElementById('mod-'+m).classList.remove('active');
+  });
+  document.getElementById('mod-'+id).classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navBtns = document.querySelectorAll('.nav-item');
+  navBtns.forEach(btn => {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'"+id+"'")) {
+      btn.classList.add('active');
+    }
+  });
+
+  document.getElementById('breadcrumb').innerHTML =
+    '<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">' + BREADCRUMBS[id] + '</span>';
+}
+
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('checked');
+}
+
+function calcF0() {
+  const fields = ['f0-ragione','f0-sede','f0-ateco','f0-dip','f0-ccnl','f0-data','f0-attivita','f0-mansione','f0-livello','f0-funzioni','f0-aspettative','f0-delta','f0-mq','f0-portoni','f0-laser','f0-planimetria'];
+  let filled = 0;
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el && el.value && el.value.trim() !== '' && el.value !== '') filled++;
+  });
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('f0-pct').textContent = pct + '%';
+  document.getElementById('f0-fill').style.width = pct + '%';
+}
+
+function saveModule(name) {
+  const data = {};
+  document.querySelectorAll('#mod-' + name + ' input, #mod-' + name + ' select, #mod-' + name + ' textarea').forEach(el => {
+    if (el.id) {
+      data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+    }
+  });
+  try {
+    localStorage.setItem('dce-' + name, JSON.stringify(data));
+    showToast('Fase salvata correttamente');
+  } catch(e) {
+    showToast('Errore nel salvataggio');
+  }
+}
+
+function loadModule(name) {
+  try {
+    const saved = localStorage.getItem('dce-' + name);
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox') { el.checked = val; if (val) toggleCheck(el.closest('.check-item')?.id); }
+      else el.value = val;
+    });
+  } catch(e) {}
+}
+
+function saveAll() {
+  ['fase0','fase1'].forEach(saveModule);
+  showToast('Tutto salvato');
+}
+
+function exportData() {
+  const all = {};
+  ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(f => {
+    try { all[f] = JSON.parse(localStorage.getItem('dce-'+f) || '{}'); } catch(e) {}
+  });
+  const blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'DCE_dati_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Dati esportati');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function updateCerStatus(sel) {
+  const td = sel.parentElement;
+  sel.style.color = sel.value === 'Fatto' ? 'var(--green)' : sel.value === 'In corso' ? 'var(--accent)' : 'var(--text2)';
+}
+
+// ============ MEZZI ============
+let mezziDB = [];
+let interventiDB = [];
+
+function saveMezziDB() {
+  try {
+    localStorage.setItem('dce-mezzi', JSON.stringify(mezziDB));
+    localStorage.setItem('dce-interventi', JSON.stringify(interventiDB));
+  } catch(e) {}
+}
+
+function loadMezziDB() {
+  try {
+    mezziDB = JSON.parse(localStorage.getItem('dce-mezzi') || '[]');
+    interventiDB = JSON.parse(localStorage.getItem('dce-interventi') || '[]');
+  } catch(e) { mezziDB = []; interventiDB = []; }
+}
+
+function daysDiff(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  return Math.ceil((d - now) / (1000*60*60*24));
+}
+
+function scadenzaTag(dateStr, label) {
+  if (!dateStr) return '';
+  const days = daysDiff(dateStr);
+  const fmt = new Date(dateStr).toLocaleDateString('it-IT');
+  if (days < 0) return `<span class="tag tag-red">⚠ ${label}: SCADUTA (${fmt})</span>`;
+  if (days <= 30) return `<span class="tag tag-red">🔴 ${label}: ${fmt} (${days}gg)</span>`;
+  if (days <= 90) return `<span class="tag tag-orange">🟠 ${label}: ${fmt} (${days}gg)</span>`;
+  return `<span class="tag tag-green">✓ ${label}: ${fmt}</span>`;
+}
+
+function addMezzo() {
+  const tipo = document.getElementById('mz-tipo').value;
+  const modello = document.getElementById('mz-modello').value.trim();
+  const targa = document.getElementById('mz-targa').value.trim();
+  if (!tipo || !targa) { showToast('Compila almeno tipo e targa/matricola'); return; }
+
+  const mezzo = {
+    id: Date.now(),
+    tipo, modello, targa,
+    anno: document.getElementById('mz-anno').value,
+    portata: document.getElementById('mz-portata').value,
+    assegnatario: document.getElementById('mz-assegnatario').value,
+    stato: document.getElementById('mz-stato').value,
+    assic: document.getElementById('mz-assic').value,
+    revisione: document.getElementById('mz-revisione').value,
+    inail: document.getElementById('mz-inail').value,
+    tagliando: document.getElementById('mz-tagliando').value,
+    estintore: document.getElementById('mz-estintore').value,
+    altraScad: document.getElementById('mz-altra-scad').value,
+    note: document.getElementById('mz-note').value,
+  };
+
+  mezziDB.push(mezzo);
+  saveMezziDB();
+  renderMezzi();
+  renderAlerts();
+  clearMezzoForm();
+  showToast('Mezzo aggiunto al registro');
+}
+
+function deleteMezzo(id) {
+  mezziDB = mezziDB.filter(m => m.id !== id);
+  saveMezziDB();
+  renderMezzi();
+  renderAlerts();
+  showToast('Mezzo rimosso');
+}
+
+function clearMezzoForm() {
+  ['mz-tipo','mz-modello','mz-targa','mz-anno','mz-portata','mz-assegnatario','mz-stato',
+   'mz-assic','mz-revisione','mz-inail','mz-tagliando','mz-estintore','mz-altra-scad','mz-note']
+  .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+}
+
+function statoColor(stato) {
+  const map = { 'Ottimo':'tag-green','Buono':'tag-green','Accettabile':'tag-orange','Da revisionare':'tag-red','Fuori servizio':'tag-red' };
+  return map[stato] || 'tag-gray';
+}
+
+function renderMezzi() {
+  const el = document.getElementById('mezzi-lista');
+  if (!mezziDB.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito</p></div>';
+    return;
+  }
+
+  el.innerHTML = mezziDB.map(m => {
+    const scadenze = [
+      scadenzaTag(m.assic, 'Assicurazione'),
+      scadenzaTag(m.revisione, 'Revisione'),
+      scadenzaTag(m.inail, 'INAIL'),
+      scadenzaTag(m.tagliando, 'Tagliando'),
+      scadenzaTag(m.estintore, 'Estintore'),
+      scadenzaTag(m.altraScad, 'Altra scad.'),
+    ].filter(Boolean).join(' ');
+
+    const intMezzo = interventiDB.filter(i => i.targa === m.targa);
+    const aperti = intMezzo.filter(i => i.stato === 'Aperto' || i.stato === 'In corso').length;
+
+    return `
+    <div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="font-size:14px;font-weight:500;color:var(--text)">${m.tipo}</span>
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">${m.targa}</span>
+        ${m.modello ? `<span style="font-size:12px;color:var(--text2)">${m.modello}</span>` : ''}
+        ${m.anno ? `<span class="tag tag-gray">${m.anno}</span>` : ''}
+        ${m.stato ? `<span class="tag ${statoColor(m.stato)}">${m.stato}</span>` : ''}
+        ${aperti > 0 ? `<span class="tag tag-red">🔧 ${aperti} intervento/i aperti</span>` : ''}
+        ${m.portata ? `<span class="tag tag-gray">⬆ ${m.portata} kg</span>` : ''}
+        ${m.assegnatario ? `<span class="tag tag-blue">👤 ${m.assegnatario}</span>` : ''}
+        <button onclick="deleteMezzo(${m.id})" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px">✕ rimuovi</button>
+      </div>
+      ${scadenze ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${scadenze}</div>` : ''}
+      ${m.note ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${m.note}</div>` : ''}
+      ${intMezzo.length > 0 ? `
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>
+          ${intMezzo.slice().reverse().map(i => `
+            <div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
+              <span style="color:var(--text3);white-space:nowrap">${i.data || '—'}</span>
+              <span class="tag ${i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red'}" style="font-size:10px">${i.stato}</span>
+              <span style="color:var(--text2);font-weight:500">${i.tipo}</span>
+              <span style="color:var(--text3)">${i.desc}</span>
+              ${i.costo ? `<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ ${i.costo}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>`;
+  }).join('');
+}
+
+function addIntervento() {
+  const targa = document.getElementById('int-targa').value.trim();
+  const tipo = document.getElementById('int-tipo').value;
+  if (!targa || !tipo) { showToast('Compila almeno targa e tipo intervento'); return; }
+
+  interventiDB.push({
+    id: Date.now(),
+    targa,
+    data: document.getElementById('int-data').value,
+    tipo,
+    stato: document.getElementById('int-stato').value,
+    desc: document.getElementById('int-desc').value,
+    costo: document.getElementById('int-costo').value,
+    eseguito: document.getElementById('int-eseguito').value,
+  });
+
+  saveMezziDB();
+  renderMezzi();
+  renderInterventi();
+  ['int-targa','int-data','int-tipo','int-desc','int-costo','int-eseguito'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('int-stato').value = 'Aperto';
+  showToast('Intervento registrato');
+}
+
+function renderInterventi() {
+  const el = document.getElementById('interventi-lista');
+  if (!interventiDB.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">🔧</div><p>Nessun intervento registrato</p></div>';
+    return;
+  }
+  const sorted = [...interventiDB].reverse();
+  el.innerHTML = `
+    <table class="data-table" style="margin-top:8px">
+      <thead><tr>
+        <th>Data</th><th>Mezzo</th><th>Tipo</th><th>Descrizione</th><th>Stato</th><th>Costo</th><th>Eseguito da</th>
+      </tr></thead>
+      <tbody>
+        ${sorted.map(i => `<tr>
+          <td style="white-space:nowrap">${i.data||'—'}</td>
+          <td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${i.targa}</span></td>
+          <td>${i.tipo}</td>
+          <td style="color:var(--text2)">${i.desc||'—'}</td>
+          <td><span class="tag ${i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red'}">${i.stato}</span></td>
+          <td>${i.costo ? '€ '+i.costo : '—'}</td>
+          <td>${i.eseguito||'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderAlerts() {
+  const el = document.getElementById('mezzi-alerts');
+  if (!mezziDB.length) { el.innerHTML = ''; return; }
+
+  const urgenti = [];
+  mezziDB.forEach(m => {
+    const checks = [
+      {label:'Assicurazione', date:m.assic},
+      {label:'Revisione', date:m.revisione},
+      {label:'Verifica INAIL', date:m.inail},
+      {label:'Tagliando', date:m.tagliando},
+      {label:'Estintore a bordo', date:m.estintore},
+    ];
+    checks.forEach(c => {
+      if (!c.date) return;
+      const days = daysDiff(c.date);
+      if (days !== null && days <= 30) {
+        urgenti.push({mezzo: m.targa + (m.modello ? ' '+m.modello : ''), label: c.label, days, date: c.date});
+      }
+    });
+  });
+
+  if (!urgenti.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = `
+    <div style="background:var(--red-bg);border:1px solid rgba(181,90,74,0.3);border-radius:var(--radius-lg);padding:14px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:8px">⚠ Scadenze imminenti o scadute (entro 30 giorni)</div>
+      ${urgenti.map(u => `
+        <div style="display:flex;gap:10px;align-items:center;padding:4px 0;font-size:12px">
+          <span style="font-family:var(--font-mono);color:var(--accent)">${u.mezzo}</span>
+          <span style="color:var(--text2)">${u.label}</span>
+          <span style="color:${u.days < 0 ? 'var(--red)' : 'var(--accent)'}">
+            ${u.days < 0 ? 'SCADUTA' : u.days === 0 ? 'OGGI' : 'tra '+u.days+' giorni'}
+            (${new Date(u.date).toLocaleDateString('it-IT')})
+          </span>
+        </div>`).join('')}
+    </div>`;
+}
+
+let assegnazioniDB = [];
+
+function saveAssegnazioniDB() {
+  try { localStorage.setItem('dce-assegnazioni', JSON.stringify(assegnazioniDB)); } catch(e) {}
+}
+
+function loadAssegnazioniDB() {
+  try { assegnazioniDB = JSON.parse(localStorage.getItem('dce-assegnazioni') || '[]'); } catch(e) { assegnazioniDB = []; }
+}
+
+function addAssegnazione() {
+  const targa = document.getElementById('ass-targa').value.trim();
+  const nome = document.getElementById('ass-nome').value.trim();
+  if (!targa || !nome) { showToast('Compila almeno targa e nome'); return; }
+
+  assegnazioniDB.push({
+    id: Date.now(),
+    targa, nome,
+    tipo: document.getElementById('ass-tipo').value,
+    inizio: document.getElementById('ass-inizio').value,
+    fine: document.getElementById('ass-fine').value,
+    km: document.getElementById('ass-km').value,
+    note: document.getElementById('ass-note').value,
+  });
+
+  saveAssegnazioniDB();
+  renderAssegnazioni();
+  ['ass-targa','ass-nome','ass-inizio','ass-fine','ass-km','ass-note'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  showToast('Assegnazione registrata');
+}
+
+function renderAssegnazioni() {
+  const el = document.getElementById('assegnazioni-lista');
+  if (!assegnazioniDB.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div>';
+    return;
+  }
+  const sorted = [...assegnazioniDB].reverse();
+  el.innerHTML = `
+    <table class="data-table" style="margin-top:8px">
+      <thead><tr>
+        <th>Mezzo</th><th>Assegnato a</th><th>Tipo</th><th>Dal</th><th>Al</th><th>Km consegna</th><th>Note</th>
+      </tr></thead>
+      <tbody>
+        ${sorted.map(a => `<tr>
+          <td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${a.targa}</span></td>
+          <td style="font-weight:500;color:var(--text)">${a.nome}</td>
+          <td><span class="tag tag-blue" style="font-size:10px">${a.tipo}</span></td>
+          <td>${a.inizio ? new Date(a.inizio).toLocaleDateString('it-IT') : '—'}</td>
+          <td>${a.fine ? new Date(a.fine).toLocaleDateString('it-IT') : '<span style="color:var(--green)">in corso</span>'}</td>
+          <td>${a.km ? a.km+' km' : '—'}</td>
+          <td style="color:var(--text3)">${a.note||'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ============ END MEZZI ============
+
+window.addEventListener('load', () => {
+  loadModule('fase0');
+  loadModule('fase1');
+  loadMezziDB();
+  loadAssegnazioniDB();
+  renderMezzi();
+  renderInterventi();
+  renderAssegnazioni();
+  renderAlerts();
+  calcF0();
+});
+</script>
+</body>
+</html>
