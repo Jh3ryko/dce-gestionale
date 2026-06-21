@@ -1952,7 +1952,7 @@ async function doLogin() {
 
     const u = rows[0];
     // Simple hash check (password stored as sha256-like — for now plaintext match, upgrade later)
-    if (u.password_hash !== btoa(pass)) {
+    if (u.password_hash !== pass) {
       errEl.textContent = 'Password errata.';
       return;
     }
@@ -2108,7 +2108,7 @@ async function setupAdmin() {
         email: 'danilo@dce.it',
         nome: 'Danilo Iacovone',
         ruolo: 'admin',
-        password_hash: btoa('DCE2024admin!')
+        password_hash: 'DCE2024admin!'
       });
       console.log('Admin created');
     }
