@@ -108,6 +108,7 @@
   .info-box { background:var(--accent-bg); border:1px solid var(--accent-border); border-radius:var(--radius); padding:10px 14px; font-size:12px; color:var(--text2); margin-bottom:16px; }
   .actions-bar { display:flex; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
   #app { display:none; flex:1; overflow:hidden; }
+  @media print { .sidebar, .topbar, .btn, .actions-bar, .toast, #login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
 </style>
 </head>
 <body>
@@ -183,20 +184,20 @@
     <div class="module active" id="mod-dashboard">
       <div class="section-header"><h1>Panoramica progetto</h1><p>DCE Carpenteria Metallica — Vidigulfo (PV)</p></div>
       <div class="dash-grid">
-        <div class="stat-card"><div class="stat-label">Avanzamento globale</div><div class="stat-value stat-accent">12%</div><div class="stat-sub">2 fasi avviate su 6</div></div>
+        <div class="stat-card"><div class="stat-label">Avanzamento globale</div><div class="stat-value stat-accent" id="dash-global">12%</div><div class="stat-sub">2 fasi avviate su 6</div></div>
         <div class="stat-card"><div class="stat-label">Documenti prodotti</div><div class="stat-value stat-green">3</div><div class="stat-sub">Report, planimetria, guida</div></div>
         <div class="stat-card"><div class="stat-label">Checklist sicurezza</div><div class="stat-value stat-blue" id="dash-checklist">0 / 9</div><div class="stat-sub">Azioni completate</div></div>
-        <div class="stat-card"><div class="stat-label">Fasi completate</div><div class="stat-value stat-green">0 / 6</div><div class="stat-sub">Progressione del progetto</div></div>
+        <div class="stat-card"><div class="stat-label">Fasi completate</div><div class="stat-value stat-green" id="dash-fasi">0 / 6</div><div class="stat-sub">Progressione del progetto</div></div>
       </div>
       <h2>Stato fasi</h2>
       <div class="phases-grid">
-        <div class="phase-card in-progress" onclick="showModule('fase0')"><div class="phase-num" style="color:var(--text3)">Fase 0</div><div class="phase-title">Fotografia iniziale</div><div class="phase-bar"><div class="phase-bar-fill" style="width:30%;background:var(--text3)"></div></div></div>
-        <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Riorganizzazione magazzino</div><div class="phase-bar"><div class="phase-bar-fill" style="width:5%;background:var(--green)"></div></div></div>
-        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--blue)">Fase 2</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" style="width:45%;background:var(--blue)"></div></div></div>
-        <div class="phase-card" onclick="showModule('fase3')"><div class="phase-num" style="color:var(--accent)">Fase 3</div><div class="phase-title">Flusso materiali</div><div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--accent)"></div></div></div>
-        <div class="phase-card" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--purple)">Fase 4</div><div class="phase-title">Scorte e inventario</div><div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--purple)"></div></div></div>
-        <div class="phase-card" onclick="showModule('fase5')"><div class="phase-num" style="color:var(--red)">Fase 5</div><div class="phase-title">Digitalizzazione ARCA</div><div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--red)"></div></div></div>
-        <div class="phase-card" onclick="showModule('fase6')"><div class="phase-num" style="color:var(--green)">Fase 6</div><div class="phase-title">Personale e SOP</div><div class="phase-bar"><div class="phase-bar-fill" style="width:0%;background:var(--green)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase0')"><div class="phase-num" style="color:var(--text3)">Fase 0</div><div class="phase-title">Fotografia iniziale</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase0" style="width:30%;background:var(--text3)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Riorganizzazione magazzino</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase1" style="width:5%;background:var(--green)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--blue)">Fase 2</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:45%;background:var(--blue)"></div></div></div>
+        <div class="phase-card" onclick="showModule('fase3')"><div class="phase-num" style="color:var(--accent)">Fase 3</div><div class="phase-title">Flusso materiali</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase3" style="width:0%;background:var(--accent)"></div></div></div>
+        <div class="phase-card" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--purple)">Fase 4</div><div class="phase-title">Scorte e inventario</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase4" style="width:0%;background:var(--purple)"></div></div></div>
+        <div class="phase-card" onclick="showModule('fase5')"><div class="phase-num" style="color:var(--red)">Fase 5</div><div class="phase-title">Digitalizzazione ARCA</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase5" style="width:0%;background:var(--red)"></div></div></div>
+        <div class="phase-card" onclick="showModule('fase6')"><div class="phase-num" style="color:var(--green)">Fase 6</div><div class="phase-title">Personale e SOP</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase6" style="width:0%;background:var(--green)"></div></div></div>
       </div>
     </div>
 
@@ -343,11 +344,57 @@
       </div>
     </div>
 
-    <!-- FASE 1 — MAGAZZINO -->
+    <!-- FASE 1 — MAGAZZINO (COMPLETA) -->
     <div class="module" id="mod-fase1">
-      <div class="section-header"><h1>Fase 1 — Riorganizzazione fisica del magazzino</h1><p>Layout, sistemi di stoccaggio, classificazione materiali, etichettatura.</p></div>
-      <div class="empty-state"><div class="icon">🏗</div><p>Modulo in costruzione — prossima sessione di lavoro</p><p style="margin-top:6px;font-size:12px">Includerà: layout proposto, accorpamento Box 1-3, scaffalature, analisi ABC, mappa posizioni fisse</p></div>
-      <div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase0')">← Fase 0</button><button class="btn btn-ghost" onclick="showModule('fase2')">Fase 2 →</button></div>
+      <div class="section-header"><h1>Fase 1 — Riorganizzazione fisica del magazzino</h1><p>Layout, sistemi di stoccaggio, classificazione materiali, etichettatura e zone funzionali.</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f1-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f1-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">1.1 · Layout e scaffalature</div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label>Tipo scaffalature</label><select id="f1-scaffali" onchange="calcF1()"><option value="">— seleziona —</option><option>Scaffalature metalliche leggere</option><option>Scaffalature metalliche pesanti</option><option>Scaffalature a piani</option><option>Scaffalature a cassettiere</option><option>Scaffalature a palette</option><option>Altro / misto</option></select></div>
+          <div class="form-group"><label>N° scaffalature installate</label><input type="number" id="f1-nscaffali" placeholder="es. 12" oninput="calcF1()"></div>
+          <div class="form-group"><label>Altezza max scaffali (m)</label><input type="number" id="f1-hscaffali" placeholder="es. 3.5" oninput="calcF1()"></div>
+          <div class="form-group"><label>Accorpamento Box 1-3</label><select id="f1-box" onchange="calcF1()"><option value="">— seleziona —</option><option>Completato</option><option>In corso</option><option>Da pianificare</option><option>Non previsto</option></select></div>
+          <div class="form-group"><label>Zona ingresso/accettazione</label><select id="f1-zona-in" onchange="calcF1()"><option value="">— seleziona —</option><option>Definita e delimitata</option><option>Da definire</option><option>Assente</option></select></div>
+          <div class="form-group"><label>Zona spedizione/uscita</label><select id="f1-zona-out" onchange="calcF1()"><option value="">— seleziona —</option><option>Definita e delimitata</option><option>Da definire</option><option>Assente</option></select></div>
+          <div class="form-group span-2"><label>Descrizione layout attuale e proposto</label><textarea id="f1-layout-desc" placeholder="Descrivi la disposizione attuale e quella proposta: corsie, zone, passaggi..." oninput="calcF1()"></textarea></div>
+          <div class="form-group"><label>Planimetria layout allegata</label><select id="f1-layout-file" onchange="calcF1()"><option value="">— seleziona —</option><option>Sì</option><option>In preparazione</option><option>No</option></select></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">1.2 · Classificazione e etichettatura</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Analisi ABC completata</label><select id="f1-abc" onchange="calcF1()"><option value="">— seleziona —</option><option>Sì</option><option>In corso</option><option>No</option></select></div>
+          <div class="form-group"><label>Codifica posizioni (es. A-01-02)</label><select id="f1-codifica" onchange="calcF1()"><option value="">— seleziona —</option><option>Sì — attiva</option><option>Sì — parziale</option><option>In definizione</option><option>No</option></select></div>
+          <div class="form-group"><label>Etichettatura posizioni</label><select id="f1-etichette" onchange="calcF1()"><option value="">— seleziona —</option><option>Completata</option><option>In corso</option><option>Da fare</option></select></div>
+          <div class="form-group"><label>Segnaletica corsie e zone</label><select id="f1-segnaletica" onchange="calcF1()"><option value="">— seleziona —</option><option>Completata</option><option>In corso</option><option>Da fare</option></select></div>
+          <div class="form-group span-2"><label>Note classificazione materiali</label><textarea id="f1-note-abc" placeholder="Categorie ABC definite, materiali ad alta rotazione, criticità..." oninput="calcF1()"></textarea></div>
+          <div class="form-group"><label>Mappa posizioni fissa disponibile</label><select id="f1-mappa" onchange="calcF1()"><option value="">— seleziona —</option><option>Sì — stampata</option><option>Sì — digitale</option><option>No</option></select></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">1.3 · Checklist azioni</div>
+        <div class="checklist">
+          <label class="check-item" id="f1-c1"><input type="checkbox" onchange="toggleCheck('f1-c1');calcF1()"><span class="check-item-text">Pulizia e sgombero area magazzino</span></label>
+          <label class="check-item" id="f1-c2"><input type="checkbox" onchange="toggleCheck('f1-c2');calcF1()"><span class="check-item-text">Installazione / revisione scaffalature</span></label>
+          <label class="check-item" id="f1-c3"><input type="checkbox" onchange="toggleCheck('f1-c3');calcF1()"><span class="check-item-text">Definizione zone: ingresso, stoccaggio, picking, spedizione</span></label>
+          <label class="check-item" id="f1-c4"><input type="checkbox" onchange="toggleCheck('f1-c4');calcF1()"><span class="check-item-text">Assegnazione posizioni fisse per categoria ABC</span></label>
+          <label class="check-item" id="f1-c5"><input type="checkbox" onchange="toggleCheck('f1-c5');calcF1()"><span class="check-item-text">Stampa e applicazione etichette codificate</span></label>
+          <label class="check-item" id="f1-c6"><input type="checkbox" onchange="toggleCheck('f1-c6');calcF1()"><span class="check-item-text">Verifica carichi scaffalature e ancoraggi</span></label>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Note generali Fase 1</div>
+        <div class="form-group"><label>Note</label><textarea id="f1-note" placeholder="Annotazioni, criticità, decisioni prese..." oninput="calcF1()"></textarea></div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase1')">Salva Fase 1</button>
+        <button class="btn btn-ghost" onclick="showModule('fase0')">← Fase 0</button>
+        <button class="btn btn-ghost" onclick="showModule('fase2')">Fase 2 →</button>
+      </div>
     </div>
 
     <!-- FASE 2 — SICUREZZA -->
@@ -393,10 +440,181 @@
       </div>
     </div>
 
-    <div class="module" id="mod-fase3"><div class="section-header"><h1>Fase 3 — Flusso materiali in entrata e uscita</h1><p>Ricezione merci, movimentazione interna, spedizioni, gestione fornitori.</p></div><div class="empty-state"><div class="icon">🔄</div><p>Modulo in costruzione</p></div><div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase2')">← Fase 2</button><button class="btn btn-ghost" onclick="showModule('fase4')">Fase 4 →</button></div></div>
-    <div class="module" id="mod-fase4"><div class="section-header"><h1>Fase 4 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div><div class="empty-state"><div class="icon">📦</div><p>Modulo in costruzione</p></div><div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase3')">← Fase 3</button><button class="btn btn-ghost" onclick="showModule('fase5')">Fase 5 →</button></div></div>
-    <div class="module" id="mod-fase5"><div class="section-header"><h1>Fase 5 — Digitalizzazione ARCA Evolution</h1><p>Mappatura funzionalità, implementazione, KPI, formazione personale.</p></div><div class="empty-state"><div class="icon">💻</div><p>Modulo in costruzione</p></div><div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase4')">← Fase 4</button><button class="btn btn-ghost" onclick="showModule('fase6')">Fase 6 →</button></div></div>
-    <div class="module" id="mod-fase6"><div class="section-header"><h1>Fase 6 — Personale e SOP</h1><p>Struttura operativa, interfacce interne, procedure standard scritte.</p></div><div class="empty-state"><div class="icon">👥</div><p>Modulo in costruzione</p></div><div class="actions-bar"><button class="btn btn-ghost" onclick="showModule('fase5')">← Fase 5</button></div></div>
+    <!-- FASE 3 — FLUSSI (COMPLETA) -->
+    <div class="module" id="mod-fase3">
+      <div class="section-header"><h1>Fase 3 — Flusso materiali in entrata e uscita</h1><p>Ricezione merci, movimentazione interna, spedizioni, gestione fornitori.</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f3-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f3-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">3.1 · Ricezione merci</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Procedura ricezione definita</label><select id="f3-ricezione" onchange="calcF3()"><option value="">— seleziona —</option><option>Sì — documentata</option><option>Sì — verbale</option><option>In stesura</option><option>No</option></select></div>
+          <div class="form-group"><label>Verifica quantità/qualità all'ingresso</label><select id="f3-verifica" onchange="calcF3()"><option value="">— seleziona —</option><option>Sempre</option><option>Campione</option><option>Su richiesta</option><option>Mai</option></select></div>
+          <div class="form-group"><label>Zona buffer materiali non verificati</label><select id="f3-buffer" onchange="calcF3()"><option value="">— seleziona —</option><option>Definita e attiva</option><option>Da attivare</option><option>Assente</option></select></div>
+          <div class="form-group span-2"><label>Procedura ricezione — note</label><textarea id="f3-ricezione-note" placeholder="Descrivi i passaggi: controllo DDT, collaudo visivo, registrazione..." oninput="calcF3()"></textarea></div>
+          <div class="form-group"><label>Responsabile ricezione</label><input type="text" id="f3-resp-ricezione" placeholder="es. Danilo Iacovone" oninput="calcF3()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">3.2 · Movimentazione interna</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Strumenti movimentazione</label><input type="text" id="f3-mov-strumenti" placeholder="es. Muletti, transpallet, carrelli..." oninput="calcF3()"></div>
+          <div class="form-group"><label>Percorsi interni definiti</label><select id="f3-percorsi" onchange="calcF3()"><option value="">— seleziona —</option><option>Sì — segnalati</option><option>Sì — non segnalati</option><option>Parziali</option><option>No</option></select></div>
+          <div class="form-group"><label>Priorità movimentazione</label><select id="f3-priorita" onchange="calcF3()"><option value="">— seleziona —</option><option>FIFO</option><option>LIFO</option><option>Per urgenza</option><option>Non definita</option></select></div>
+          <div class="form-group span-2"><label>Flusso interno — descrizione</label><textarea id="f3-flusso-note" placeholder="Dall'ingresso allo stoccaggio, al picking, alla produzione..." oninput="calcF3()"></textarea></div>
+          <div class="form-group"><label>Tracciabilità movimenti</label><select id="f3-tracciabilita" onchange="calcF3()"><option value="">— seleziona —</option><option>Gestionale ARCA</option><option>Registro cartaceo</option><option>Entrambi</option><option>Non tracciato</option></select></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">3.3 · Spedizioni e uscite</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Procedura spedizione definita</label><select id="f3-spedizione" onchange="calcF3()"><option value="">— seleziona —</option><option>Sì — documentata</option><option>In stesura</option><option>No</option></select></div>
+          <div class="form-group"><label>Verifica uscita merce</label><select id="f3-uscita" onchange="calcF3()"><option value="">— seleziona —</option><option>Controllo DDT + firma</option><option>Solo DDT</option><option>Verbalmente</option><option>Nessuno</option></select></div>
+          <div class="form-group"><label>Imballaggi e materiali spedizione</label><input type="text" id="f3-imballaggi" placeholder="es. Bancali, film, angolari..." oninput="calcF3()"></div>
+          <div class="form-group span-2"><label>Note spedizioni</label><textarea id="f3-sped-note" placeholder="Corrieri abituali, tempi medi, criticità..." oninput="calcF3()"></textarea></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">3.4 · Fornitori chiave</div>
+        <div class="form-group"><label>Fornitori principali materiali</label><textarea id="f3-fornitori" placeholder="Elenca i fornitori chiave per acciaio, consumabili, imballaggi..." oninput="calcF3()"></textarea></div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase3')">Salva Fase 3</button>
+        <button class="btn btn-ghost" onclick="showModule('fase2')">← Fase 2</button>
+        <button class="btn btn-ghost" onclick="showModule('fase4')">Fase 4 →</button>
+      </div>
+    </div>
+
+    <!-- FASE 4 — SCORTE (COMPLETA) -->
+    <div class="module" id="mod-fase4">
+      <div class="section-header"><h1>Fase 4 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f4-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f4-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">4.1 · Inventario e censimento</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Inventario generale effettuato</label><select id="f4-inventario" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — completo</option><option>Parziale</option><option>In corso</option><option>No</option></select></div>
+          <div class="form-group"><label>Data ultimo inventario</label><input type="date" id="f4-data-inv" onchange="calcF4()"></div>
+          <div class="form-group"><label>Frequenza inventario ciclico</label><select id="f4-freq" onchange="calcF4()"><option value="">— seleziona —</option><option>Mensile</option><option>Trimestrale</option><option>Semestrale</option><option>Annuale</option><option>Non programmato</option></select></div>
+          <div class="form-group span-2"><label>Metodo inventario</label><textarea id="f4-metodo" placeholder="es. Inventario a campione su categoria A, totale su B/C..." oninput="calcF4()"></textarea></div>
+          <div class="form-group"><label>Differenze inventario riscontrate</label><select id="f4-differenze" onchange="calcF4()"><option value="">— seleziona —</option><option>Entro tolleranza</option><option>Significative</option><option>Non verificato</option></select></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">4.2 · Scorte minime e punti di riordino</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Scorte minime definite</label><select id="f4-minime" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — per tutti gli articoli</option><option>Sì — solo articoli critici</option><option>In definizione</option><option>No</option></select></div>
+          <div class="form-group"><label>Punti di riordino attivati</label><select id="f4-riordino" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — automatici</option><option>Sì — manuali</option><option>In attivazione</option><option>No</option></select></div>
+          <div class="form-group"><label>Giacenza media magazzino (gg)</label><input type="number" id="f4-giacenza" placeholder="es. 30" oninput="calcF4()"></div>
+          <div class="form-group span-2"><label>Articoli critici / stock-out riscontrati</label><textarea id="f4-critici" placeholder="Elenca gli articoli con rischio rottura stock..." oninput="calcF4()"></textarea></div>
+          <div class="form-group"><label>Responsabile approvvigionamenti</label><input type="text" id="f4-resp" placeholder="es. Danilo Iacovone" oninput="calcF4()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">4.3 · Checklist</div>
+        <div class="checklist">
+          <label class="check-item" id="f4-c1"><input type="checkbox" onchange="toggleCheck('f4-c1');calcF4()"><span class="check-item-text">Censimento completo articoli magazzino</span></label>
+          <label class="check-item" id="f4-c2"><input type="checkbox" onchange="toggleCheck('f4-c2');calcF4()"><span class="check-item-text">Definizione scorte minime per categoria</span></label>
+          <label class="check-item" id="f4-c3"><input type="checkbox" onchange="toggleCheck('f4-c3');calcF4()"><span class="check-item-text">Attivazione punti di riordino su gestionale</span></label>
+          <label class="check-item" id="f4-c4"><input type="checkbox" onchange="toggleCheck('f4-c4');calcF4()"><span class="check-item-text">Pianificazione inventario ciclico</span></label>
+          <label class="check-item" id="f4-c5"><input type="checkbox" onchange="toggleCheck('f4-c5');calcF4()"><span class="check-item-text">Analisi differenze inventario e rettifiche</span></label>
+        </div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase4')">Salva Fase 4</button>
+        <button class="btn btn-ghost" onclick="showModule('fase3')">← Fase 3</button>
+        <button class="btn btn-ghost" onclick="showModule('fase5')">Fase 5 →</button>
+      </div>
+    </div>
+
+    <!-- FASE 5 — DIGITALIZZAZIONE (COMPLETA) -->
+    <div class="module" id="mod-fase5">
+      <div class="section-header"><h1>Fase 5 — Digitalizzazione ARCA Evolution</h1><p>Mappatura funzionalità, implementazione, KPI, formazione personale.</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f5-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f5-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">5.1 · Stato implementazione ARCA</div>
+        <div class="form-grid">
+          <div class="form-group"><label>ARCA Evolution installato</label><select id="f5-arca" onchange="calcF5()"><option value="">— seleziona —</option><option>Sì — operativo</option><option>Sì — in configurazione</option><option>In attesa</option><option>No</option></select></div>
+          <div class="form-group"><label>Moduli attivi</label><input type="text" id="f5-moduli" placeholder="es. Magazzino, Produzione, Vendite..." oninput="calcF5()"></div>
+          <div class="form-group"><label>Stato migrazione dati</label><select id="f5-migrazione" onchange="calcF5()"><option value="">— seleziona —</option><option>Completata</option><option>In corso</option><option>Da pianificare</option><option>Non necessaria</option></select></div>
+          <div class="form-group span-2"><label>Criticità implementazione</label><textarea id="f5-crit" placeholder="Problemi riscontrati, customizzazioni necessarie..." oninput="calcF5()"></textarea></div>
+          <div class="form-group"><label>Referente IT / consulente</label><input type="text" id="f5-it" placeholder="es. Consulente Rossi Srl" oninput="calcF5()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">5.2 · KPI e reportistica</div>
+        <div class="form-grid">
+          <div class="form-group"><label>KPI definiti</label><select id="f5-kpi-def" onchange="calcF5()"><option value="">— seleziona —</option><option>Sì — dashboard attiva</option><option>Sì — solo elenco</option><option>In definizione</option><option>No</option></select></div>
+          <div class="form-group"><label>Reportistica automatica</label><select id="f5-report" onchange="calcF5()"><option value="">— seleziona —</option><option>Sì — mensile</option><option>Sì — su richiesta</option><option>In configurazione</option><option>No</option></select></div>
+          <div class="form-group span-2"><label>KPI principali monitorati</label><textarea id="f5-kpi-list" placeholder="es. Rotazione scorte, tempi picking, esattezza inventario..." oninput="calcF5()"></textarea></div>
+          <div class="form-group"><label>Data go-live prevista</label><input type="date" id="f5-golive" onchange="calcF5()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">5.3 · Formazione digitale</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Formazione operatori completata</label><select id="f5-formazione" onchange="calcF5()"><option value="">— seleziona —</option><option>Sì — tutti</option><option>Parziale</option><option>Da pianificare</option><option>No</option></select></div>
+          <div class="form-group"><label>Manuali utente disponibili</label><select id="f5-manuali" onchange="calcF5()"><option value="">— seleziona —</option><option>Sì — cartacei e digitali</option><option>Solo digitali</option><option>In stesura</option><option>No</option></select></div>
+          <div class="form-group span-2"><label>Note formazione</label><textarea id="f5-form-note" placeholder="Sessioni svolte, operatori formati, argomenti..." oninput="calcF5()"></textarea></div>
+        </div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase5')">Salva Fase 5</button>
+        <button class="btn btn-ghost" onclick="showModule('fase4')">← Fase 4</button>
+        <button class="btn btn-ghost" onclick="showModule('fase6')">Fase 6 →</button>
+      </div>
+    </div>
+
+    <!-- FASE 6 — PERSONALE & SOP (COMPLETA) -->
+    <div class="module" id="mod-fase6">
+      <div class="section-header"><h1>Fase 6 — Personale e SOP</h1><p>Struttura operativa, interfacce interne, procedure standard scritte.</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Completamento sezione</span><span id="f6-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="f6-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">6.1 · Struttura operativa</div>
+        <div class="form-grid">
+          <div class="form-group"><label>N° operatori magazzino</label><input type="number" id="f6-n-operatori" placeholder="es. 3" oninput="calcF6()"></div>
+          <div class="form-group"><label>Responsabile magazzino</label><input type="text" id="f6-resp-mag" placeholder="es. Danilo Iacovone" oninput="calcF6()"></div>
+          <div class="form-group"><label>Turni copertura</label><input type="text" id="f6-turni" placeholder="es. 1 turno, 6-14 / 14-22" oninput="calcF6()"></div>
+          <div class="form-group span-2"><label>Mansioni e competenze</label><textarea id="f6-mansioni" placeholder="Descrivi le figure: magazziniere, addetto picking, addetto ricevimento..." oninput="calcF6()"></textarea></div>
+          <div class="form-group"><label>Organigramma aggiornato</label><select id="f6-org" onchange="calcF6()"><option value="">— seleziona —</option><option>Sì</option><option>No</option></select></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">6.2 · Procedure standard (SOP)</div>
+        <div class="form-grid">
+          <div class="form-group"><label>SOP Ricezione merci</label><select id="f6-sop-ricezione" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group"><label>SOP Stoccaggio e picking</label><select id="f6-sop-picking" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group"><label>SOP Spedizione</label><select id="f6-sop-sped" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group"><label>SOP Gestione rifiuti</label><select id="f6-sop-rifiuti" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group"><label>SOP Inventario</label><select id="f6-sop-inv" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group"><label>SOP Uso DPI</label><select id="f6-sop-dpi" onchange="calcF6()"><option value="">— seleziona —</option><option>Redatta e approvata</option><option>In redazione</option><option>Da redigere</option></select></div>
+          <div class="form-group span-2"><label>Repository SOP (cartaceo/digitale)</label><input type="text" id="f6-repo" placeholder="es. Cartella condivisa / Qualita / SOP-2026" oninput="calcF6()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">6.3 · Formazione e autorizzazioni</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Formazione generale sicurezza</label><select id="f6-form-sic" onchange="calcF6()"><option value="">— seleziona —</option><option>Tutti aggiornati</option><option>Parziale</option><option>Scaduta</option><option>Non effettuata</option></select></div>
+          <div class="form-group"><label>Patentini muletto</label><input type="text" id="f6-patentini" placeholder="es. 2 operatori certificati" oninput="calcF6()"></div>
+          <div class="form-group"><label>Formazione specifica magazzino</label><select id="f6-form-mag" onchange="calcF6()"><option value="">— seleziona —</option><option>Completata</option><option>In programma</option><option>Da pianificare</option></select></div>
+          <div class="form-group span-2"><label>Note formazione e autorizzazioni</label><textarea id="f6-form-note" placeholder="Corsi svolti, scadenze, certificazioni..." oninput="calcF6()"></textarea></div>
+        </div>
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveModule('fase6')">Salva Fase 6</button>
+        <button class="btn btn-ghost" onclick="showModule('fase5')">← Fase 5</button>
+      </div>
+    </div>
 
     <!-- MEZZI -->
     <div class="module" id="mod-mezzi">
@@ -495,38 +713,182 @@ function showModule(id) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(btn => { if(btn.getAttribute('onclick')&&btn.getAttribute('onclick').includes("'"+id+"'")) btn.classList.add('active'); });
   document.getElementById('breadcrumb').innerHTML = '<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
+  // Aggiorna progress dashboard quando si naviga
+  if(id==='dashboard') updateDashboardStats();
 }
 
-function toggleCheck(id) { const el=document.getElementById(id); if(el) el.classList.toggle('checked'); }
+function toggleCheck(id) {
+  const el=document.getElementById(id);
+  if(el) {
+    const cb = el.querySelector('input[type="checkbox"]');
+    if(cb && document.activeElement !== cb) {
+      cb.checked = !cb.checked;
+    }
+    el.classList.toggle('checked', cb ? cb.checked : false);
+  }
+}
+
+function calcProgress(moduleId, fields, pctId, fillId) {
+  let filled = 0;
+  let total = fields.length;
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (!el) return;
+    if (el.type === 'checkbox') {
+      if (el.checked) filled++;
+    } else if (el.tagName === 'SELECT') {
+      if (el.value && el.value.trim() !== '') filled++;
+    } else {
+      if (el.value && el.value.trim() !== '') filled++;
+    }
+  });
+  const pct = total ? Math.round((filled / total) * 100) : 0;
+  const pctEl = document.getElementById(pctId);
+  const fillEl = document.getElementById(fillId);
+  if(pctEl) pctEl.textContent = pct + '%';
+  if(fillEl) fillEl.style.width = pct + '%';
+  return pct;
+}
 
 function calcF0() {
-  const fields=['f0-ragione','f0-sede','f0-ateco','f0-dip','f0-ccnl','f0-data','f0-attivita','f0-mq','f0-portoni','f0-saldatura','f0-laser','f0-planimetria','f0-gestionale','f0-note'];
-  let filled=0;
-  fields.forEach(f=>{ const el=document.getElementById(f); if(el&&el.value&&el.value.trim()!='') filled++; });
-  const pct=Math.round((filled/fields.length)*100);
-  document.getElementById('f0-pct').textContent=pct+'%';
-  document.getElementById('f0-fill').style.width=pct+'%';
+  const fields = ['f0-ragione','f0-sede','f0-ateco','f0-dip','f0-ccnl','f0-data','f0-attivita','f0-mq','f0-portoni','f0-saldatura','f0-laser','f0-planimetria','f0-gestionale','f0-note'];
+  const checkboxes = ['ci-1','ci-2','ci-3','ci-4','ci-5','ci-6','ci-7','ci-8'];
+  let filled = 0;
+  fields.forEach(f => { const el = document.getElementById(f); if(el && el.value && el.value.trim() !== '') filled++; });
+  checkboxes.forEach(id => { const el = document.getElementById(id); if(el && el.querySelector('input').checked) filled++; });
+  const total = fields.length + checkboxes.length;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('f0-pct').textContent = pct + '%';
+  document.getElementById('f0-fill').style.width = pct + '%';
+  document.getElementById('bar-fase0').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function calcF1() {
+  const fields = ['f1-scaffali','f1-nscaffali','f1-hscaffali','f1-box','f1-zona-in','f1-zona-out','f1-layout-desc','f1-layout-file','f1-abc','f1-codifica','f1-etichette','f1-segnaletica','f1-note-abc','f1-mappa','f1-note'];
+  const checks = ['f1-c1','f1-c2','f1-c3','f1-c4','f1-c5','f1-c6'];
+  let filled = 0;
+  fields.forEach(f => { const el = document.getElementById(f); if(el && el.value && el.value.trim() !== '') filled++; });
+  checks.forEach(id => { const el = document.getElementById(id); if(el && el.querySelector('input').checked) filled++; });
+  const total = fields.length + checks.length;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('f1-pct').textContent = pct + '%';
+  document.getElementById('f1-fill').style.width = pct + '%';
+  document.getElementById('bar-fase1').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function calcF3() {
+  const fields = ['f3-ricezione','f3-verifica','f3-buffer','f3-ricezione-note','f3-resp-ricezione','f3-mov-strumenti','f3-percorsi','f3-priorita','f3-flusso-note','f3-tracciabilita','f3-spedizione','f3-uscita','f3-imballaggi','f3-sped-note','f3-fornitori'];
+  const pct = calcProgress('fase3', fields, 'f3-pct', 'f3-fill');
+  document.getElementById('bar-fase3').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function calcF4() {
+  const fields = ['f4-inventario','f4-data-inv','f4-freq','f4-metodo','f4-differenze','f4-minime','f4-riordino','f4-giacenza','f4-critici','f4-resp'];
+  const checks = ['f4-c1','f4-c2','f4-c3','f4-c4','f4-c5'];
+  let filled = 0;
+  fields.forEach(f => { const el = document.getElementById(f); if(el && el.value && el.value.trim() !== '') filled++; });
+  checks.forEach(id => { const el = document.getElementById(id); if(el && el.querySelector('input').checked) filled++; });
+  const total = fields.length + checks.length;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('f4-pct').textContent = pct + '%';
+  document.getElementById('f4-fill').style.width = pct + '%';
+  document.getElementById('bar-fase4').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function calcF5() {
+  const fields = ['f5-arca','f5-moduli','f5-migrazione','f5-crit','f5-it','f5-kpi-def','f5-report','f5-kpi-list','f5-golive','f5-formazione','f5-manuali','f5-form-note'];
+  const pct = calcProgress('fase5', fields, 'f5-pct', 'f5-fill');
+  document.getElementById('bar-fase5').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function calcF6() {
+  const fields = ['f6-n-operatori','f6-resp-mag','f6-turni','f6-mansioni','f6-org','f6-sop-ricezione','f6-sop-picking','f6-sop-sped','f6-sop-rifiuti','f6-sop-inv','f6-sop-dpi','f6-repo','f6-form-sic','f6-patentini','f6-form-mag','f6-form-note'];
+  const pct = calcProgress('fase6', fields, 'f6-pct', 'f6-fill');
+  document.getElementById('bar-fase6').style.width = pct + '%';
+  updateDashboardStats();
+}
+
+function updateDashboardStats() {
+  // Calcola media progressi fasi
+  const p0 = parseInt(document.getElementById('f0-pct')?.textContent || '0');
+  const p1 = parseInt(document.getElementById('f1-pct')?.textContent || '0');
+  const p2 = parseInt(document.getElementById('f2-pct')?.textContent || '0') || 45; // default fase2
+  const p3 = parseInt(document.getElementById('f3-pct')?.textContent || '0');
+  const p4 = parseInt(document.getElementById('f4-pct')?.textContent || '0');
+  const p5 = parseInt(document.getElementById('f5-pct')?.textContent || '0');
+  const p6 = parseInt(document.getElementById('f6-pct')?.textContent || '0');
+  const avg = Math.round((p0 + p1 + p2 + p3 + p4 + p5 + p6) / 6);
+  const globalEl = document.getElementById('dash-global');
+  if(globalEl) globalEl.textContent = avg + '%';
+
+  // Conta fasi completate (>90%)
+  const completed = [p0,p1,p2,p3,p4,p5,p6].filter(p => p >= 90).length;
+  const fasiEl = document.getElementById('dash-fasi');
+  if(fasiEl) fasiEl.textContent = completed + ' / 6';
+
+  // Conta checklist sicurezza
+  let sChecked = 0;
+  for(let i=1;i<=9;i++) {
+    const el = document.getElementById('s-'+i);
+    if(el && el.querySelector('input').checked) sChecked++;
+  }
+  const checkEl = document.getElementById('dash-checklist');
+  if(checkEl) checkEl.textContent = sChecked + ' / 9';
 }
 
 function saveModule(name) {
   const data={};
   document.querySelectorAll('#mod-'+name+' input, #mod-'+name+' select, #mod-'+name+' textarea').forEach(el=>{ if(el.id) data[el.id]=el.type==='checkbox'?el.checked:el.value; });
-  try { localStorage.setItem('dce-'+name,JSON.stringify(data)); showToast('Fase salvata'); } catch(e) { showToast('Errore salvataggio'); }
+  try { localStorage.setItem('dce-'+name,JSON.stringify(data)); showToast(name==='fase0'?'Fase 0 salvata':name==='fase1'?'Fase 1 salvata':name==='fase2'?'Fase 2 salvata':name==='fase3'?'Fase 3 salvata':name==='fase4'?'Fase 4 salvata':name==='fase5'?'Fase 5 salvata':name==='fase6'?'Fase 6 salvata':'Salvato'); } catch(e) { showToast('Errore salvataggio'); }
+  // Cloud sync
+  if(typeof saveToCloud === 'function') saveToCloud(name,data);
 }
 
 function loadModule(name) {
   try {
     const saved=localStorage.getItem('dce-'+name); if(!saved) return;
     const data=JSON.parse(saved);
-    Object.entries(data).forEach(([id,val])=>{ const el=document.getElementById(id); if(!el) return; if(el.type==='checkbox'){el.checked=val;if(val&&el.closest('.check-item'))toggleCheck(el.closest('.check-item').id);}else el.value=val; });
+    Object.entries(data).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox'){
+        el.checked=val;
+        const item = el.closest('.check-item');
+        if(item) item.classList.toggle('checked', val);
+      } else {
+        el.value=val;
+      }
+    });
+    // Ricalcola progresso dopo caricamento
+    if(name==='fase0') setTimeout(calcF0,0);
+    if(name==='fase1') setTimeout(calcF1,0);
+    if(name==='fase3') setTimeout(calcF3,0);
+    if(name==='fase4') setTimeout(calcF4,0);
+    if(name==='fase5') setTimeout(calcF5,0);
+    if(name==='fase6') setTimeout(calcF6,0);
   } catch(e) {}
 }
 
-function saveAll() { saveModule('fase0'); saveModule('fase2'); showToast('Tutto salvato'); }
+function saveAll() {
+  ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(saveModule);
+  saveCharter();
+  showToast('Tutto salvato');
+}
 
 function exportData() {
   const all={};
-  ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(f=>{ try{all[f]=JSON.parse(localStorage.getItem('dce-'+f)||'{}');}catch(e){} });
+  ['fase0','fase1','fase2','fase3','fase4','fase5','fase6','charter'].forEach(f=>{
+    try{all[f]=JSON.parse(localStorage.getItem('dce-'+f)||'{}');}catch(e){}
+  });
+  // Aggiungi mezzi
+  try{ all.mezzi = JSON.parse(localStorage.getItem('dce-mezzi')||'[]'); }catch(e){}
+  try{ all.interventi = JSON.parse(localStorage.getItem('dce-interventi')||'[]'); }catch(e){}
+  try{ all.assegnazioni = JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]'); }catch(e){}
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='DCE_dati_'+new Date().toISOString().split('T')[0]+'.json'; a.click();
   showToast('Dati esportati');
@@ -537,7 +899,14 @@ function showToast(msg) {
   t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-function updateCerStatus(sel) { sel.style.color=sel.value==='Fatto'?'var(--green)':sel.value==='In corso'?'var(--accent)':'var(--text2)'; }
+function updateCerStatus(sel) {
+  sel.style.color = sel.value==='Fatto'?'var(--green)':sel.value==='In corso'?'var(--accent)':'var(--text2)';
+  // Ricalcola progresso fase2 in base ai CER
+  let cerDone = 0;
+  document.querySelectorAll('.cer-status').forEach(s => { if(s.value === 'Fatto') cerDone++; });
+  const cerPct = Math.round((cerDone / 6) * 100);
+  document.getElementById('bar-fase2').style.width = Math.max(45, cerPct) + '%';
+}
 
 // ============ CHARTER ============
 function saveCharter() {
@@ -553,16 +922,31 @@ function saveCharter() {
       document.getElementById('ch-firma-resp').textContent=document.getElementById('ch-responsabile').value||'___________________________';
     }
     showToast('Project Charter salvato');
+    if(typeof saveToCloud === 'function') saveToCloud('charter',data);
   } catch(e) { showToast('Errore salvataggio'); }
 }
 
 function loadCharter() {
   try {
     const saved=JSON.parse(localStorage.getItem('dce-charter')||'{}');
-    Object.entries(saved).forEach(([id,val])=>{ const el=document.getElementById(id); if(!el) return; if(el.type==='checkbox'){el.checked=val;if(val&&el.closest('.check-item'))toggleCheck(el.closest('.check-item').id);}else el.value=val; });
+    Object.entries(saved).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox'){
+        el.checked=val;
+        const item = el.closest('.check-item');
+        if(item) item.classList.toggle('checked', val);
+      } else {
+        el.value=val;
+      }
+    });
     const nome=document.getElementById('ch-approv-nome')?.value;
     const dataA=document.getElementById('ch-approv-data')?.value;
-    if(nome&&dataA) { const fmt=new Date(dataA).toLocaleDateString('it-IT'); document.getElementById('ch-approv-status').innerHTML=`<span style="color:var(--green)">✓ Approvato da ${nome} in data ${fmt}</span>`; }
+    if(nome&&dataA) {
+      const fmt=new Date(dataA).toLocaleDateString('it-IT');
+      const statusEl = document.getElementById('ch-approv-status');
+      if(statusEl) statusEl.innerHTML=`<span style="color:var(--green)">✓ Approvato da ${nome} in data ${fmt}</span>`;
+    }
   } catch(e) {}
 }
 
@@ -774,9 +1158,11 @@ let currentUser=null;
 async function sbFetch(path,method='GET',body=null,extra={}) {
   const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=representation',...extra};
   const opts={method,headers}; if(body) opts.body=JSON.stringify(body);
-  const res=await fetch(SUPABASE_URL+path,opts);
-  if(!res.ok) { const err=await res.text(); throw new Error(err); }
-  const text=await res.text(); return text?JSON.parse(text):[];
+  try {
+    const res=await fetch(SUPABASE_URL+path,opts);
+    if(!res.ok) { const err=await res.text(); throw new Error(err); }
+    const text=await res.text(); return text?JSON.parse(text):[];
+  } catch(e) { console.warn('Supabase fetch error:',e); return []; }
 }
 
 async function ensureUser(email,nome,ruolo,password) {
@@ -788,6 +1174,9 @@ async function ensureUser(email,nome,ruolo,password) {
 
 async function setupAdmin() {
   await ensureUser('danilo@dcecarpenteria.it','Danilo Iacovone','admin','DCE2024admin!');
+  await ensureUser('domingo@dcecarpenteria.it','Domingo','operatore','Asia2026Toto!');
+  await ensureUser('claudia@dcecarpenteria.it','Claudia','operatore','Toto2026Asia!');
+  await ensureUser('guest1@dce.it','Guest','guest','DCEguest1!');
 }
 
 async function doLogin() {
@@ -826,6 +1215,7 @@ async function auditLog(azione,sezione,dettaglio='') {
 }
 
 async function saveToCloud(sezione,dati) {
+  if(!currentUser) return;
   try {
     await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser?.nome||'sistema',updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});
     await auditLog('salvataggio',sezione,'Dati sezione "'+sezione+'" aggiornati');
@@ -837,35 +1227,32 @@ async function loadFromCloud(sezione) {
 }
 
 async function loadAllFromCloud() {
+  if(!currentUser) return;
   try {
-    const charter=await loadFromCloud('charter');
-    if(charter) Object.entries(charter).forEach(([id,val])=>{ const el=document.getElementById(id); if(!el) return; if(el.type==='checkbox'){el.checked=val;if(val&&el.closest('.check-item'))toggleCheck(el.closest('.check-item').id);}else el.value=val; });
-    const f0=await loadFromCloud('fase0');
-    if(f0) Object.entries(f0).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
-    const f2=await loadFromCloud('fase2');
-    if(f2) Object.entries(f2).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+    // Load all phases
+    for(const phase of ['charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6']) {
+      const data = await loadFromCloud(phase);
+      if(data) {
+        Object.entries(data).forEach(([id,val])=>{
+          const el=document.getElementById(id);
+          if(!el) return;
+          if(el.type==='checkbox'){
+            el.checked=val;
+            const item = el.closest('.check-item');
+            if(item) item.classList.toggle('checked', val);
+          } else {
+            el.value=val;
+          }
+        });
+      }
+    }
     const mezziRows=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc'); mezziDB=mezziRows.map(r=>r.dati);
     const intRows=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc'); interventiDB=intRows.map(r=>r.dati);
     const assRows=await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc'); assegnazioniDB=assRows.map(r=>r.dati);
-    calcF0(); renderMezzi(); renderInterventi(); renderAssegnazioni(); renderAlerts();
+    // Ricalcola tutti i progressi
+    setTimeout(()=>{ calcF0(); calcF1(); calcF3(); calcF4(); calcF5(); calcF6(); renderMezzi(); renderInterventi(); renderAssegnazioni(); renderAlerts(); updateDashboardStats(); }, 100);
   } catch(e) { console.warn('Load error:',e); }
 }
-
-const _origSaveModule=saveModule;
-window.saveModule=async function(name) {
-  _origSaveModule(name);
-  const data={};
-  document.querySelectorAll('#mod-'+name+' input,#mod-'+name+' select,#mod-'+name+' textarea').forEach(el=>{ if(el.id) data[el.id]=el.type==='checkbox'?el.checked:el.value; });
-  await saveToCloud(name,data);
-};
-
-const _origSaveCharter=saveCharter;
-window.saveCharter=async function() {
-  _origSaveCharter();
-  const data={};
-  document.querySelectorAll('#mod-charter input,#mod-charter select,#mod-charter textarea').forEach(el=>{ if(el.id) data[el.id]=el.type==='checkbox'?el.checked:el.value; });
-  await saveToCloud('charter',data);
-};
 
 async function showAuditLog() {
   if(currentUser?.ruolo!=='admin') { showToast('Accesso riservato all\'amministratore'); return; }
@@ -896,9 +1283,17 @@ window.addEventListener('load',async()=>{
     document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
     await loadAllFromCloud();
   }
-  loadCharter(); loadModule('fase0'); loadModule('fase2');
+  loadCharter();
+  loadModule('fase0');
+  loadModule('fase1');
+  loadModule('fase2');
+  loadModule('fase3');
+  loadModule('fase4');
+  loadModule('fase5');
+  loadModule('fase6');
   loadMezziDB(); loadAssegnazioniDB();
-  renderMezzi(); renderInterventi(); renderAssegnazioni(); renderAlerts(); calcF0();
+  renderMezzi(); renderInterventi(); renderAssegnazioni(); renderAlerts();
+  updateDashboardStats();
 });
 </script>
 </body>
