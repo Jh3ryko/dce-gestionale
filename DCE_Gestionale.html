@@ -110,6 +110,7 @@
   #app { display:none; flex:1; overflow:hidden; }
   @media print { .sidebar,.topbar,.btn,.actions-bar,.toast,#login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -916,11 +917,11 @@ const SUPABASE_URL='https://oejkxzxnqhyiwchqsdmh.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
 let sb=null, currentUser=null, currentSession=null;
 
-// Inizializza client Supabase
-async function initSupabase(){
+function initSupabase(){
   if(sb) return;
-  const mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-  sb=mod.createClient(SUPABASE_URL,SUPABASE_ANON,{auth:{persistSession:true,autoRefreshToken:true}});
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON,{
+    auth:{persistSession:true,autoRefreshToken:true,storageKey:'dce-auth'}
+  });
 }
 
 // Helper fetch autenticato con JWT
@@ -937,8 +938,7 @@ async function sbFetch(path,method='GET',body=null,extra={}){
 
 // LOGIN con Supabase Auth nativo
 async function doLogin(){
-  await initSupabase();
-  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  initSupabase();
   const pass=document.getElementById('login-pass').value;
   const errEl=document.getElementById('login-error');
   errEl.textContent='';
@@ -968,7 +968,7 @@ async function doLogin(){
 
 // LOGOUT
 async function doLogout(){
-  await initSupabase();
+  initSupabase();
   await sb.auth.signOut();
   sessionStorage.removeItem('dce-user');
   currentUser=null;currentSession=null;
@@ -1038,7 +1038,7 @@ function closeAuditModal(){document.getElementById('audit-modal').style.display=
 
 // INIT
 window.addEventListener('load',async()=>{
-  await initSupabase();
+  initSupabase();
   // Controlla sessione esistente
   const {data:{session}}=await sb.auth.getSession();
   if(session){
