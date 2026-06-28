@@ -110,7 +110,7 @@
   #app { display:none; flex:1; overflow:hidden; }
   @media print { .sidebar,.topbar,.btn,.actions-bar,.toast,#login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -938,20 +938,24 @@ async function sbFetch(path,method='GET',body=null,extra={}){
 
 // LOGIN con Supabase Auth nativo
 async function doLogin(){
-  initSupabase();
-  const pass=document.getElementById('login-pass').value;
   const errEl=document.getElementById('login-error');
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
   errEl.textContent='';
   if(!email||!pass){errEl.textContent='Compila email e password.';return;}
+  if(!window.supabase){errEl.textContent='Errore: libreria non caricata. Ricarica la pagina.';return;}
+  if(!sb){errEl.textContent='Errore: client non inizializzato. Ricarica la pagina.';return;}
+  errEl.style.color='var(--text2)';
+  errEl.textContent='Accesso in corso...';
   try{
     const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error){
-      if(error.message.includes('Invalid login')||error.message.includes('invalid'))errEl.textContent='Email o password errati.';
-      else errEl.textContent='Errore: '+error.message;
+      errEl.style.color='var(--red)';
+      errEl.textContent=error.message.includes('Invalid')?'Email o password errati.':'Errore: '+error.message;
       return;
     }
+    errEl.textContent='';
     currentSession=data.session;
-    // Carica profilo
     const profile=await sbFetch('/rest/v1/profiles?id=eq.'+data.user.id+'&select=nome,ruolo');
     const nome=profile.length?profile[0].nome:data.user.email.split('@')[0];
     const ruolo=profile.length?profile[0].ruolo:'viewer';
@@ -963,7 +967,11 @@ async function doLogin(){
     document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
     await loadAllFromCloud();
     showToast('Benvenuto '+nome+'!');
-  }catch(e){errEl.textContent='Errore di connessione. Riprova.';console.error(e);}
+  }catch(e){
+    errEl.style.color='var(--red)';
+    errEl.textContent='Errore: '+e.message;
+    console.error('doLogin error:',e);
+  }
 }
 
 // LOGOUT
