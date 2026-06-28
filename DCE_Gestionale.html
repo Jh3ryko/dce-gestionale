@@ -911,66 +911,104 @@ function renderAssegnazioni(){
   el.innerHTML='<table class="data-table" style="margin-top:8px"><thead><tr><th>Mezzo</th><th>Assegnato a</th><th>Tipo</th><th>Dal</th><th>Al</th><th>Km</th><th>Note</th></tr></thead><tbody>'+[...assegnazioniDB].reverse().map(a=>'<tr><td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">'+a.targa+'</span></td><td style="font-weight:500;color:var(--text)">'+a.nome+'</td><td><span class="tag tag-blue" style="font-size:10px">'+a.tipo+'</span></td><td>'+(a.inizio?new Date(a.inizio).toLocaleDateString('it-IT'):'—')+'</td><td>'+(a.fine?new Date(a.fine).toLocaleDateString('it-IT'):'<span style="color:var(--green)">in corso</span>')+'</td><td>'+(a.km?a.km+' km':'—')+'</td><td style="color:var(--text3)">'+(a.note||'—')+'</td></tr>').join('')+'</tbody></table>';
 }
 
-// SUPABASE
+// SUPABASE — Auth nativo con JWT sicuro
 const SUPABASE_URL='https://oejkxzxnqhyiwchqsdmh.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
-let currentUser=null;
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
+let sb=null, currentUser=null, currentSession=null;
 
+// Inizializza client Supabase
+async function initSupabase(){
+  if(sb) return;
+  const mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  sb=mod.createClient(SUPABASE_URL,SUPABASE_ANON,{auth:{persistSession:true,autoRefreshToken:true}});
+}
+
+// Helper fetch autenticato con JWT
 async function sbFetch(path,method='GET',body=null,extra={}){
-  const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=representation',...extra};
+  const token=currentSession?.access_token||SUPABASE_ANON;
+  const headers={'apikey':SUPABASE_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation',...extra};
   const opts={method,headers};if(body)opts.body=JSON.stringify(body);
-  try{const res=await fetch(SUPABASE_URL+path,opts);if(!res.ok){const err=await res.text();throw new Error(err);}const text=await res.text();return text?JSON.parse(text):[];}
-  catch(e){console.warn('sbFetch error:',e);return [];}
-}
-
-async function ensureUser(email,nome,ruolo,password){
-  try{const ex=await sbFetch('/rest/v1/utenti?email=eq.'+encodeURIComponent(email)+'&select=id');if(!ex.length)await sbFetch('/rest/v1/utenti','POST',{email,nome,ruolo,password_hash:password});}
-  catch(e){console.warn('Setup user error:',email,e);}
-}
-
-async function setupAdmin(){
-  await ensureUser('danilo@dcecarpenteria.it','Danilo Iacovone','admin','DCE2024admin!');
-  await ensureUser('domingo@dcecarpenteria.it','Domingo','operatore','Asia2026Toto!');
-  await ensureUser('claudia@dcecarpenteria.it','Claudia','operatore','Toto2026Asia!');
-  await ensureUser('guest1@dce.it','Guest','guest','DCEguest1!');
-}
-
-async function doLogin(){
-  const email=document.getElementById('login-email').value.trim().toLowerCase(),pass=document.getElementById('login-pass').value,errEl=document.getElementById('login-error');
-  errEl.textContent='';if(!email||!pass){errEl.textContent='Compila email e password.';return;}
   try{
-    const rows=await sbFetch('/rest/v1/utenti?email=eq.'+encodeURIComponent(email)+'&select=*');
-    if(!rows.length){errEl.textContent='Utente non trovato.';return;}
-    const u=rows[0];if(u.password_hash!==pass){errEl.textContent='Password errata.';return;}
-    currentUser={email:u.email,nome:u.nome,ruolo:u.ruolo};
+    const res=await fetch(SUPABASE_URL+path,opts);
+    if(!res.ok){const err=await res.text();throw new Error(err);}
+    const text=await res.text();return text?JSON.parse(text):[];
+  }catch(e){console.warn('sbFetch error:',e);return[];}
+}
+
+// LOGIN con Supabase Auth nativo
+async function doLogin(){
+  await initSupabase();
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='Compila email e password.';return;}
+  try{
+    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){
+      if(error.message.includes('Invalid login')||error.message.includes('invalid'))errEl.textContent='Email o password errati.';
+      else errEl.textContent='Errore: '+error.message;
+      return;
+    }
+    currentSession=data.session;
+    // Carica profilo
+    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+data.user.id+'&select=nome,ruolo');
+    const nome=profile.length?profile[0].nome:data.user.email.split('@')[0];
+    const ruolo=profile.length?profile[0].ruolo:'viewer';
+    currentUser={email:data.user.email,nome,ruolo,id:data.user.id};
     sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
-    await auditLog('login','sistema','Accesso effettuato da '+u.nome+' ('+u.ruolo+')');
+    await auditLog('login','sistema','Accesso da '+nome+' ('+ruolo+')');
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=u.nome+' · '+u.ruolo;
+    document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
     await loadAllFromCloud();
-    showToast('Benvenuto '+u.nome+'!');
+    showToast('Benvenuto '+nome+'!');
   }catch(e){errEl.textContent='Errore di connessione. Riprova.';console.error(e);}
 }
 
-function doLogout(){sessionStorage.removeItem('dce-user');currentUser=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('login-email').value='';document.getElementById('login-pass').value='';}
-
-async function auditLog(azione,sezione,dettaglio=''){if(!currentUser)return;try{await sbFetch('/rest/v1/audit_log','POST',{utente_email:currentUser.email,utente_nome:currentUser.nome,azione,sezione,dettaglio});}catch(e){console.warn('Audit log error:',e);}}
-
-async function saveToCloud(sezione,dati){
-  if(!currentUser)return;
-  try{await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});await auditLog('salvataggio',sezione,'Dati sezione "'+sezione+'" aggiornati');}
-  catch(e){console.warn('Cloud save error:',e);}
+// LOGOUT
+async function doLogout(){
+  await initSupabase();
+  await sb.auth.signOut();
+  sessionStorage.removeItem('dce-user');
+  currentUser=null;currentSession=null;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
 }
 
-async function loadFromCloud(sezione){try{const rows=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati');return rows.length?rows[0].dati:null;}catch(e){return null;}}
+// AUDIT LOG
+async function auditLog(azione,sezione,dettaglio=''){
+  if(!currentUser)return;
+  try{await sbFetch('/rest/v1/audit_log','POST',{utente_email:currentUser.email,utente_nome:currentUser.nome,azione,sezione,dettaglio});}
+  catch(e){console.warn('Audit log error:',e);}
+}
+
+// CLOUD SAVE
+async function saveToCloud(sezione,dati){
+  if(!currentUser)return;
+  try{
+    await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});
+    await auditLog('salvataggio',sezione,'Sezione "'+sezione+'" aggiornata');
+  }catch(e){console.warn('Cloud save error:',e);}
+}
+
+async function loadFromCloud(sezione){
+  try{const rows=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati');return rows.length?rows[0].dati:null;}
+  catch(e){return null;}
+}
 
 async function loadAllFromCloud(){
   if(!currentUser)return;
   try{
     for(const phase of['charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6']){
       const data=await loadFromCloud(phase);if(!data)continue;
-      Object.entries(data).forEach(([id,val])=>{const el=document.getElementById(id);if(!el)return;if(el.type==='checkbox'){el.checked=val;const item=el.closest('.check-item');if(item)item.classList.toggle('checked',val);}else el.value=val;});
+      Object.entries(data).forEach(([id,val])=>{
+        const el=document.getElementById(id);if(!el)return;
+        if(el.type==='checkbox'){el.checked=val;const item=el.closest('.check-item');if(item)item.classList.toggle('checked',val);}
+        else el.value=val;
+      });
     }
     const mezziRows=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');mezziDB=mezziRows.map(r=>r.dati).filter(Boolean);
     const intRows=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');interventiDB=intRows.map(r=>r.dati).filter(Boolean);
@@ -979,11 +1017,19 @@ async function loadAllFromCloud(){
   }catch(e){console.warn('Load error:',e);}
 }
 
+// AUDIT LOG VIEWER
 async function showAuditLog(){
   if(currentUser?.ruolo!=='admin'){showToast("Accesso riservato all'amministratore");return;}
   try{
     const rows=await sbFetch('/rest/v1/audit_log?select=*&order=created_at.desc&limit=100');
-    document.getElementById('audit-body').innerHTML=rows.length?rows.map(r=>'<tr><td style="white-space:nowrap;font-size:11px">'+new Date(r.created_at).toLocaleString('it-IT')+'</td><td style="font-weight:500;color:var(--text)">'+(r.utente_nome||'—')+'</td><td><span class="tag tag-gray" style="font-size:10px">'+(r.utente_email||'—')+'</span></td><td><span class="tag '+(r.azione==='login'?'tag-green':r.azione==='salvataggio'?'tag-blue':'tag-gray')+'" style="font-size:10px">'+r.azione+'</span></td><td style="color:var(--text2)">'+(r.sezione||'—')+'</td><td style="color:var(--text3);font-size:12px">'+(r.dettaglio||'—')+'</td></tr>').join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nessuna attività registrata</td></tr>';
+    document.getElementById('audit-body').innerHTML=rows.length?rows.map(r=>`<tr>
+      <td style="white-space:nowrap;font-size:11px">${new Date(r.created_at).toLocaleString('it-IT')}</td>
+      <td style="font-weight:500;color:var(--text)">${r.utente_nome||'—'}</td>
+      <td><span class="tag tag-gray" style="font-size:10px">${r.utente_email||'—'}</span></td>
+      <td><span class="tag ${r.azione==='login'?'tag-green':r.azione==='salvataggio'?'tag-blue':'tag-gray'}" style="font-size:10px">${r.azione}</span></td>
+      <td style="color:var(--text2)">${r.sezione||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${r.dettaglio||'—'}</td>
+    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nessuna attività</td></tr>';
     document.getElementById('audit-modal').style.display='flex';
   }catch(e){showToast('Errore caricamento log');}
 }
@@ -992,13 +1038,19 @@ function closeAuditModal(){document.getElementById('audit-modal').style.display=
 
 // INIT
 window.addEventListener('load',async()=>{
-  setupAdmin().catch(e=>console.warn('setupAdmin:',e));
-  const saved=sessionStorage.getItem('dce-user');
-  if(saved){
-    currentUser=JSON.parse(saved);
+  await initSupabase();
+  // Controlla sessione esistente
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentSession=session;
+    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+session.user.id+'&select=nome,ruolo');
+    const nome=profile.length?profile[0].nome:session.user.email.split('@')[0];
+    const ruolo=profile.length?profile[0].ruolo:'viewer';
+    currentUser={email:session.user.email,nome,ruolo,id:session.user.id};
+    sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
+    document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
     loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
   }
   loadCharter();
