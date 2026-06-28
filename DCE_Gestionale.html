@@ -151,9 +151,9 @@
     <div class="sidebar-section-label">Fasi del progetto</div>
     <button class="nav-item" onclick="showModule('fase0')"><span class="nav-dot" style="background:#9a9890"></span>Fase 0 — Fotografia iniziale<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 1 — Magazzino<span class="nav-badge tag-orange">attiva</span></button>
-    <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 2 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
+    <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Scorte<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase3')"><span class="nav-dot" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-gray">prossima</span></button>
-    <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 4 — Scorte<span class="nav-badge tag-gray">prossima</span></button>
+    <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 4 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase5')"><span class="nav-dot" style="background:#b55a4a"></span>Fase 5 — Digitalizzazione<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase6')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 6 — Personale & SOP<span class="nav-badge tag-gray">prossima</span></button>
   </div>
@@ -190,9 +190,9 @@
       <div class="phases-grid">
         <div class="phase-card in-progress" onclick="showModule('fase0')"><div class="phase-num" style="color:var(--text3)">Fase 0</div><div class="phase-title">Fotografia iniziale</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase0" style="width:0%;background:var(--text3)"></div></div></div>
         <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Riorganizzazione magazzino</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase1" style="width:0%;background:var(--green)"></div></div></div>
-        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--blue)">Fase 2</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:0%;background:var(--blue)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--purple)">Fase 2</div><div class="phase-title">Scorte e inventario</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:0%;background:var(--purple)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase3')"><div class="phase-num" style="color:var(--accent)">Fase 3</div><div class="phase-title">Flusso materiali</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase3" style="width:0%;background:var(--accent)"></div></div></div>
-        <div class="phase-card" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--purple)">Fase 4</div><div class="phase-title">Scorte e inventario</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase4" style="width:0%;background:var(--purple)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--blue)">Fase 4</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase4" style="width:0%;background:var(--blue)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase5')"><div class="phase-num" style="color:var(--red)">Fase 5</div><div class="phase-title">Digitalizzazione ARCA</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase5" style="width:0%;background:var(--red)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase6')"><div class="phase-num" style="color:var(--green)">Fase 6</div><div class="phase-title">Personale e SOP</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase6" style="width:0%;background:var(--green)"></div></div></div>
       </div>
@@ -379,39 +379,40 @@
       </div>
     </div>
 
-    <!-- FASE 2 — SICUREZZA -->
+    <!-- FASE 2 — SCORTE -->
     <div class="module" id="mod-fase2">
-      <div class="section-header"><h1>Fase 2 — Sicurezza e conformità normativa</h1><p>Gestione rifiuti speciali, segnaletica, DPI e interfaccia con RSPP.</p></div>
-      <div class="info-box">Hai già prodotto il <strong>Report Sicurezza Rifiuti DCE</strong> — carica qui i dati per tenerli tracciati nel gestionale.</div>
+      <div class="section-header"><h1>Fase 2 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f2-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f2-fill" style="width:0%"></div></div></div>
       <div class="form-card">
-        <div class="form-card-title">2.1 · Rifiuti speciali — Codici CER</div>
-        <table class="data-table">
-          <thead><tr><th>Materiale di scarto</th><th>Codice CER</th><th>Pericoloso</th><th>Contenitore dedicato</th><th>Stato</th></tr></thead>
-          <tbody>
-            <tr><td>Dischi da taglio / mole esauriti</td><td style="font-family:var(--font-mono);font-size:12px">12 01 21</td><td><span class="tag tag-green">No</span></td><td>Contenitore rigido separato</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-            <tr><td>Limatura e trucioli metallici</td><td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td><td><span class="tag tag-green">No</span></td><td>Cestello / cassone scarrabile</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-            <tr><td>Scorie e residui di saldatura</td><td style="font-family:var(--font-mono);font-size:12px">12 01 13</td><td><span class="tag tag-green">No</span></td><td>Bidone metallico autoestinguente</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-            <tr><td>Bombolette spray esauste</td><td style="font-family:var(--font-mono);font-size:12px">15 01 11*</td><td><span class="tag tag-red">Sì ⚠</span></td><td>Contenitore chiuso etichettato</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-            <tr><td>Stracci / DPI contaminati</td><td style="font-family:var(--font-mono);font-size:12px">15 02 02*</td><td><span class="tag tag-red">Sì ⚠</span></td><td>Contenitore con coperchio</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-            <tr><td>Sfridi e ritagli di lamiera</td><td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td><td><span class="tag tag-green">No</span></td><td>Cassone scarrabile / recupero</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">2.2 · Checklist azioni prioritarie</div>
-        <div class="checklist">
-          <label class="check-item" id="s-1"><input type="checkbox" onchange="toggleCheck('s-1');updateCerBar()"><span class="check-item-text"><strong>Contenitori postazioni:</strong> posizionare contenitori dedicati a ogni postazione di saldatura</span></label>
-          <label class="check-item" id="s-2"><input type="checkbox" onchange="toggleCheck('s-2');updateCerBar()"><span class="check-item-text"><strong>Punti raccolta centralizzati:</strong> allestire area rifiuti pericolosi con registro C/S</span></label>
-          <label class="check-item" id="s-3"><input type="checkbox" onchange="toggleCheck('s-3');updateCerBar()"><span class="check-item-text"><strong>Segnaletica orizzontale:</strong> verificare stato percorso giallo</span></label>
-          <label class="check-item" id="s-4"><input type="checkbox" onchange="toggleCheck('s-4');updateCerBar()"><span class="check-item-text"><strong>Segnaletica verticale:</strong> cartellonistica UNI EN ISO 7010 — portoni A/B, laser, saldatura</span></label>
-          <label class="check-item" id="s-5"><input type="checkbox" onchange="toggleCheck('s-5');updateCerBar()"><span class="check-item-text"><strong>Aspirazione fumi:</strong> verificare bracci aspiranti alle 6 postazioni</span></label>
-          <label class="check-item" id="s-6"><input type="checkbox" onchange="toggleCheck('s-6');updateCerBar()"><span class="check-item-text"><strong>Schermature UV:</strong> tende protettive ignifughe tra postazioni ravvicinate</span></label>
-          <label class="check-item" id="s-7"><input type="checkbox" onchange="toggleCheck('s-7');updateCerBar()"><span class="check-item-text"><strong>Estintori:</strong> posizionamento e idoneità classe ABC</span></label>
-          <label class="check-item" id="s-8"><input type="checkbox" onchange="toggleCheck('s-8');updateCerBar()"><span class="check-item-text"><strong>DPI:</strong> censire maschere, guanti, grembiali, calzature, lavaocchi</span></label>
-          <label class="check-item" id="s-9"><input type="checkbox" onchange="toggleCheck('s-9');updateCerBar()"><span class="check-item-text"><strong>RSPP:</strong> condividere report per validazione e integrazione nel DVR</span></label>
+        <div class="form-card-title">2.1 · Inventario e censimento</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Inventario generale effettuato</label><select id="f2-inventario" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — completo</option><option>Parziale</option><option>In corso</option><option>No</option></select></div>
+          <div class="form-group"><label>Data ultimo inventario</label><input type="date" id="f2-data-inv" onchange="calcF2()"></div>
+          <div class="form-group"><label>Frequenza inventario ciclico</label><select id="f2-freq" onchange="calcF2()"><option value="">— seleziona —</option><option>Mensile</option><option>Trimestrale</option><option>Semestrale</option><option>Annuale</option><option>Non programmato</option></select></div>
+          <div class="form-group span-2"><label>Metodo inventario</label><textarea id="f2-metodo" oninput="calcF2()"></textarea></div>
+          <div class="form-group"><label>Differenze inventario riscontrate</label><select id="f2-differenze" onchange="calcF2()"><option value="">— seleziona —</option><option>Entro tolleranza</option><option>Significative</option><option>Non verificato</option></select></div>
         </div>
       </div>
-      <div class="form-card"><div class="form-card-title">Note e stato coordinamento RSPP</div><div class="form-group"><label>Note operative</label><textarea id="f2-note"></textarea></div></div>
+      <div class="form-card">
+        <div class="form-card-title">2.2 · Scorte minime e punti di riordino</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Scorte minime definite</label><select id="f2-minime" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — per tutti gli articoli</option><option>Sì — solo articoli critici</option><option>In definizione</option><option>No</option></select></div>
+          <div class="form-group"><label>Punti di riordino attivati</label><select id="f2-riordino" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — automatici</option><option>Sì — manuali</option><option>In attivazione</option><option>No</option></select></div>
+          <div class="form-group"><label>Giacenza media magazzino (gg)</label><input type="number" id="f2-giacenza" oninput="calcF2()"></div>
+          <div class="form-group span-2"><label>Articoli critici / stock-out riscontrati</label><textarea id="f2-critici" oninput="calcF2()"></textarea></div>
+          <div class="form-group"><label>Responsabile approvvigionamenti</label><input type="text" id="f2-resp" oninput="calcF2()"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">2.3 · Checklist</div>
+        <div class="checklist">
+          <label class="check-item" id="f2-c1"><input type="checkbox" onchange="toggleCheck('f2-c1');calcF2()"><span class="check-item-text">Censimento completo articoli magazzino</span></label>
+          <label class="check-item" id="f2-c2"><input type="checkbox" onchange="toggleCheck('f2-c2');calcF2()"><span class="check-item-text">Definizione scorte minime per categoria</span></label>
+          <label class="check-item" id="f2-c3"><input type="checkbox" onchange="toggleCheck('f2-c3');calcF2()"><span class="check-item-text">Attivazione punti di riordino su gestionale</span></label>
+          <label class="check-item" id="f2-c4"><input type="checkbox" onchange="toggleCheck('f2-c4');calcF2()"><span class="check-item-text">Pianificazione inventario ciclico</span></label>
+          <label class="check-item" id="f2-c5"><input type="checkbox" onchange="toggleCheck('f2-c5');calcF2()"><span class="check-item-text">Analisi differenze inventario e rettifiche</span></label>
+        </div>
+      </div>
       <div class="actions-bar">
         <button class="btn btn-primary" onclick="saveModule('fase2')">Salva Fase 2</button>
         <button class="btn btn-ghost" onclick="showModule('fase1')">← Fase 1</button>
@@ -460,40 +461,39 @@
       </div>
     </div>
 
-    <!-- FASE 4 — SCORTE -->
+    <!-- FASE 4 — SICUREZZA -->
     <div class="module" id="mod-fase4">
-      <div class="section-header"><h1>Fase 4 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div>
-      <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f4-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f4-fill" style="width:0%"></div></div></div>
+      <div class="section-header"><h1>Fase 4 — Sicurezza e conformità normativa</h1><p>Gestione rifiuti speciali, segnaletica, DPI e interfaccia con RSPP.</p></div>
+      <div class="info-box">Hai già prodotto il <strong>Report Sicurezza Rifiuti DCE</strong> — carica qui i dati per tenerli tracciati nel gestionale.</div>
       <div class="form-card">
-        <div class="form-card-title">4.1 · Inventario e censimento</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Inventario generale effettuato</label><select id="f4-inventario" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — completo</option><option>Parziale</option><option>In corso</option><option>No</option></select></div>
-          <div class="form-group"><label>Data ultimo inventario</label><input type="date" id="f4-data-inv" onchange="calcF4()"></div>
-          <div class="form-group"><label>Frequenza inventario ciclico</label><select id="f4-freq" onchange="calcF4()"><option value="">— seleziona —</option><option>Mensile</option><option>Trimestrale</option><option>Semestrale</option><option>Annuale</option><option>Non programmato</option></select></div>
-          <div class="form-group span-2"><label>Metodo inventario</label><textarea id="f4-metodo" oninput="calcF4()"></textarea></div>
-          <div class="form-group"><label>Differenze inventario riscontrate</label><select id="f4-differenze" onchange="calcF4()"><option value="">— seleziona —</option><option>Entro tolleranza</option><option>Significative</option><option>Non verificato</option></select></div>
-        </div>
+        <div class="form-card-title">4.1 · Rifiuti speciali — Codici CER</div>
+        <table class="data-table">
+          <thead><tr><th>Materiale di scarto</th><th>Codice CER</th><th>Pericoloso</th><th>Contenitore dedicato</th><th>Stato</th></tr></thead>
+          <tbody>
+            <tr><td>Dischi da taglio / mole esauriti</td><td style="font-family:var(--font-mono);font-size:12px">12 01 21</td><td><span class="tag tag-green">No</span></td><td>Contenitore rigido separato</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+            <tr><td>Limatura e trucioli metallici</td><td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td><td><span class="tag tag-green">No</span></td><td>Cestello / cassone scarrabile</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+            <tr><td>Scorie e residui di saldatura</td><td style="font-family:var(--font-mono);font-size:12px">12 01 13</td><td><span class="tag tag-green">No</span></td><td>Bidone metallico autoestinguente</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+            <tr><td>Bombolette spray esauste</td><td style="font-family:var(--font-mono);font-size:12px">15 01 11*</td><td><span class="tag tag-red">Sì ⚠</span></td><td>Contenitore chiuso etichettato</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+            <tr><td>Stracci / DPI contaminati</td><td style="font-family:var(--font-mono);font-size:12px">15 02 02*</td><td><span class="tag tag-red">Sì ⚠</span></td><td>Contenitore con coperchio</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+            <tr><td>Sfridi e ritagli di lamiera</td><td style="font-family:var(--font-mono);font-size:12px">12 01 01/03</td><td><span class="tag tag-green">No</span></td><td>Cassone scarrabile / recupero</td><td><select class="cer-status" style="background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text2);font-size:11px" onchange="updateCerStatus(this)"><option>Da fare</option><option>In corso</option><option>Fatto</option></select></td></tr>
+          </tbody>
+        </table>
       </div>
       <div class="form-card">
-        <div class="form-card-title">4.2 · Scorte minime e punti di riordino</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Scorte minime definite</label><select id="f4-minime" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — per tutti gli articoli</option><option>Sì — solo articoli critici</option><option>In definizione</option><option>No</option></select></div>
-          <div class="form-group"><label>Punti di riordino attivati</label><select id="f4-riordino" onchange="calcF4()"><option value="">— seleziona —</option><option>Sì — automatici</option><option>Sì — manuali</option><option>In attivazione</option><option>No</option></select></div>
-          <div class="form-group"><label>Giacenza media magazzino (gg)</label><input type="number" id="f4-giacenza" oninput="calcF4()"></div>
-          <div class="form-group span-2"><label>Articoli critici / stock-out riscontrati</label><textarea id="f4-critici" oninput="calcF4()"></textarea></div>
-          <div class="form-group"><label>Responsabile approvvigionamenti</label><input type="text" id="f4-resp" oninput="calcF4()"></div>
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">4.3 · Checklist</div>
+        <div class="form-card-title">4.2 · Checklist azioni prioritarie</div>
         <div class="checklist">
-          <label class="check-item" id="f4-c1"><input type="checkbox" onchange="toggleCheck('f4-c1');calcF4()"><span class="check-item-text">Censimento completo articoli magazzino</span></label>
-          <label class="check-item" id="f4-c2"><input type="checkbox" onchange="toggleCheck('f4-c2');calcF4()"><span class="check-item-text">Definizione scorte minime per categoria</span></label>
-          <label class="check-item" id="f4-c3"><input type="checkbox" onchange="toggleCheck('f4-c3');calcF4()"><span class="check-item-text">Attivazione punti di riordino su gestionale</span></label>
-          <label class="check-item" id="f4-c4"><input type="checkbox" onchange="toggleCheck('f4-c4');calcF4()"><span class="check-item-text">Pianificazione inventario ciclico</span></label>
-          <label class="check-item" id="f4-c5"><input type="checkbox" onchange="toggleCheck('f4-c5');calcF4()"><span class="check-item-text">Analisi differenze inventario e rettifiche</span></label>
+          <label class="check-item" id="s-1"><input type="checkbox" onchange="toggleCheck('s-1');updateCerBar()"><span class="check-item-text"><strong>Contenitori postazioni:</strong> posizionare contenitori dedicati a ogni postazione di saldatura</span></label>
+          <label class="check-item" id="s-2"><input type="checkbox" onchange="toggleCheck('s-2');updateCerBar()"><span class="check-item-text"><strong>Punti raccolta centralizzati:</strong> allestire area rifiuti pericolosi con registro C/S</span></label>
+          <label class="check-item" id="s-3"><input type="checkbox" onchange="toggleCheck('s-3');updateCerBar()"><span class="check-item-text"><strong>Segnaletica orizzontale:</strong> verificare stato percorso giallo</span></label>
+          <label class="check-item" id="s-4"><input type="checkbox" onchange="toggleCheck('s-4');updateCerBar()"><span class="check-item-text"><strong>Segnaletica verticale:</strong> cartellonistica UNI EN ISO 7010 — portoni A/B, laser, saldatura</span></label>
+          <label class="check-item" id="s-5"><input type="checkbox" onchange="toggleCheck('s-5');updateCerBar()"><span class="check-item-text"><strong>Aspirazione fumi:</strong> verificare bracci aspiranti alle 6 postazioni</span></label>
+          <label class="check-item" id="s-6"><input type="checkbox" onchange="toggleCheck('s-6');updateCerBar()"><span class="check-item-text"><strong>Schermature UV:</strong> tende protettive ignifughe tra postazioni ravvicinate</span></label>
+          <label class="check-item" id="s-7"><input type="checkbox" onchange="toggleCheck('s-7');updateCerBar()"><span class="check-item-text"><strong>Estintori:</strong> posizionamento e idoneità classe ABC</span></label>
+          <label class="check-item" id="s-8"><input type="checkbox" onchange="toggleCheck('s-8');updateCerBar()"><span class="check-item-text"><strong>DPI:</strong> censire maschere, guanti, grembiali, calzature, lavaocchi</span></label>
+          <label class="check-item" id="s-9"><input type="checkbox" onchange="toggleCheck('s-9');updateCerBar()"><span class="check-item-text"><strong>RSPP:</strong> condividere report per validazione e integrazione nel DVR</span></label>
         </div>
       </div>
+      <div class="form-card"><div class="form-card-title">Note e stato coordinamento RSPP</div><div class="form-group"><label>Note operative</label><textarea id="f4-note-sic"></textarea></div></div>
       <div class="actions-bar">
         <button class="btn btn-primary" onclick="saveModule('fase4')">Salva Fase 4</button>
         <button class="btn btn-ghost" onclick="showModule('fase3')">← Fase 3</button>
@@ -667,7 +667,7 @@
 
 <script>
 const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Sicurezza',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Scorte',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti'};
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Scorte',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti'};
 
 function showModule(id) {
   MODULES.forEach(m=>document.getElementById('mod-'+m).classList.remove('active'));
@@ -716,12 +716,17 @@ function calcF1(){
   setBar('f1-pct','f1-fill','bar-fase1',pct);updateDashboardStats();
 }
 
-function updateCerBar(){
-  let done=0;
-  for(let i=1;i<=9;i++){const el=document.getElementById('s-'+i);if(el&&el.querySelector('input').checked)done++;}
-  const pct=Math.round((done/9)*100);
-  setBar(null,null,'bar-fase2',pct);updateDashboardStats();
+function calcF2(){
+  const fields=['f2-inventario','f2-data-inv','f2-freq','f2-metodo','f2-differenze','f2-minime','f2-riordino','f2-giacenza','f2-critici','f2-resp'];
+  const checks=['f2-c1','f2-c2','f2-c3','f2-c4','f2-c5'];
+  let filled=0,total=fields.length+checks.length;
+  fields.forEach(f=>{const el=document.getElementById(f);if(el&&el.value&&el.value.trim()!=='')filled++;});
+  checks.forEach(id=>{const el=document.getElementById(id);if(el&&el.querySelector('input').checked)filled++;});
+  const pct=Math.round((filled/total)*100);
+  setBar('f2-pct','f2-fill','bar-fase2',pct);updateDashboardStats();
 }
+
+function updateCerBar(){ calcF4(); }
 
 function updateCerStatus(sel){
   sel.style.color=sel.value==='Fatto'?'var(--green)':sel.value==='In corso'?'var(--accent)':'var(--text2)';
@@ -733,13 +738,11 @@ function calcF3(){
 }
 
 function calcF4(){
-  const fields=['f4-inventario','f4-data-inv','f4-freq','f4-metodo','f4-differenze','f4-minime','f4-riordino','f4-giacenza','f4-critici','f4-resp'];
-  const checks=['f4-c1','f4-c2','f4-c3','f4-c4','f4-c5'];
-  let filled=0,total=fields.length+checks.length;
-  fields.forEach(f=>{const el=document.getElementById(f);if(el&&el.value&&el.value.trim()!=='')filled++;});
-  checks.forEach(id=>{const el=document.getElementById(id);if(el&&el.querySelector('input').checked)filled++;});
-  const pct=Math.round((filled/total)*100);
-  setBar('f4-pct','f4-fill','bar-fase4',pct);updateDashboardStats();
+  // Fase 4 = Sicurezza — progress tracked via checklist s-1..s-9
+  let done=0;
+  for(let i=1;i<=9;i++){const el=document.getElementById('s-'+i);if(el&&el.querySelector('input').checked)done++;}
+  const pct=Math.round((done/9)*100);
+  setBar(null,null,'bar-fase4',pct);updateDashboardStats();
 }
 
 function calcF5(){
@@ -754,11 +757,11 @@ function calcF6(){
 
 function updateDashboardStats(){
   const getN=id=>{const el=document.getElementById(id);return el?parseInt(el.textContent||'0'):0;};
-  const p0=getN('f0-pct'),p1=getN('f1-pct'),p3=getN('f3-pct'),p4=getN('f4-pct'),p5=getN('f5-pct'),p6=getN('f6-pct');
-  const b2=parseInt(document.getElementById('bar-fase2')?.style.width||'0');
-  const avg=Math.round((p0+p1+b2+p3+p4+p5+p6)/6);
+  const p0=getN('f0-pct'),p1=getN('f1-pct'),p2=getN('f2-pct'),p3=getN('f3-pct'),p5=getN('f5-pct'),p6=getN('f6-pct');
+  const b4=parseInt(document.getElementById('bar-fase4')?.style.width||'0');
+  const avg=Math.round((p0+p1+p2+p3+b4+p5+p6)/6);
   const gEl=document.getElementById('dash-global');if(gEl)gEl.textContent=avg+'%';
-  const completed=[p0,p1,b2,p3,p4,p5,p6].filter(p=>p>=90).length;
+  const completed=[p0,p1,p2,p3,b4,p5,p6].filter(p=>p>=90).length;
   const fEl=document.getElementById('dash-fasi');if(fEl)fEl.textContent=completed+' / 6';
   let sChecked=0;for(let i=1;i<=9;i++){const el=document.getElementById('s-'+i);if(el&&el.querySelector('input').checked)sChecked++;}
   const cEl=document.getElementById('dash-checklist');if(cEl)cEl.textContent=sChecked+' / 9';
@@ -782,7 +785,7 @@ function loadModule(name){
     });
     if(name==='fase0')setTimeout(calcF0,0);
     if(name==='fase1')setTimeout(calcF1,0);
-    if(name==='fase2')setTimeout(updateCerBar,0);
+    if(name==='fase2')setTimeout(calcF2,0);
     if(name==='fase3')setTimeout(calcF3,0);
     if(name==='fase4')setTimeout(calcF4,0);
     if(name==='fase5')setTimeout(calcF5,0);
@@ -972,7 +975,7 @@ async function loadAllFromCloud(){
     const mezziRows=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');mezziDB=mezziRows.map(r=>r.dati).filter(Boolean);
     const intRows=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');interventiDB=intRows.map(r=>r.dati).filter(Boolean);
     const assRows=await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc');assegnazioniDB=assRows.map(r=>r.dati).filter(Boolean);
-    setTimeout(()=>{calcF0();calcF1();updateCerBar();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateDashboardStats();},100);
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateDashboardStats();},100);
   }catch(e){console.warn('Load error:',e);}
 }
 
