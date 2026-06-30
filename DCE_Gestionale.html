@@ -943,7 +943,7 @@ async function doLogin(){
   const pass=document.getElementById('login-pass').value;
   errEl.textContent='';
   if(!email||!pass){errEl.textContent='Compila email e password.';return;}
-  if(!window.supabase){errEl.textContent='Errore: libreria non caricata. Ricarica la pagina.';return;}
+  if(!window.supabase){errEl.textContent='Attendo il caricamento della libreria...';return;}
   if(!sb){errEl.textContent='Errore: client non inizializzato. Ricarica la pagina.';return;}
   errEl.style.color='var(--text2)';
   errEl.textContent='Accesso in corso...';
