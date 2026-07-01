@@ -110,7 +110,6 @@
   #app { display:none; flex:1; overflow:hidden; }
   @media print { .sidebar,.topbar,.btn,.actions-bar,.toast,#login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
 </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -915,18 +914,13 @@ function renderAssegnazioni(){
 // SUPABASE — Auth nativo con JWT sicuro
 const SUPABASE_URL='https://oejkxzxnqhyiwchqsdmh.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
-let sb=null, currentUser=null, currentSession=null;
+let currentUser=null, accessToken=null;
 
-function initSupabase(){
-  if(sb) return;
-  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON,{
-    auth:{persistSession:true,autoRefreshToken:true,storageKey:'dce-auth'}
-  });
-}
+// Pure REST - no library needed
 
 // Helper fetch autenticato con JWT
 async function sbFetch(path,method='GET',body=null,extra={}){
-  const token=currentSession?.access_token||SUPABASE_ANON;
+  const token=accessToken||SUPABASE_ANON;
   const headers={'apikey':SUPABASE_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation',...extra};
   const opts={method,headers};if(body)opts.body=JSON.stringify(body);
   try{
@@ -943,25 +937,30 @@ async function doLogin(){
   const pass=document.getElementById('login-pass').value;
   errEl.textContent='';
   if(!email||!pass){errEl.textContent='Compila email e password.';return;}
-  if(!window.supabase){errEl.textContent='Attendo il caricamento della libreria...';return;}
-  if(!sb){errEl.textContent='Errore: client non inizializzato. Ricarica la pagina.';return;}
   errEl.style.color='var(--text2)';
   errEl.textContent='Accesso in corso...';
   try{
-    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-    if(error){
+    const authRes=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass})
+    });
+    const authData=await authRes.json();
+    if(!authRes.ok||authData.error){
       errEl.style.color='var(--red)';
-      errEl.textContent=error.message.includes('Invalid')?'Email o password errati.':'Errore: '+error.message;
+      errEl.textContent=authData.error_description||authData.msg||'Email o password errati.';
       return;
     }
-    errEl.textContent='';
-    currentSession=data.session;
-    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+data.user.id+'&select=nome,ruolo');
-    const nome=profile.length?profile[0].nome:data.user.email.split('@')[0];
+    accessToken=authData.access_token;
+    sessionStorage.setItem('dce-token',accessToken);
+    const uid=authData.user?.id||'';
+    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
+    const nome=profile.length?profile[0].nome:email.split('@')[0];
     const ruolo=profile.length?profile[0].ruolo:'viewer';
-    currentUser={email:data.user.email,nome,ruolo,id:data.user.id};
+    currentUser={email:authData.user.email,nome,ruolo,id:uid};
     sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
     await auditLog('login','sistema','Accesso da '+nome+' ('+ruolo+')');
+    errEl.textContent='';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
     document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
@@ -976,10 +975,9 @@ async function doLogin(){
 
 // LOGOUT
 async function doLogout(){
-  initSupabase();
-  await sb.auth.signOut();
+  try{await fetch(SUPABASE_URL+'/auth/v1/logout',{method:'POST',headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+(accessToken||'')}});}catch(e){}
   sessionStorage.removeItem('dce-user');
-  currentUser=null;currentSession=null;
+  accessToken=null;currentUser=null;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('login-email').value='';
@@ -1046,19 +1044,15 @@ function closeAuditModal(){document.getElementById('audit-modal').style.display=
 
 // INIT
 window.addEventListener('load',async()=>{
-  initSupabase();
   // Controlla sessione esistente
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentSession=session;
-    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+session.user.id+'&select=nome,ruolo');
-    const nome=profile.length?profile[0].nome:session.user.email.split('@')[0];
-    const ruolo=profile.length?profile[0].ruolo:'viewer';
-    currentUser={email:session.user.email,nome,ruolo,id:session.user.id};
-    sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
+  const savedToken=sessionStorage.getItem('dce-token');
+  const savedUser=sessionStorage.getItem('dce-user');
+  if(savedToken&&savedUser){
+    accessToken=savedToken;
+    currentUser=JSON.parse(savedUser);
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
+    document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
     loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
   }
   loadCharter();
