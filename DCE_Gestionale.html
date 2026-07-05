@@ -1072,7 +1072,7 @@ async function doLogin(){
     const uid=data.user?.id||'';
     let profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
     if(!profile.length){
-      await sbFetch('/rest/v1/profiles','POST',{id:uid,nome:email.split('@')[0],ruolo:'viewer'});
+      await sbFetch('/rest/v1/profiles','POST',{id:uid,nome:email.split('@')[0],ruolo:'viewer'},{'Prefer':'resolution=ignore-duplicates,return=representation'});
       profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
     }
     const nome=profile.length?profile[0].nome:email.split('@')[0];
