@@ -383,44 +383,251 @@
 
     <!-- FASE 2 — SCORTE -->
     <div class="module" id="mod-fase2">
-      <div class="section-header"><h1>Fase 2 — Gestione scorte e inventario</h1><p>Censimento, scorte minime, punti di riordino, inventario ciclico.</p></div>
-      <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f2-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f2-fill" style="width:0%"></div></div></div>
-      <div class="form-card">
-        <div class="form-card-title">2.1 · Inventario e censimento</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Inventario generale effettuato</label><select id="f2-inventario" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — completo</option><option>Parziale</option><option>In corso</option><option>No</option></select></div>
-          <div class="form-group"><label>Data ultimo inventario</label><input type="date" id="f2-data-inv" onchange="calcF2()"></div>
-          <div class="form-group"><label>Frequenza inventario ciclico</label><select id="f2-freq" onchange="calcF2()"><option value="">— seleziona —</option><option>Mensile</option><option>Trimestrale</option><option>Semestrale</option><option>Annuale</option><option>Non programmato</option></select></div>
-          <div class="form-group span-2"><label>Metodo inventario</label><textarea id="f2-metodo" oninput="calcF2()"></textarea></div>
-          <div class="form-group"><label>Differenze inventario riscontrate</label><select id="f2-differenze" onchange="calcF2()"><option value="">— seleziona —</option><option>Entro tolleranza</option><option>Significative</option><option>Non verificato</option></select></div>
-        </div>
+      <div class="section-header">
+        <h1>Fase 2 — Scorte e Consumi</h1>
+        <p>Gestione consumi officina (saldatori) e squadre di montaggio — dischi e dotazione attrezzature.</p>
       </div>
-      <div class="form-card">
-        <div class="form-card-title">2.2 · Scorte minime e punti di riordino</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Scorte minime definite</label><select id="f2-minime" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — per tutti gli articoli</option><option>Sì — solo articoli critici</option><option>In definizione</option><option>No</option></select></div>
-          <div class="form-group"><label>Punti di riordino attivati</label><select id="f2-riordino" onchange="calcF2()"><option value="">— seleziona —</option><option>Sì — automatici</option><option>Sì — manuali</option><option>In attivazione</option><option>No</option></select></div>
-          <div class="form-group"><label>Giacenza media magazzino (gg)</label><input type="number" id="f2-giacenza" oninput="calcF2()"></div>
-          <div class="form-group span-2"><label>Articoli critici / stock-out riscontrati</label><textarea id="f2-critici" oninput="calcF2()"></textarea></div>
-          <div class="form-group"><label>Responsabile approvvigionamenti</label><input type="text" id="f2-resp" oninput="calcF2()"></div>
-        </div>
+
+      <!-- TAB NAVIGATION -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
+        <button id="tab-officina" onclick="switchF2Tab('officina')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Officina — Saldatori</button>
+        <button id="tab-squadre" onclick="switchF2Tab('squadre')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Squadre Montaggio</button>
       </div>
-      <div class="form-card">
-        <div class="form-card-title">2.3 · Checklist</div>
-        <div class="checklist">
-          <label class="check-item" id="f2-c1"><input type="checkbox" onchange="toggleCheck('f2-c1');calcF2()"><span class="check-item-text">Censimento completo articoli magazzino</span></label>
-          <label class="check-item" id="f2-c2"><input type="checkbox" onchange="toggleCheck('f2-c2');calcF2()"><span class="check-item-text">Definizione scorte minime per categoria</span></label>
-          <label class="check-item" id="f2-c3"><input type="checkbox" onchange="toggleCheck('f2-c3');calcF2()"><span class="check-item-text">Attivazione punti di riordino su gestionale</span></label>
-          <label class="check-item" id="f2-c4"><input type="checkbox" onchange="toggleCheck('f2-c4');calcF2()"><span class="check-item-text">Pianificazione inventario ciclico</span></label>
-          <label class="check-item" id="f2-c5"><input type="checkbox" onchange="toggleCheck('f2-c5');calcF2()"><span class="check-item-text">Analisi differenze inventario e rettifiche</span></label>
+
+      <!-- ===== TAB OFFICINA ===== -->
+      <div id="f2-tab-officina">
+
+        <!-- Registro Saldatori -->
+        <div class="form-card">
+          <div class="form-card-title">Registro Saldatori</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <input type="text" id="sald-nome" placeholder="Nome saldatore" style="flex:1;min-width:150px">
+            <input type="text" id="sald-postazione" placeholder="Postazione (es. P1)" style="width:130px">
+            <button class="btn btn-primary" onclick="addSaldatore()">+ Aggiungi</button>
+          </div>
+          <div id="saldatori-lista">
+            <div class="empty-state"><div class="icon">👷</div><p>Nessun saldatore registrato</p></div>
+          </div>
         </div>
-      </div>
+
+        <!-- Registra Consumo Officina -->
+        <div class="form-card">
+          <div class="form-card-title">Registra consumo dischi — Officina</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Saldatore</label>
+              <select id="cons-sald-nome">
+                <option value="">— seleziona saldatore —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tipo disco</label>
+              <select id="cons-sald-tipo">
+                <option value="">— seleziona —</option>
+                <option>Disco taglio lamiera</option>
+                <option>Disco taglio pietra</option>
+                <option>Disco lamellare</option>
+                <option>Disco abrasivo (sbavatura)</option>
+                <option>Disco flessibile</option>
+                <option>Disco smerigliatrice diritta</option>
+                <option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Diametro (mm)</label>
+              <select id="cons-sald-diam">
+                <option value="">— seleziona —</option>
+                <option>115 mm</option><option>125 mm</option><option>150 mm</option>
+                <option>180 mm</option><option>230 mm</option><option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quantita</label>
+              <input type="number" id="cons-sald-qty" placeholder="es. 5" min="1">
+            </div>
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="cons-sald-data">
+            </div>
+            <div class="form-group">
+              <label>Note</label>
+              <input type="text" id="cons-sald-note" placeholder="es. lavoro specifico, commessa">
+            </div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" onclick="addConsumoSaldatore()">Registra consumo</button>
+          </div>
+        </div>
+
+        <!-- Riepilogo consumi officina -->
+        <div class="form-card">
+          <div class="form-card-title">Riepilogo consumi officina</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="filter-sald" onchange="renderConsumiOfficina()" style="width:200px">
+              <option value="">Tutti i saldatori</option>
+            </select>
+            <select id="filter-sald-tipo" onchange="renderConsumiOfficina()" style="width:200px">
+              <option value="">Tutti i tipi disco</option>
+              <option>Disco taglio lamiera</option><option>Disco taglio pietra</option>
+              <option>Disco lamellare</option><option>Disco abrasivo (sbavatura)</option>
+              <option>Disco flessibile</option><option>Disco smerigliatrice diritta</option>
+            </select>
+            <button class="btn btn-ghost" onclick="stampaConsumiOfficina()">Stampa</button>
+          </div>
+          <div id="consumi-officina-lista">
+            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
+          </div>
+        </div>
+
+      </div><!-- /tab-officina -->
+
+      <!-- ===== TAB SQUADRE ===== -->
+      <div id="f2-tab-squadre" style="display:none">
+
+        <!-- Registro Squadre -->
+        <div class="form-card">
+          <div class="form-card-title">Registro Squadre Montaggio</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Nome squadra</label>
+              <input type="text" id="sq-nome" placeholder="es. Squadra A / Nord">
+            </div>
+            <div class="form-group">
+              <label>Capo squadra</label>
+              <input type="text" id="sq-capo" placeholder="es. Mario Rossi">
+            </div>
+            <div class="form-group">
+              <label>N. componenti</label>
+              <input type="number" id="sq-ncomp" placeholder="es. 3">
+            </div>
+            <div class="form-group span-2">
+              <label>Membri squadra</label>
+              <input type="text" id="sq-membri" placeholder="es. Bianchi, Verdi, Neri">
+            </div>
+            <div class="form-group">
+              <label>Zona / Cantiere attivo</label>
+              <input type="text" id="sq-cantiere" placeholder="es. Cantiere Milano">
+            </div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" onclick="addSquadra()">+ Aggiungi squadra</button>
+          </div>
+          <div id="squadre-lista" style="margin-top:12px">
+            <div class="empty-state"><div class="icon">👷</div><p>Nessuna squadra registrata</p></div>
+          </div>
+        </div>
+
+        <!-- Registra Consumo Squadre -->
+        <div class="form-card">
+          <div class="form-card-title">Registra consumo dischi — Squadre</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Squadra</label>
+              <select id="cons-sq-nome">
+                <option value="">— seleziona squadra —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tipo disco</label>
+              <select id="cons-sq-tipo">
+                <option value="">— seleziona —</option>
+                <option>Disco taglio lamiera</option>
+                <option>Disco taglio pietra</option>
+                <option>Disco lamellare</option>
+                <option>Disco abrasivo (sbavatura)</option>
+                <option>Disco flessibile</option>
+                <option>Disco smerigliatrice diritta</option>
+                <option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Diametro (mm)</label>
+              <select id="cons-sq-diam">
+                <option value="">— seleziona —</option>
+                <option>115 mm</option><option>125 mm</option><option>150 mm</option>
+                <option>180 mm</option><option>230 mm</option><option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quantita</label>
+              <input type="number" id="cons-sq-qty" placeholder="es. 10" min="1">
+            </div>
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="cons-sq-data">
+            </div>
+            <div class="form-group">
+              <label>Cantiere / Note</label>
+              <input type="text" id="cons-sq-note" placeholder="es. Cantiere Roma, commessa 123">
+            </div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" onclick="addConsumoSquadra()">Registra consumo</button>
+          </div>
+        </div>
+
+        <!-- Dotazione attrezzature squadre -->
+        <div class="form-card">
+          <div class="form-card-title">Dotazione attrezzature — Squadre</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Squadra</label>
+              <select id="dot-sq-nome">
+                <option value="">— seleziona squadra —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Attrezzatura</label>
+              <input type="text" id="dot-sq-attr" placeholder="es. Flessibile Bosch GWS 22">
+            </div>
+            <div class="form-group">
+              <label>N. Seriale / Inventario</label>
+              <input type="text" id="dot-sq-sn" placeholder="es. ATT-005">
+            </div>
+            <div class="form-group">
+              <label>Data consegna</label>
+              <input type="date" id="dot-sq-data">
+            </div>
+            <div class="form-group">
+              <label>Stato</label>
+              <select id="dot-sq-stato">
+                <option>Consegnata</option><option>Restituita</option><option>Da restituire</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Note</label>
+              <input type="text" id="dot-sq-note" placeholder="es. condizioni, accessori">
+            </div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" onclick="addDotazioneSquadra()">Registra dotazione</button>
+          </div>
+        </div>
+
+        <!-- Riepilogo squadre -->
+        <div class="form-card">
+          <div class="form-card-title">Riepilogo consumi squadre</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="filter-sq" onchange="renderConsumiSquadre()" style="width:200px">
+              <option value="">Tutte le squadre</option>
+            </select>
+            <button class="btn btn-ghost" onclick="stampaConsumiSquadre()">Stampa</button>
+          </div>
+          <div id="consumi-squadre-lista">
+            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
+          </div>
+        </div>
+
+      </div><!-- /tab-squadre -->
+
       <div class="actions-bar">
-        <button class="btn btn-primary" onclick="saveModule('fase2')">Salva Fase 2</button>
+        <button class="btn btn-primary" onclick="saveScorte()">Salva Fase 2</button>
         <button class="btn btn-ghost" onclick="showModule('fase1')">← Fase 1</button>
         <button class="btn btn-ghost" onclick="showModule('fase3')">Fase 3 →</button>
       </div>
     </div>
+
+
 
     <!-- FASE 3 — FLUSSO MATERIALI -->
     <div class="module" id="mod-fase3">
@@ -845,15 +1052,305 @@ function calcF1(){
   setBar('f1-pct','f1-fill','bar-fase1',pct);updateDashboardStats();
 }
 
-function calcF2(){
-  const fields=['f2-inventario','f2-data-inv','f2-freq','f2-metodo','f2-differenze','f2-minime','f2-riordino','f2-giacenza','f2-critici','f2-resp'];
-  const checks=['f2-c1','f2-c2','f2-c3','f2-c4','f2-c5'];
-  let filled=0,total=fields.length+checks.length;
-  fields.forEach(f=>{const el=document.getElementById(f);if(el&&el.value&&el.value.trim()!=='')filled++;});
-  checks.forEach(id=>{const el=document.getElementById(id);if(el&&el.querySelector('input').checked)filled++;});
-  const pct=Math.round((filled/total)*100);
-  setBar('f2-pct','f2-fill','bar-fase2',pct);updateDashboardStats();
+// ============ FASE 2 SCORTE ============
+let saldatoriDB=[], consumiOfficDB=[], squadreDB=[], consumiSqDB=[], dotazioniSqDB=[];
+
+function saveScorteDB(){
+  try{
+    localStorage.setItem('dce-saldatori',JSON.stringify(saldatoriDB));
+    localStorage.setItem('dce-consumioffic',JSON.stringify(consumiOfficDB));
+    localStorage.setItem('dce-squadre',JSON.stringify(squadreDB));
+    localStorage.setItem('dce-consumisq',JSON.stringify(consumiSqDB));
+    localStorage.setItem('dce-dotazionisq',JSON.stringify(dotazioniSqDB));
+  }catch(e){}
 }
+
+function loadScorteDB(){
+  try{
+    saldatoriDB=JSON.parse(localStorage.getItem('dce-saldatori')||'[]');
+    consumiOfficDB=JSON.parse(localStorage.getItem('dce-consumioffic')||'[]');
+    squadreDB=JSON.parse(localStorage.getItem('dce-squadre')||'[]');
+    consumiSqDB=JSON.parse(localStorage.getItem('dce-consumisq')||'[]');
+    dotazioniSqDB=JSON.parse(localStorage.getItem('dce-dotazionisq')||'[]');
+  }catch(e){saldatoriDB=[];consumiOfficDB=[];squadreDB=[];consumiSqDB=[];dotazioniSqDB=[];}
+}
+
+function saveScorte(){
+  saveScorteDB();
+  showToast('Fase 2 salvata');
+  if(typeof saveToCloud==='function'&&currentUser){
+    saveToCloud('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB});
+  }
+}
+
+function switchF2Tab(tab){
+  document.getElementById('f2-tab-officina').style.display=tab==='officina'?'block':'none';
+  document.getElementById('f2-tab-squadre').style.display=tab==='squadre'?'block':'none';
+  document.getElementById('tab-officina').style.background=tab==='officina'?'var(--accent)':'transparent';
+  document.getElementById('tab-officina').style.color=tab==='officina'?'#fff':'var(--text2)';
+  document.getElementById('tab-squadre').style.background=tab==='squadre'?'var(--accent)':'transparent';
+  document.getElementById('tab-squadre').style.color=tab==='squadre'?'#fff':'var(--text2)';
+}
+
+function calcF2(){
+  const pct=saldatoriDB.length>0&&squadreDB.length>0?50:saldatoriDB.length>0||squadreDB.length>0?25:0;
+  const b=document.getElementById('bar-fase2');if(b)b.style.width=pct+'%';
+  updateDashboardStats();
+}
+
+// --- SALDATORI ---
+function addSaldatore(){
+  const nome=document.getElementById('sald-nome').value.trim();
+  const post=document.getElementById('sald-postazione').value.trim();
+  if(!nome){showToast('Inserisci il nome del saldatore');return;}
+  if(saldatoriDB.find(s=>s.nome===nome)){showToast('Saldatore gia presente');return;}
+  saldatoriDB.push({id:Date.now(),nome,postazione:post});
+  saveScorteDB();renderSaldatori();updateSaldSelect();calcF2();
+  document.getElementById('sald-nome').value='';
+  document.getElementById('sald-postazione').value='';
+  showToast('Saldatore aggiunto');
+}
+
+function deleteSaldatore(id){
+  if(!confirm('Eliminare questo saldatore?'))return;
+  saldatoriDB=saldatoriDB.filter(s=>s.id!==id);
+  saveScorteDB();renderSaldatori();updateSaldSelect();calcF2();
+  showToast('Saldatore rimosso');
+}
+
+function renderSaldatori(){
+  const el=document.getElementById('saldatori-lista');if(!el)return;
+  if(!saldatoriDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessun saldatore registrato</p></div>';return;}
+  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+    saldatoriDB.map(s=>{
+      const tot=consumiOfficDB.filter(c=>c.saldatore===s.nome).reduce((acc,c)=>acc+(parseInt(c.qty)||0),0);
+      return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px">'+
+        '<span style="font-size:18px">👷</span>'+
+        '<div><div style="font-weight:500;color:var(--text)">'+s.nome+'</div>'+
+        (s.postazione?'<div style="font-size:11px;color:var(--text3)">Postazione: '+s.postazione+'</div>':'')+
+        '<div style="font-size:11px;color:var(--accent)">Totale dischi: '+tot+'</div></div>'+
+        '<button onclick="deleteSaldatore('+s.id+')" style="margin-left:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px">x</button>'+
+        '</div>';
+    }).join('')+'</div>';
+}
+
+function updateSaldSelect(){
+  const sel=document.getElementById('cons-sald-nome');
+  const filt=document.getElementById('filter-sald');
+  if(!sel||!filt)return;
+  const opts='<option value="">— seleziona saldatore —</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
+  sel.innerHTML=opts;
+  filt.innerHTML='<option value="">Tutti i saldatori</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
+}
+
+// --- CONSUMI OFFICINA ---
+function addConsumoSaldatore(){
+  const saldatore=document.getElementById('cons-sald-nome').value;
+  const tipo=document.getElementById('cons-sald-tipo').value;
+  const qty=document.getElementById('cons-sald-qty').value;
+  if(!saldatore||!tipo||!qty){showToast('Compila saldatore, tipo disco e quantita');return;}
+  consumiOfficDB.push({
+    id:Date.now(),saldatore,tipo,
+    diametro:document.getElementById('cons-sald-diam').value,
+    qty:parseInt(qty),
+    data:document.getElementById('cons-sald-data').value,
+    note:document.getElementById('cons-sald-note').value
+  });
+  saveScorteDB();renderConsumiOfficina();
+  ['cons-sald-nome','cons-sald-tipo','cons-sald-diam','cons-sald-qty','cons-sald-data','cons-sald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('Consumo registrato');
+}
+
+function renderConsumiOfficina(){
+  const el=document.getElementById('consumi-officina-lista');if(!el)return;
+  const fs=document.getElementById('filter-sald')?.value||'';
+  const ft=document.getElementById('filter-sald-tipo')?.value||'';
+  let list=[...consumiOfficDB].filter(c=>(!fs||c.saldatore===fs)&&(!ft||c.tipo===ft)).reverse();
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">0</div><p>Nessun consumo registrato</p></div>';return;}
+
+  // Totali per saldatore
+  const totali={};
+  consumiOfficDB.filter(c=>(!fs||c.saldatore===fs)&&(!ft||c.tipo===ft)).forEach(c=>{
+    if(!totali[c.saldatore])totali[c.saldatore]={};
+    if(!totali[c.saldatore][c.tipo])totali[c.saldatore][c.tipo]=0;
+    totali[c.saldatore][c.tipo]+=parseInt(c.qty)||0;
+  });
+
+  let html='<div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px">';
+  Object.entries(totali).forEach(([sald,tipi])=>{
+    let subtot=Object.values(tipi).reduce((a,b)=>a+b,0);
+    html+='<div style="background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--radius);padding:8px 12px;font-size:12px">'+
+      '<strong style="color:var(--accent)">'+sald+'</strong><br>'+
+      Object.entries(tipi).map(([t,n])=>'<span style="color:var(--text2)">'+t+': <b style="color:var(--text)">'+n+'</b></span>').join(' | ')+
+      '<br><span style="color:var(--text3);font-size:11px">Totale: '+subtot+' dischi</span></div>';
+  });
+  html+='</div>';
+
+  html+='<table class="data-table"><thead><tr><th>Data</th><th>Saldatore</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Note</th><th></th></tr></thead><tbody>'+
+    list.map(c=>'<tr>'+
+      '<td style="white-space:nowrap">'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td>'+
+      '<td style="font-weight:500;color:var(--text)">'+c.saldatore+'</td>'+
+      '<td>'+c.tipo+'</td>'+
+      '<td>'+(c.diametro||'—')+'</td>'+
+      '<td><span style="font-weight:600;color:var(--accent)">'+c.qty+'</span></td>'+
+      '<td style="color:var(--text3)">'+(c.note||'—')+'</td>'+
+      '<td><button onclick="deleteConsumoOffic('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer">x</button></td>'+
+      '</tr>').join('')+
+    '</tbody></table>';
+  el.innerHTML=html;
+}
+
+function deleteConsumoOffic(id){
+  consumiOfficDB=consumiOfficDB.filter(c=>c.id!==id);
+  saveScorteDB();renderConsumiOfficina();
+}
+
+function stampaConsumiOfficina(){
+  const w=window.open('','_blank');
+  const rows=consumiOfficDB.map(c=>'<tr><td>'+(c.data||'')+'</td><td>'+c.saldatore+'</td><td>'+c.tipo+'</td><td>'+(c.diametro||'')+'</td><td>'+c.qty+'</td><td>'+(c.note||'')+'</td></tr>').join('');
+  const tot=consumiOfficDB.reduce((a,c)=>a+(parseInt(c.qty)||0),0);
+  w.document.write('<!DOCTYPE html><html><head><title>Consumi Officina DCE</title><style>body{font-family:Arial,font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px}th{background:#f0f0f0}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h2>Consumi Dischi Officina - DCE Carpenteria Metallica</h2>');
+  w.document.write('<p>Stampato il '+new Date().toLocaleDateString('it-IT')+' - Totale dischi consumati: <b>'+tot+'</b></p>');
+  w.document.write('<table><thead><tr><th>Data</th><th>Saldatore</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>');
+  w.document.write('<br><button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
+}
+
+// --- SQUADRE ---
+function addSquadra(){
+  const nome=document.getElementById('sq-nome').value.trim();
+  const capo=document.getElementById('sq-capo').value.trim();
+  if(!nome||!capo){showToast('Inserisci nome squadra e capo squadra');return;}
+  if(squadreDB.find(s=>s.nome===nome)){showToast('Squadra gia presente');return;}
+  squadreDB.push({
+    id:Date.now(),nome,capo,
+    ncomp:document.getElementById('sq-ncomp').value,
+    membri:document.getElementById('sq-membri').value,
+    cantiere:document.getElementById('sq-cantiere').value
+  });
+  saveScorteDB();renderSquadre();updateSqSelect();calcF2();
+  ['sq-nome','sq-capo','sq-ncomp','sq-membri','sq-cantiere'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('Squadra aggiunta');
+}
+
+function deleteSquadra(id){
+  if(!confirm('Eliminare questa squadra?'))return;
+  squadreDB=squadreDB.filter(s=>s.id!==id);
+  saveScorteDB();renderSquadre();updateSqSelect();calcF2();
+}
+
+function renderSquadre(){
+  const el=document.getElementById('squadre-lista');if(!el)return;
+  if(!squadreDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessuna squadra registrata</p></div>';return;}
+  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+    squadreDB.map(s=>{
+      const totDischi=consumiSqDB.filter(c=>c.squadra===s.nome).reduce((a,c)=>a+(parseInt(c.qty)||0),0);
+      const totAttr=dotazioniSqDB.filter(d=>d.squadra===s.nome&&d.stato==='Consegnata').length;
+      return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;min-width:200px">'+
+        '<div style="font-weight:500;color:var(--text);margin-bottom:4px">'+s.nome+'</div>'+
+        '<div style="font-size:12px;color:var(--text2)">Capo: <b>'+s.capo+'</b></div>'+
+        (s.ncomp?'<div style="font-size:11px;color:var(--text3)">Componenti: '+s.ncomp+'</div>':'')+
+        (s.membri?'<div style="font-size:11px;color:var(--text3)">'+s.membri+'</div>':'')+
+        (s.cantiere?'<div style="font-size:11px;color:var(--blue)">Cantiere: '+s.cantiere+'</div>':'')+
+        '<div style="font-size:11px;color:var(--accent);margin-top:4px">Dischi: '+totDischi+' | Attr. in dotazione: '+totAttr+'</div>'+
+        '<button onclick="deleteSquadra('+s.id+')" style="margin-top:6px;background:none;border:1px solid var(--border2);border-radius:3px;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 8px">Rimuovi</button>'+
+        '</div>';
+    }).join('')+'</div>';
+}
+
+function updateSqSelect(){
+  ['cons-sq-nome','dot-sq-nome','filter-sq'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const def=id==='filter-sq'?'<option value="">Tutte le squadre</option>':'<option value="">— seleziona squadra —</option>';
+    el.innerHTML=def+squadreDB.map(s=>'<option>'+s.nome+'</option>').join('');
+  });
+}
+
+// --- CONSUMI SQUADRE ---
+function addConsumoSquadra(){
+  const squadra=document.getElementById('cons-sq-nome').value;
+  const tipo=document.getElementById('cons-sq-tipo').value;
+  const qty=document.getElementById('cons-sq-qty').value;
+  if(!squadra||!tipo||!qty){showToast('Compila squadra, tipo disco e quantita');return;}
+  consumiSqDB.push({
+    id:Date.now(),squadra,tipo,
+    diametro:document.getElementById('cons-sq-diam').value,
+    qty:parseInt(qty),
+    data:document.getElementById('cons-sq-data').value,
+    note:document.getElementById('cons-sq-note').value
+  });
+  saveScorteDB();renderConsumiSquadre();renderSquadre();
+  ['cons-sq-nome','cons-sq-tipo','cons-sq-diam','cons-sq-qty','cons-sq-data','cons-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('Consumo registrato');
+}
+
+function renderConsumiSquadre(){
+  const el=document.getElementById('consumi-squadre-lista');if(!el)return;
+  const fs=document.getElementById('filter-sq')?.value||'';
+  let list=[...consumiSqDB].filter(c=>!fs||c.squadra===fs).reverse();
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">0</div><p>Nessun consumo registrato</p></div>';return;}
+  const totali={};
+  consumiSqDB.filter(c=>!fs||c.squadra===fs).forEach(c=>{
+    if(!totali[c.squadra])totali[c.squadra]=0;
+    totali[c.squadra]+=parseInt(c.qty)||0;
+  });
+  let html='<div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px">';
+  Object.entries(totali).forEach(([sq,tot])=>{
+    html+='<div style="background:var(--blue-bg);border:1px solid rgba(74,126,181,0.2);border-radius:var(--radius);padding:8px 12px;font-size:12px">'+
+      '<strong style="color:var(--blue)">'+sq+'</strong><br>'+
+      '<span style="color:var(--text2)">Totale dischi: <b style="color:var(--text)">'+tot+'</b></span></div>';
+  });
+  html+='</div>';
+  html+='<table class="data-table"><thead><tr><th>Data</th><th>Squadra</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Cantiere/Note</th><th></th></tr></thead><tbody>'+
+    list.map(c=>'<tr>'+
+      '<td style="white-space:nowrap">'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td>'+
+      '<td style="font-weight:500;color:var(--text)">'+c.squadra+'</td>'+
+      '<td>'+c.tipo+'</td>'+
+      '<td>'+(c.diametro||'—')+'</td>'+
+      '<td><span style="font-weight:600;color:var(--accent)">'+c.qty+'</span></td>'+
+      '<td style="color:var(--text3)">'+(c.note||'—')+'</td>'+
+      '<td><button onclick="deleteConsumoSq('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer">x</button></td>'+
+      '</tr>').join('')+'</tbody></table>';
+  el.innerHTML=html;
+}
+
+function deleteConsumoSq(id){
+  consumiSqDB=consumiSqDB.filter(c=>c.id!==id);
+  saveScorteDB();renderConsumiSquadre();renderSquadre();
+}
+
+function stampaConsumiSquadre(){
+  const w=window.open('','_blank');
+  const rows=consumiSqDB.map(c=>'<tr><td>'+(c.data||'')+'</td><td>'+c.squadra+'</td><td>'+c.tipo+'</td><td>'+(c.diametro||'')+'</td><td>'+c.qty+'</td><td>'+(c.note||'')+'</td></tr>').join('');
+  const tot=consumiSqDB.reduce((a,c)=>a+(parseInt(c.qty)||0),0);
+  w.document.write('<!DOCTYPE html><html><head><title>Consumi Squadre DCE</title><style>body{font-family:Arial,font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px}th{background:#f0f0f0}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h2>Consumi Dischi Squadre Montaggio - DCE Carpenteria Metallica</h2>');
+  w.document.write('<p>Stampato il '+new Date().toLocaleDateString('it-IT')+' - Totale dischi: <b>'+tot+'</b></p>');
+  w.document.write('<table><thead><tr><th>Data</th><th>Squadra</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>');
+  w.document.write('<br><button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
+}
+
+// --- DOTAZIONE SQUADRE ---
+function addDotazioneSquadra(){
+  const squadra=document.getElementById('dot-sq-nome').value;
+  const attr=document.getElementById('dot-sq-attr').value.trim();
+  if(!squadra||!attr){showToast('Compila squadra e attrezzatura');return;}
+  dotazioniSqDB.push({
+    id:Date.now(),squadra,attr,
+    sn:document.getElementById('dot-sq-sn').value.trim(),
+    data:document.getElementById('dot-sq-data').value,
+    stato:document.getElementById('dot-sq-stato').value,
+    note:document.getElementById('dot-sq-note').value
+  });
+  saveScorteDB();renderSquadre();
+  ['dot-sq-nome','dot-sq-attr','dot-sq-sn','dot-sq-data','dot-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('Dotazione registrata');
+}
+// ============ END FASE 2 SCORTE ============
+
+
 
 function updateCerBar(){ calcF4(); }
 
@@ -1228,25 +1725,24 @@ function stampaRegistroAttr(){
 // ============ END ATTREZZATURE ============
 
 window.addEventListener('load',async()=>{
-  initSupabase();
-  // Controlla sessione esistente
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentSession=session;
-    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+session.user.id+'&select=nome,ruolo');
-    const nome=profile.length?profile[0].nome:session.user.email.split('@')[0];
-    const ruolo=profile.length?profile[0].ruolo:'viewer';
-    currentUser={email:session.user.email,nome,ruolo,id:session.user.id};
-    sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
+  // Ripristina sessione da sessionStorage
+  const savedToken=sessionStorage.getItem('dce-token');
+  const savedUser=sessionStorage.getItem('dce-user');
+  if(savedToken&&savedUser){
+    accessToken=savedToken;
+    currentUser=JSON.parse(savedUser);
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
+    document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
     loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
   }
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
-  loadMezziDB();loadAssegnazioniDB();
+  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();
   renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();
+  renderAttrezzature();
+  renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
+  renderConsumiOfficina();renderConsumiSquadre();
   updateDashboardStats();
 });
 </script>
