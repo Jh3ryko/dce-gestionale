@@ -110,6 +110,7 @@
   #app { display:none; flex:1; overflow:hidden; }
   @media print { .sidebar,.topbar,.btn,.actions-bar,.toast,#login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
 </style>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -160,6 +161,7 @@
   <div class="sidebar-section">
     <div class="sidebar-section-label">Registri operativi</div>
     <button class="nav-item" onclick="showModule('mezzi')"><span class="nav-dot" style="background:#4a7eb5"></span>Automezzi e Muletti<span class="nav-badge tag-blue">attivo</span></button>
+    <button class="nav-item" onclick="showModule('attrezzature')"><span class="nav-dot" style="background:#7a68b5"></span>Attrezzature<span class="nav-badge tag-purple">attivo</span></button>
   </div>
   <div class="sidebar-footer">Danilo Iacovone<br>Resp. Magazzino e Logistica</div>
 </aside>
@@ -646,6 +648,133 @@
       </div>
     </div>
 
+  
+    <!-- ATTREZZATURE -->
+    <div class="module" id="mod-attrezzature">
+      <div class="section-header"><h1>Registro Attrezzature</h1><p>Censimento utensili aziendali — stato, posizione, dotazione, storico manutenzioni.</p></div>
+      <div class="form-card" id="attr-form-card">
+        <div class="form-card-title" id="attr-form-title">Aggiungi / Modifica attrezzatura</div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label>Tipo attrezzatura</label>
+            <select id="at-tipo">
+              <option value="">— seleziona —</option>
+              <optgroup label="Taglio e abrasione">
+                <option>Smerigliatrice angolare (flessibile)</option><option>Smerigliatrice diritta</option>
+                <option>Troncatrice</option><option>Seghetto alternativo</option><option>Sega circolare</option><option>Cesoia elettrica</option>
+              </optgroup>
+              <optgroup label="Foratura e avvitatura">
+                <option>Trapano a percussione</option><option>Trapano combinato (tassellatore)</option><option>Trapano a colonna</option>
+                <option>Avvitatore a impulsi</option><option>Avvitatore a batteria</option><option>Cacciavite elettrico</option><option>Rivettatore</option>
+              </optgroup>
+              <optgroup label="Levigatura e finitura">
+                <option>Levigatrice orbitale</option><option>Levigatrice a nastro</option><option>Levigatrice delta</option><option>Lucidatrice</option><option>Sabbiatrice</option>
+              </optgroup>
+              <optgroup label="Misura e tracciatura">
+                <option>Laser di misura (distanziometro)</option><option>Livella laser</option><option>Laser a croce</option>
+                <option>Laser rotante</option><option>Metro laser</option><option>Calibro digitale</option><option>Micrometro</option><option>Squadra di precisione</option>
+              </optgroup>
+              <optgroup label="Saldatura e termici">
+                <option>Saldatrice MIG/MAG portatile</option><option>Saldatrice TIG portatile</option>
+                <option>Saldatrice elettrica (inverter)</option><option>Cannello ossiacetilenico</option><option>Pistola aria calda</option>
+              </optgroup>
+              <optgroup label="Pneumatici e idraulici">
+                <option>Compressore d'aria</option><option>Pistola sparachiodi</option><option>Pistola pneumatica</option><option>Cricco idraulico</option>
+              </optgroup>
+              <optgroup label="Contenitori">
+                <option>Valigetta attrezzi</option><option>Cassetta utensili</option><option>Carrello porta attrezzi</option><option>Armadio porta attrezzi</option>
+              </optgroup>
+              <option>Altro (specifica nelle note)</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Tipo personalizzato</label><input type="text" id="at-tipo-custom" placeholder="es. Piegatrice manuale"></div>
+          <div class="form-group"><label>Marca</label>
+            <select id="at-marca">
+              <option value="">— seleziona —</option>
+              <option>Wurth</option><option>Milwaukee</option><option>Hilti</option><option>Bosch Professional</option>
+              <option>Bosch</option><option>DeWalt</option><option>Makita</option><option>Metabo</option><option>Flex</option>
+              <option>Fein</option><option>Festool</option><option>Leica</option><option>Stanley</option><option>Facom</option>
+              <option>Beta</option><option>Usag</option><option>ESAB</option><option>Lincoln Electric</option><option>Altra marca</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Marca personalizzata</label><input type="text" id="at-marca-custom" placeholder="es. Sidamo"></div>
+          <div class="form-group"><label>Modello</label><input type="text" id="at-modello" placeholder="es. GWS 22-230"></div>
+          <div class="form-group"><label>N. Seriale / Inventario</label><input type="text" id="at-seriale" placeholder="es. ATT-001"></div>
+          <div class="form-group"><label>Alimentazione</label>
+            <select id="at-alim">
+              <option value="">— seleziona —</option>
+              <option>A filo 220V</option><option>A filo 380V (trifase)</option><option>A batteria 12V</option>
+              <option>A batteria 18V</option><option>A batteria 36V</option><option>Pneumatico (aria compressa)</option>
+              <option>Idraulico</option><option>Manuale</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Anno acquisto</label><input type="number" id="at-anno" placeholder="es. 2021"></div>
+          <div class="form-group"><label>Proprieta</label>
+            <select id="at-prop"><option>Proprieta aziendale</option><option>Noleggio</option><option>Leasing</option><option>Proprieta dipendente</option><option>In comodato</option></select>
+          </div>
+          <div class="form-group"><label>Stato attuale</label>
+            <select id="at-stato">
+              <option value="">— seleziona —</option>
+              <option>Ottimo</option><option>Buono</option><option>Usato - funzionante</option>
+              <option>Da riparare</option><option>In riparazione</option><option>Fuori uso</option><option>Dismesso</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Posizione / Ubicazione</label>
+            <select id="at-posizione">
+              <option value="">— seleziona —</option>
+              <option>Magazzino - Scaffalatura A</option><option>Magazzino - Scaffalatura B</option><option>Magazzino - Scaffalatura C</option>
+              <option>Magazzino - Box 1</option><option>Magazzino - Box 2</option><option>Magazzino - Box 3</option>
+              <option>Area stoccaggio A1</option><option>Area stoccaggio A2</option><option>Area stoccaggio A7</option>
+              <option>Postazione saldatura 1</option><option>Postazione saldatura 2</option><option>Postazione saldatura 3</option>
+              <option>Postazione saldatura 4</option><option>Postazione saldatura 5</option><option>Postazione saldatura 6</option>
+              <option>Zona laser</option><option>Zona taglierina</option><option>Ufficio</option>
+              <option>In dotazione (vedi campo)</option><option>Posizione sconosciuta</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Codice posizione</label><input type="text" id="at-codpos" placeholder="es. MAG-A-R2-P3"></div>
+          <div class="form-group"><label>In dotazione a</label><input type="text" id="at-dotazione" placeholder="es. Mario Rossi / uso comune"></div>
+          <div class="form-group"><label>Data dotazione</label><input type="date" id="at-data-dot"></div>
+          <div class="form-group span-2"><label>Note</label><textarea id="at-note" placeholder="Condizioni, accessori, anomalie..." style="min-height:60px"></textarea></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:12px 0 0;margin:0">
+          <button class="btn btn-primary" id="btn-salva-attr" onclick="addAttrezzo()">Aggiungi attrezzatura</button>
+          <button class="btn btn-ghost" onclick="clearAttrezzoForm()">Annulla</button>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Registro manutenzioni e riparazioni</div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label>N. Seriale attrezzatura</label><input type="text" id="man-seriale" placeholder="es. ATT-001"></div>
+          <div class="form-group"><label>Data intervento</label><input type="date" id="man-data"></div>
+          <div class="form-group"><label>Tipo intervento</label>
+            <select id="man-tipo"><option value="">— seleziona —</option>
+              <option>Manutenzione ordinaria</option><option>Riparazione</option><option>Sostituzione componente</option>
+              <option>Sostituzione batteria</option><option>Sostituzione spazzole</option><option>Revisione completa</option><option>Dismissione</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Stato dopo</label>
+            <select id="man-stato-dopo"><option>Ottimo</option><option>Buono</option><option>Usato - funzionante</option><option>Da riparare ancora</option><option>Fuori uso</option></select>
+          </div>
+          <div class="form-group"><label>Costo (euro)</label><input type="number" id="man-costo" placeholder="es. 45"></div>
+          <div class="form-group"><label>Eseguito da</label><input type="text" id="man-chi" placeholder="es. Officina Rossi / interno"></div>
+          <div class="form-group span-2"><label>Descrizione</label><textarea id="man-desc" placeholder="Cosa e stato fatto..." style="min-height:55px"></textarea></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addManutenzione()">Registra intervento</button></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Registro attrezzature (<span id="attr-count">0</span>)</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <input type="text" id="attr-search" placeholder="Cerca tipo, marca, seriale, posizione..." style="flex:1;min-width:200px" oninput="renderAttrezzature()">
+          <select id="attr-filter-stato" onchange="renderAttrezzature()" style="width:170px">
+            <option value="">Tutti gli stati</option>
+            <option>Ottimo</option><option>Buono</option><option>Usato - funzionante</option>
+            <option>Da riparare</option><option>In riparazione</option><option>Fuori uso</option><option>Dismesso</option>
+          </select>
+          <button class="btn btn-ghost" onclick="stampaRegistroAttr()">Stampa</button>
+        </div>
+        <div id="attr-lista"><div class="empty-state"><div class="icon">360</div><p>Nessuna attrezzatura registrata</p></div></div>
+      </div>
+    </div>
+
   </div>
 </main>
 </div>
@@ -666,8 +795,8 @@
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg">Salvato</span></div>
 
 <script>
-const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Scorte',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti'};
+const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature'];
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Scorte',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature'};
 
 function showModule(id) {
   MODULES.forEach(m=>document.getElementById('mod-'+m).classList.remove('active'));
@@ -916,48 +1045,39 @@ const SUPABASE_URL='https://oejkxzxnqhyiwchqsdmh.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
 let currentUser=null, accessToken=null;
 
-// Pure REST - no library needed
-
-// Helper fetch autenticato con JWT
 async function sbFetch(path,method='GET',body=null,extra={}){
   const token=accessToken||SUPABASE_ANON;
   const headers={'apikey':SUPABASE_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation',...extra};
   const opts={method,headers};if(body)opts.body=JSON.stringify(body);
-  try{
-    const res=await fetch(SUPABASE_URL+path,opts);
-    if(!res.ok){const err=await res.text();throw new Error(err);}
-    const text=await res.text();return text?JSON.parse(text):[];
-  }catch(e){console.warn('sbFetch error:',e);return[];}
+  try{const res=await fetch(SUPABASE_URL+path,opts);if(!res.ok){const err=await res.text();throw new Error(err);}const text=await res.text();return text?JSON.parse(text):[];}
+  catch(e){console.warn('sbFetch:',e);return[];}
 }
 
-// LOGIN con Supabase Auth nativo
 async function doLogin(){
   const errEl=document.getElementById('login-error');
   const email=document.getElementById('login-email').value.trim().toLowerCase();
   const pass=document.getElementById('login-pass').value;
-  errEl.textContent='';
-  if(!email||!pass){errEl.textContent='Compila email e password.';return;}
-  errEl.style.color='var(--text2)';
+  errEl.style.color='var(--text2)';errEl.textContent='';
+  if(!email||!pass){errEl.style.color='var(--red)';errEl.textContent='Compila email e password.';return;}
   errEl.textContent='Accesso in corso...';
   try{
-    const authRes=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
-      method:'POST',
-      headers:{'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
+    const res=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
+      method:'POST',headers:{'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
       body:JSON.stringify({email,password:pass})
     });
-    const authData=await authRes.json();
-    if(!authRes.ok||authData.error){
-      errEl.style.color='var(--red)';
-      errEl.textContent=authData.error_description||authData.msg||'Email o password errati.';
-      return;
-    }
-    accessToken=authData.access_token;
+    const data=await res.json();
+    if(!res.ok||data.error){errEl.style.color='var(--red)';errEl.textContent=data.error_description||data.msg||'Email o password errati.';return;}
+    accessToken=data.access_token;
     sessionStorage.setItem('dce-token',accessToken);
-    const uid=authData.user?.id||'';
-    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
+    const uid=data.user?.id||'';
+    let profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
+    if(!profile.length){
+      await sbFetch('/rest/v1/profiles','POST',{id:uid,nome:email.split('@')[0],ruolo:'viewer'});
+      profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
+    }
     const nome=profile.length?profile[0].nome:email.split('@')[0];
     const ruolo=profile.length?profile[0].ruolo:'viewer';
-    currentUser={email:authData.user.email,nome,ruolo,id:uid};
+    currentUser={email:data.user.email,nome,ruolo,id:uid};
     sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
     await auditLog('login','sistema','Accesso da '+nome+' ('+ruolo+')');
     errEl.textContent='';
@@ -966,93 +1086,161 @@ async function doLogin(){
     document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
     await loadAllFromCloud();
     showToast('Benvenuto '+nome+'!');
-  }catch(e){
-    errEl.style.color='var(--red)';
-    errEl.textContent='Errore: '+e.message;
-    console.error('doLogin error:',e);
-  }
+  }catch(e){errEl.style.color='var(--red)';errEl.textContent='Errore: '+e.message;console.error(e);}
 }
 
-// LOGOUT
 async function doLogout(){
   try{await fetch(SUPABASE_URL+'/auth/v1/logout',{method:'POST',headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+(accessToken||'')}});}catch(e){}
-  sessionStorage.removeItem('dce-user');
   accessToken=null;currentUser=null;
+  sessionStorage.removeItem('dce-user');sessionStorage.removeItem('dce-token');
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
-  document.getElementById('login-email').value='';
-  document.getElementById('login-pass').value='';
+  document.getElementById('login-email').value='';document.getElementById('login-pass').value='';
 }
 
-// AUDIT LOG
 async function auditLog(azione,sezione,dettaglio=''){
   if(!currentUser)return;
-  try{await sbFetch('/rest/v1/audit_log','POST',{utente_email:currentUser.email,utente_nome:currentUser.nome,azione,sezione,dettaglio});}
-  catch(e){console.warn('Audit log error:',e);}
+  try{await sbFetch('/rest/v1/audit_log','POST',{utente_email:currentUser.email,utente_nome:currentUser.nome,azione,sezione,dettaglio});}catch(e){}
 }
 
-// CLOUD SAVE
 async function saveToCloud(sezione,dati){
   if(!currentUser)return;
-  try{
-    await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});
-    await auditLog('salvataggio',sezione,'Sezione "'+sezione+'" aggiornata');
-  }catch(e){console.warn('Cloud save error:',e);}
+  try{await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});await auditLog('salvataggio',sezione,'Sezione "'+sezione+'" aggiornata');}catch(e){console.warn(e);}
 }
 
-async function loadFromCloud(sezione){
-  try{const rows=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati');return rows.length?rows[0].dati:null;}
-  catch(e){return null;}
-}
+async function loadFromCloud(sezione){try{const r=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati');return r.length?r[0].dati:null;}catch(e){return null;}}
 
 async function loadAllFromCloud(){
   if(!currentUser)return;
   try{
-    for(const phase of['charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6']){
-      const data=await loadFromCloud(phase);if(!data)continue;
-      Object.entries(data).forEach(([id,val])=>{
-        const el=document.getElementById(id);if(!el)return;
-        if(el.type==='checkbox'){el.checked=val;const item=el.closest('.check-item');if(item)item.classList.toggle('checked',val);}
-        else el.value=val;
-      });
+    for(const p of['charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6']){
+      const d=await loadFromCloud(p);if(!d)continue;
+      Object.entries(d).forEach(([id,val])=>{const el=document.getElementById(id);if(!el)return;if(el.type==='checkbox'){el.checked=val;const it=el.closest('.check-item');if(it)it.classList.toggle('checked',val);}else el.value=val;});
     }
-    const mezziRows=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');mezziDB=mezziRows.map(r=>r.dati).filter(Boolean);
-    const intRows=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');interventiDB=intRows.map(r=>r.dati).filter(Boolean);
-    const assRows=await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc');assegnazioniDB=assRows.map(r=>r.dati).filter(Boolean);
+    const mr=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');mezziDB=mr.map(r=>r.dati).filter(Boolean);
+    const ir=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');interventiDB=ir.map(r=>r.dati).filter(Boolean);
+    const ar=await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc');assegnazioniDB=ar.map(r=>r.dati).filter(Boolean);
     setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateDashboardStats();},100);
-  }catch(e){console.warn('Load error:',e);}
+  }catch(e){console.warn(e);}
 }
 
-// AUDIT LOG VIEWER
 async function showAuditLog(){
-  if(currentUser?.ruolo!=='admin'){showToast("Accesso riservato all'amministratore");return;}
+  if(currentUser?.ruolo!=='admin'){showToast("Solo l'admin puo vedere il log");return;}
   try{
     const rows=await sbFetch('/rest/v1/audit_log?select=*&order=created_at.desc&limit=100');
-    document.getElementById('audit-body').innerHTML=rows.length?rows.map(r=>`<tr>
-      <td style="white-space:nowrap;font-size:11px">${new Date(r.created_at).toLocaleString('it-IT')}</td>
-      <td style="font-weight:500;color:var(--text)">${r.utente_nome||'—'}</td>
-      <td><span class="tag tag-gray" style="font-size:10px">${r.utente_email||'—'}</span></td>
-      <td><span class="tag ${r.azione==='login'?'tag-green':r.azione==='salvataggio'?'tag-blue':'tag-gray'}" style="font-size:10px">${r.azione}</span></td>
-      <td style="color:var(--text2)">${r.sezione||'—'}</td>
-      <td style="color:var(--text3);font-size:12px">${r.dettaglio||'—'}</td>
-    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nessuna attività</td></tr>';
+    document.getElementById('audit-body').innerHTML=rows.length?rows.map(r=>'<tr><td style="white-space:nowrap;font-size:11px">'+new Date(r.created_at).toLocaleString('it-IT')+'</td><td style="font-weight:500;color:var(--text)">'+(r.utente_nome||'—')+'</td><td><span class="tag tag-gray" style="font-size:10px">'+(r.utente_email||'—')+'</span></td><td><span class="tag '+(r.azione==='login'?'tag-green':r.azione==='salvataggio'?'tag-blue':'tag-gray')+'" style="font-size:10px">'+r.azione+'</span></td><td style="color:var(--text2)">'+(r.sezione||'—')+'</td><td style="color:var(--text3);font-size:12px">'+(r.dettaglio||'—')+'</td></tr>').join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nessuna attivita</td></tr>';
     document.getElementById('audit-modal').style.display='flex';
-  }catch(e){showToast('Errore caricamento log');}
+  }catch(e){showToast('Errore log');}
 }
 
 function closeAuditModal(){document.getElementById('audit-modal').style.display='none';}
 
-// INIT
+
+// ============ ATTREZZATURE ============
+let attrezzatureDB=[], manutenzioniDB=[], editingAttrId=null;
+function saveAttrDB(){try{localStorage.setItem('dce-attrezzature',JSON.stringify(attrezzatureDB));localStorage.setItem('dce-manutenzioni',JSON.stringify(manutenzioniDB));}catch(e){}}
+function loadAttrDB(){try{attrezzatureDB=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');manutenzioniDB=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){attrezzatureDB=[];manutenzioniDB=[];}}
+function getTipo(){const s=document.getElementById('at-tipo').value,c=document.getElementById('at-tipo-custom').value.trim();return(s==='Altro (specifica nelle note)'&&c)?c:s;}
+function getMarca(){const s=document.getElementById('at-marca').value,c=document.getElementById('at-marca-custom').value.trim();return(s==='Altra marca'&&c)?c:s;}
+function addAttrezzo(){
+  const tipo=getTipo();if(!tipo){showToast('Seleziona almeno il tipo');return;}
+  let seriale=document.getElementById('at-seriale').value.trim();if(!seriale)seriale='ATT-'+Date.now().toString().slice(-5);
+  const d={id:editingAttrId||Date.now(),tipo,marca:getMarca(),modello:document.getElementById('at-modello').value.trim(),seriale,
+    alim:document.getElementById('at-alim').value,anno:document.getElementById('at-anno').value,prop:document.getElementById('at-prop').value,
+    stato:document.getElementById('at-stato').value,posizione:document.getElementById('at-posizione').value,
+    codpos:document.getElementById('at-codpos').value.trim(),dotazione:document.getElementById('at-dotazione').value.trim(),
+    dataDot:document.getElementById('at-data-dot').value,note:document.getElementById('at-note').value};
+  if(editingAttrId){const i=attrezzatureDB.findIndex(a=>a.id===editingAttrId);if(i!==-1){attrezzatureDB[i]=d;showToast('Aggiornata');}editingAttrId=null;document.getElementById('btn-salva-attr').textContent='Aggiungi attrezzatura';document.getElementById('attr-form-title').textContent='Aggiungi / Modifica attrezzatura';}
+  else{attrezzatureDB.push(d);showToast('Aggiunta');}
+  saveAttrDB();renderAttrezzature();clearAttrezzoForm();
+}
+function editAttrezzo(id){
+  const a=attrezzatureDB.find(x=>x.id===id);if(!a)return;editingAttrId=id;
+  const ts=document.getElementById('at-tipo'),to=[...ts.options].map(o=>o.value);
+  if(to.includes(a.tipo)){ts.value=a.tipo;}else{ts.value='Altro (specifica nelle note)';document.getElementById('at-tipo-custom').value=a.tipo||'';}
+  const ms=document.getElementById('at-marca'),mo=[...ms.options].map(o=>o.value);
+  if(mo.includes(a.marca)){ms.value=a.marca;}else{ms.value='Altra marca';document.getElementById('at-marca-custom').value=a.marca||'';}
+  ['modello','seriale','anno','codpos','dotazione','note'].forEach(k=>{const el=document.getElementById('at-'+k);if(el)el.value=a[k]||'';});
+  document.getElementById('at-alim').value=a.alim||'';document.getElementById('at-prop').value=a.prop||'Proprieta aziendale';
+  document.getElementById('at-stato').value=a.stato||'';document.getElementById('at-posizione').value=a.posizione||'';document.getElementById('at-data-dot').value=a.dataDot||'';
+  document.getElementById('btn-salva-attr').textContent='Salva modifiche';document.getElementById('attr-form-title').textContent='Modifica: '+a.tipo;
+  document.getElementById('attr-form-card').scrollIntoView({behavior:'smooth'});showToast('Modifica in corso');
+}
+function deleteAttrezzo(id){if(!confirm('Eliminare?'))return;attrezzatureDB=attrezzatureDB.filter(a=>a.id!==id);saveAttrDB();renderAttrezzature();showToast('Rimossa');}
+function clearAttrezzoForm(){
+  editingAttrId=null;document.getElementById('btn-salva-attr').textContent='Aggiungi attrezzatura';document.getElementById('attr-form-title').textContent='Aggiungi / Modifica attrezzatura';
+  ['at-tipo','at-tipo-custom','at-marca','at-marca-custom','at-modello','at-seriale','at-alim','at-anno','at-posizione','at-codpos','at-dotazione','at-data-dot','at-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('at-prop').value='Proprieta aziendale';document.getElementById('at-stato').value='';
+}
+function attrStatoColor(s){return{'Ottimo':'tag-green','Buono':'tag-green','Usato - funzionante':'tag-orange','Da riparare':'tag-red','In riparazione':'tag-red','Fuori uso':'tag-red','Dismesso':'tag-gray'}[s]||'tag-gray';}
+function renderAttrezzature(){
+  const el=document.getElementById('attr-lista');if(!el)return;
+  const search=(document.getElementById('attr-search')?.value||'').toLowerCase();
+  const fs=document.getElementById('attr-filter-stato')?.value||'';
+  const list=attrezzatureDB.filter(a=>(!search||[a.tipo,a.marca,a.modello,a.seriale,a.posizione,a.dotazione].join(' ').toLowerCase().includes(search))&&(!fs||a.stato===fs));
+  const c=document.getElementById('attr-count');if(c)c.textContent=attrezzatureDB.length;
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">0</div><p>Nessuna attrezzatura'+(search||fs?' trovata':' registrata')+'</p></div>';return;}
+  el.innerHTML=list.map(a=>{
+    const mans=manutenzioniDB.filter(m=>m.seriale===a.seriale);
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)">'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
+    '<span style="font-size:14px;font-weight:500;color:var(--text)">'+a.tipo+'</span>'+
+    (a.marca?'<span class="tag tag-orange">'+a.marca+'</span>':'')+
+    (a.modello?'<span style="font-size:12px;color:var(--text2)">'+a.modello+'</span>':'')+
+    (a.alim?'<span class="tag tag-gray" style="font-size:10px">'+a.alim+'</span>':'')+
+    (a.stato?'<span class="tag '+attrStatoColor(a.stato)+'">'+a.stato+'</span>':'')+
+    '<div style="margin-left:auto;display:flex;gap:6px">'+
+    '<button onclick="editAttrezzo('+a.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">Modifica</button>'+
+    '<button onclick="deleteAttrezzo('+a.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">X</button>'+
+    '</div></div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text2)">'+
+    (a.seriale?'<span>S/N: '+a.seriale+'</span>':'')+
+    (a.posizione?'<span>Posizione: '+a.posizione+(a.codpos?' ['+a.codpos+']':'')+'</span>':'')+
+    (a.dotazione?'<span>Dotazione: '+a.dotazione+(a.dataDot?' dal '+new Date(a.dataDot).toLocaleDateString('it-IT'):'')+'</span>':'')+
+    (a.anno?'<span>Anno: '+a.anno+'</span>':'')+
+    '</div>'+(a.note?'<div style="font-size:12px;color:var(--text3);margin-top:6px">'+a.note+'</div>':'')+
+    (mans.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Storico ('+mans.length+')</div>'+
+    mans.slice().reverse().slice(0,3).map(m=>'<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap"><span style="color:var(--text3)">'+(m.data||'—')+'</span><span class="tag '+attrStatoColor(m.statoDopo)+'" style="font-size:10px">'+(m.statoDopo||'—')+'</span><span style="color:var(--text2)">'+(m.tipo||'—')+'</span><span style="color:var(--text3)">'+(m.desc||'')+'</span>'+(m.costo?'<span style="color:var(--accent);margin-left:auto">euro '+m.costo+'</span>':'')+'</div>').join('')+
+    (mans.length>3?'<div style="font-size:11px;color:var(--text3);margin-top:4px">+ altri '+(mans.length-3)+'</div>':'')+
+    '</div>':'')+
+    '</div>';
+  }).join('');
+}
+function addManutenzione(){
+  const seriale=document.getElementById('man-seriale').value.trim(),tipo=document.getElementById('man-tipo').value;
+  if(!seriale||!tipo){showToast('Compila almeno seriale e tipo');return;}
+  const m={id:Date.now(),seriale,data:document.getElementById('man-data').value,tipo,statoDopo:document.getElementById('man-stato-dopo').value,costo:document.getElementById('man-costo').value,chi:document.getElementById('man-chi').value,desc:document.getElementById('man-desc').value};
+  manutenzioniDB.push(m);const a=attrezzatureDB.find(x=>x.seriale===seriale);if(a)a.stato=m.statoDopo;
+  saveAttrDB();renderAttrezzature();
+  ['man-seriale','man-data','man-tipo','man-costo','man-chi','man-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('Intervento registrato');
+}
+function stampaRegistroAttr(){
+  const w=window.open('','_blank');
+  const rows=attrezzatureDB.map(a=>'<tr><td>'+(a.tipo||'')+'</td><td>'+(a.marca||'')+'</td><td>'+(a.modello||'')+'</td><td>'+(a.seriale||'')+'</td><td>'+(a.alim||'')+'</td><td>'+(a.stato||'')+'</td><td>'+(a.posizione||'')+(a.codpos?' ['+a.codpos+']':'')+'</td><td>'+(a.dotazione||'')+'</td><td>'+(a.prop||'')+'</td><td>'+(a.note||'')+'</td></tr>').join('');
+  w.document.write('<!DOCTYPE html><html><head><title>Registro Attrezzature DCE</title><style>body{font-family:Arial,sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px 7px}th{background:#f0f0f0}tr:nth-child(even){background:#fafafa}button{margin-top:12px;padding:8px 16px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h2>Registro Attrezzature - DCE Carpenteria Metallica S.r.l.</h2>');
+  w.document.write('<p style="color:#666;font-size:10px">Stampato il '+new Date().toLocaleDateString('it-IT')+' - Totale: '+attrezzatureDB.length+' attrezzature</p>');
+  w.document.write('<table><thead><tr><th>Tipo</th><th>Marca</th><th>Modello</th><th>Seriale</th><th>Alim.</th><th>Stato</th><th>Posizione</th><th>Dotazione</th><th>Proprieta</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>');
+  w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
+}
+// ============ END ATTREZZATURE ============
+
 window.addEventListener('load',async()=>{
+  initSupabase();
   // Controlla sessione esistente
-  const savedToken=sessionStorage.getItem('dce-token');
-  const savedUser=sessionStorage.getItem('dce-user');
-  if(savedToken&&savedUser){
-    accessToken=savedToken;
-    currentUser=JSON.parse(savedUser);
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentSession=session;
+    const profile=await sbFetch('/rest/v1/profiles?id=eq.'+session.user.id+'&select=nome,ruolo');
+    const nome=profile.length?profile[0].nome:session.user.email.split('@')[0];
+    const ruolo=profile.length?profile[0].ruolo:'viewer';
+    currentUser={email:session.user.email,nome,ruolo,id:session.user.id};
+    sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
+    document.getElementById('topbar-user').textContent=nome+' · '+ruolo;
     loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
   }
   loadCharter();
