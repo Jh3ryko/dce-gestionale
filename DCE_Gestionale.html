@@ -1123,12 +1123,17 @@ function renderSaldatori(){
   if(!saldatoriDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessun saldatore registrato</p></div>';return;}
   el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+
     saldatoriDB.map(s=>{
-      const tot=consumiOfficDB.filter(c=>c.saldatore===s.nome).reduce((acc,c)=>acc+(parseInt(c.qty)||0),0);
+      const consumi=consumiOfficDB.filter(c=>c.saldatore&&s.nome&&c.saldatore.trim().toLowerCase()===s.nome.trim().toLowerCase());
+      const tot=consumi.reduce((acc,c)=>acc+(parseInt(c.qty)||0),0);
+      const perTipo={};
+      consumi.forEach(c=>{if(!perTipo[c.tipo])perTipo[c.tipo]=0;perTipo[c.tipo]+=parseInt(c.qty)||0;});
+      const tipiHtml=Object.entries(perTipo).map(([t,n])=>'<span style="font-size:11px;color:var(--text2)">'+t.replace('Disco ','').replace(' (sbavatura)','')+':<b style="color:var(--text)"> '+n+'</b></span>').join(' &nbsp;|&nbsp; ');
       return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px">'+
         '<span style="font-size:18px">👷</span>'+
         '<div><div style="font-weight:500;color:var(--text)">'+s.nome+'</div>'+
         (s.postazione?'<div style="font-size:11px;color:var(--text3)">Postazione: '+s.postazione+'</div>':'')+
-        '<div style="font-size:11px;color:var(--accent)">Totale dischi: '+tot+'</div></div>'+
+        (tot>0?'<div style="font-size:11px;margin-top:4px">'+tipiHtml+'</div>':'')+
+        '<div style="font-size:11px;color:var(--accent);margin-top:2px">Totale: <b>'+tot+'</b> dischi</div></div>'+
         '<button onclick="deleteSaldatore('+s.id+')" style="margin-left:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px">x</button>'+
         '</div>';
     }).join('')+'</div>';
@@ -1156,8 +1161,8 @@ function addConsumoSaldatore(){
     data:document.getElementById('cons-sald-data').value,
     note:document.getElementById('cons-sald-note').value
   });
-  saveScorteDB();renderConsumiOfficina();
-  ['cons-sald-nome','cons-sald-tipo','cons-sald-diam','cons-sald-qty','cons-sald-data','cons-sald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  saveScorteDB();renderConsumiOfficina();renderSaldatori();
+  ['cons-sald-nome','cons-sald-tipo','cons-sald-diam','cons-sald-qty','cons-sald-data','cons-sald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});;
   showToast('Consumo registrato');
 }
 
