@@ -1075,11 +1075,13 @@ function loadScorteDB(){
   }catch(e){saldatoriDB=[];consumiOfficDB=[];squadreDB=[];consumiSqDB=[];dotazioniSqDB=[];}
 }
 
-function saveScorte(){
+async function saveScorte(){
   saveScorteDB();
-  showToast('Fase 2 salvata');
   if(typeof saveToCloud==='function'&&currentUser){
-    saveToCloud('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB});
+    const ok=await saveToCloud('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB});
+    showToast(ok?'Fase 2 salvata ✓ (locale + cloud)':'Fase 2 salvata solo in locale');
+  }else{
+    showToast('Fase 2 salvata (solo locale)');
   }
 }
 
@@ -1398,11 +1400,12 @@ function updateDashboardStats(){
   const cEl=document.getElementById('dash-checklist');if(cEl)cEl.textContent=sChecked+' / 9';
 }
 
-function saveModule(name){
+async function saveModule(name){
   const data={};
   document.querySelectorAll('#mod-'+name+' input,#mod-'+name+' select,#mod-'+name+' textarea').forEach(el=>{if(el.id)data[el.id]=el.type==='checkbox'?el.checked:el.value;});
-  try{localStorage.setItem('dce-'+name,JSON.stringify(data));showToast('Salvato ✓');}catch(e){showToast('Errore salvataggio');}
-  if(typeof saveToCloud==='function'&&currentUser)saveToCloud(name,data);
+  try{localStorage.setItem('dce-'+name,JSON.stringify(data));}catch(e){showToast('Errore salvataggio locale');return;}
+  if(typeof saveToCloud==='function'&&currentUser){const ok=await saveToCloud(name,data);if(ok)showToast('Salvato ✓ (locale + cloud)');}
+  else showToast('Salvato ✓ (solo locale, non hai eseguito il login)');
 }
 
 function loadModule(name){
@@ -1443,16 +1446,16 @@ function showToast(msg){
 }
 
 // CHARTER
-function saveCharter(){
+async function saveCharter(){
   const data={};
   document.querySelectorAll('#mod-charter input,#mod-charter select,#mod-charter textarea').forEach(el=>{if(el.id)data[el.id]=el.type==='checkbox'?el.checked:el.value;});
   try{
     localStorage.setItem('dce-charter',JSON.stringify(data));
     const nome=document.getElementById('ch-approv-nome').value,dataA=document.getElementById('ch-approv-data').value;
     if(nome&&dataA){const fmt=new Date(dataA).toLocaleDateString('it-IT');document.getElementById('ch-approv-status').innerHTML='<span style="color:var(--green)">✓ Approvato da '+nome+' in data '+fmt+'</span>';document.getElementById('ch-firma-resp').textContent=document.getElementById('ch-responsabile').value||'___________________________';}
-    showToast('Project Charter salvato');
-    if(typeof saveToCloud==='function'&&currentUser)saveToCloud('charter',data);
-  }catch(e){showToast('Errore salvataggio');}
+  }catch(e){showToast('Errore salvataggio locale');return;}
+  if(typeof saveToCloud==='function'&&currentUser){const ok=await saveToCloud('charter',data);showToast(ok?'Project Charter salvato ✓ (locale + cloud)':'Charter salvato solo in locale');}
+  else showToast('Project Charter salvato (solo locale)');
 }
 
 function loadCharter(){
@@ -1606,11 +1609,16 @@ async function auditLog(azione,sezione,dettaglio=''){
 }
 
 async function saveToCloud(sezione,dati){
-  if(!currentUser)return;
-  try{await sbFetch('/rest/v1/dati_progetto','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});await auditLog('salvataggio',sezione,'Sezione "'+sezione+'" aggiornata');}catch(e){console.warn(e);}
+  if(!currentUser)return false;
+  try{
+    const res=await sbFetch('/rest/v1/dati_progetto?on_conflict=sezione','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});
+    if(!res||(Array.isArray(res)&&!res.length)){showToast('⚠ Salvataggio cloud non riuscito (solo locale)');return false;}
+    await auditLog('salvataggio',sezione,'Sezione "'+sezione+'" aggiornata');
+    return true;
+  }catch(e){console.warn(e);showToast('⚠ Errore cloud: dati salvati solo in locale');return false;}
 }
 
-async function loadFromCloud(sezione){try{const r=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati');return r.length?r[0].dati:null;}catch(e){return null;}}
+async function loadFromCloud(sezione){try{const r=await sbFetch('/rest/v1/dati_progetto?sezione=eq.'+sezione+'&select=dati&order=updated_at.desc&limit=1');return r.length?r[0].dati:null;}catch(e){return null;}}
 
 async function loadAllFromCloud(){
   if(!currentUser)return;
@@ -1622,7 +1630,12 @@ async function loadAllFromCloud(){
     const mr=await sbFetch('/rest/v1/mezzi?select=dati&order=id.asc');mezziDB=mr.map(r=>r.dati).filter(Boolean);
     const ir=await sbFetch('/rest/v1/interventi?select=dati&order=id.asc');interventiDB=ir.map(r=>r.dati).filter(Boolean);
     const ar=await sbFetch('/rest/v1/assegnazioni?select=dati&order=id.asc');assegnazioniDB=ar.map(r=>r.dati).filter(Boolean);
-    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateDashboardStats();},100);
+    const scorte=await loadFromCloud('fase2-scorte');
+    if(scorte){
+      saldatoriDB=scorte.saldatori||[];consumiOfficDB=scorte.consumiOffic||[];squadreDB=scorte.squadre||[];consumiSqDB=scorte.consumiSq||[];dotazioniSqDB=scorte.dotazioniSq||[];
+      saveScorteDB();
+    }
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();updateDashboardStats();},100);
   }catch(e){console.warn(e);}
 }
 
