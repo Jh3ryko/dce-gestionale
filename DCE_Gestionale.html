@@ -487,7 +487,7 @@
 
         <!-- Registro Squadre -->
         <div class="form-card">
-          <div class="form-card-title">Registro Squadre Montaggio</div>
+          <div class="form-card-title" id="sq-form-title">Registro Squadre Montaggio</div>
           <div class="form-grid cols-3">
             <div class="form-group">
               <label>Nome squadra</label>
@@ -511,7 +511,8 @@
             </div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" onclick="addSquadra()">+ Aggiungi squadra</button>
+            <button class="btn btn-primary" id="btn-salva-sq" onclick="addSquadra()">+ Aggiungi squadra</button>
+            <button class="btn btn-ghost" onclick="clearSquadraForm()">Annulla</button>
           </div>
           <div id="squadre-lista" style="margin-top:12px">
             <div class="empty-state"><div class="icon">👷</div><p>Nessuna squadra registrata</p></div>
@@ -569,7 +570,7 @@
 
         <!-- Dotazione attrezzature squadre -->
         <div class="form-card">
-          <div class="form-card-title">Dotazione attrezzature — Squadre</div>
+          <div class="form-card-title" id="dot-form-title">Dotazione attrezzature — Squadre</div>
           <div class="form-grid cols-3">
             <div class="form-group">
               <label>Squadra</label>
@@ -601,7 +602,8 @@
             </div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" onclick="addDotazioneSquadra()">Registra dotazione</button>
+            <button class="btn btn-primary" id="btn-salva-dot" onclick="addDotazioneSquadra()">Registra dotazione</button>
+            <button class="btn btn-ghost" onclick="clearDotazioneForm()">Annulla</button>
           </div>
         </div>
 
@@ -1291,45 +1293,99 @@ function stampaConsumiOfficina(){
 }
 
 // --- SQUADRE ---
+let editingSquadraId=null, editingDotazioneId=null;
+
 function addSquadra(){
   const nome=document.getElementById('sq-nome').value.trim();
   const capo=document.getElementById('sq-capo').value.trim();
   if(!nome||!capo){showToast('Inserisci nome squadra e capo squadra');return;}
-  if(squadreDB.find(s=>s.nome===nome)){showToast('Squadra gia presente');return;}
-  squadreDB.push({
-    id:Date.now(),nome,capo,
+  const dup=squadreDB.find(s=>s.nome===nome&&s.id!==editingSquadraId);
+  if(dup){showToast('Squadra gia presente');return;}
+  const d={
+    id:editingSquadraId||Date.now(),nome,capo,
     ncomp:document.getElementById('sq-ncomp').value,
     membri:document.getElementById('sq-membri').value,
     cantiere:document.getElementById('sq-cantiere').value
-  });
-  saveScorteDB();renderSquadre();updateSqSelect();calcF2();
+  };
+  if(editingSquadraId){
+    const i=squadreDB.findIndex(s=>s.id===editingSquadraId);
+    if(i!==-1){
+      const vecchioNome=squadreDB[i].nome;
+      squadreDB[i]=d;
+      if(vecchioNome!==nome){
+        dotazioniSqDB.forEach(x=>{if(x.squadra===vecchioNome)x.squadra=nome;});
+        consumiSqDB.forEach(x=>{if(x.squadra===vecchioNome)x.squadra=nome;});
+      }
+      showToast('Squadra aggiornata');
+    }
+  }else{
+    squadreDB.push(d);showToast('Squadra aggiunta');
+  }
+  saveScorteDB();renderSquadre();updateSqSelect();calcF2();clearSquadraForm();
+}
+function editSquadra(id){
+  const s=squadreDB.find(x=>x.id===id);if(!s)return;
+  editingSquadraId=id;
+  document.getElementById('sq-nome').value=s.nome||'';
+  document.getElementById('sq-capo').value=s.capo||'';
+  document.getElementById('sq-ncomp').value=s.ncomp||'';
+  document.getElementById('sq-membri').value=s.membri||'';
+  document.getElementById('sq-cantiere').value=s.cantiere||'';
+  document.getElementById('btn-salva-sq').textContent='Salva modifiche';
+  document.getElementById('sq-form-title').textContent='Modifica: '+s.nome;
+  document.getElementById('sq-form-title').scrollIntoView({behavior:'smooth'});
+}
+function clearSquadraForm(){
+  editingSquadraId=null;
+  document.getElementById('btn-salva-sq').textContent='+ Aggiungi squadra';
+  document.getElementById('sq-form-title').textContent='Registro Squadre Montaggio';
   ['sq-nome','sq-capo','sq-ncomp','sq-membri','sq-cantiere'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  showToast('Squadra aggiunta');
 }
 
 function deleteSquadra(id){
-  if(!confirm('Eliminare questa squadra?'))return;
+  if(!confirm('Eliminare questa squadra e tutte le dotazioni/consumi associati?'))return;
+  const s=squadreDB.find(x=>x.id===id);
   squadreDB=squadreDB.filter(s=>s.id!==id);
-  saveScorteDB();renderSquadre();updateSqSelect();calcF2();
+  if(s){dotazioniSqDB=dotazioniSqDB.filter(d=>d.squadra!==s.nome);consumiSqDB=consumiSqDB.filter(c=>c.squadra!==s.nome);}
+  saveScorteDB();renderSquadre();updateSqSelect();renderConsumiSquadre();calcF2();showToast('Squadra rimossa');
 }
 
 function renderSquadre(){
   const el=document.getElementById('squadre-lista');if(!el)return;
   if(!squadreDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessuna squadra registrata</p></div>';return;}
-  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+
-    squadreDB.map(s=>{
-      const totDischi=consumiSqDB.filter(c=>c.squadra===s.nome).reduce((a,c)=>a+(parseInt(c.qty)||0),0);
-      const totAttr=dotazioniSqDB.filter(d=>d.squadra===s.nome&&d.stato==='Consegnata').length;
-      return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;min-width:200px">'+
-        '<div style="font-weight:500;color:var(--text);margin-bottom:4px">'+s.nome+'</div>'+
-        '<div style="font-size:12px;color:var(--text2)">Capo: <b>'+s.capo+'</b></div>'+
-        (s.ncomp?'<div style="font-size:11px;color:var(--text3)">Componenti: '+s.ncomp+'</div>':'')+
-        (s.membri?'<div style="font-size:11px;color:var(--text3)">'+s.membri+'</div>':'')+
-        (s.cantiere?'<div style="font-size:11px;color:var(--blue)">Cantiere: '+s.cantiere+'</div>':'')+
-        '<div style="font-size:11px;color:var(--accent);margin-top:4px">Dischi: '+totDischi+' | Attr. in dotazione: '+totAttr+'</div>'+
-        '<button onclick="deleteSquadra('+s.id+')" style="margin-top:6px;background:none;border:1px solid var(--border2);border-radius:3px;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 8px">Rimuovi</button>'+
-        '</div>';
-    }).join('')+'</div>';
+  el.innerHTML=squadreDB.map(s=>{
+    const totDischi=consumiSqDB.filter(c=>c.squadra===s.nome).reduce((a,c)=>a+(parseInt(c.qty)||0),0);
+    const dotazioni=dotazioniSqDB.filter(d=>d.squadra===s.nome);
+    const statoColor=st=>st==='Consegnata'?'tag-green':st==='Restituita'?'tag-gray':'tag-orange';
+    return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
+      '<span style="font-size:14px;font-weight:500;color:var(--text)">'+s.nome+'</span>'+
+      '<span class="tag tag-blue" style="font-size:10px">Capo: '+s.capo+'</span>'+
+      (s.cantiere?'<span class="tag tag-orange" style="font-size:10px">'+s.cantiere+'</span>':'')+
+      '<div style="margin-left:auto;display:flex;gap:6px">'+
+      '<button onclick="stampaModuloConsegnaSquadra('+s.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo consegna</button>'+
+      '<button onclick="editSquadra('+s.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
+      '<button onclick="deleteSquadra('+s.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>'+
+      '</div></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text2)">'+
+      (s.ncomp?'<span>Componenti: '+s.ncomp+'</span>':'')+
+      (s.membri?'<span>'+s.membri+'</span>':'')+
+      '<span>Dischi consumati: '+totDischi+'</span>'+
+      '</div>'+
+      '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">'+
+      '<div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Attrezzature in dotazione ('+dotazioni.length+')</div>'+
+      (dotazioni.length?dotazioni.map(d=>'<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap;align-items:center">'+
+        '<span style="color:var(--text);font-weight:500">'+d.attr+'</span>'+
+        (d.sn?'<span style="color:var(--text3);font-family:var(--font-mono);font-size:11px">'+d.sn+'</span>':'')+
+        '<span class="tag '+statoColor(d.stato)+'" style="font-size:10px">'+d.stato+'</span>'+
+        (d.data?'<span style="color:var(--text3)">dal '+new Date(d.data).toLocaleDateString('it-IT')+'</span>':'')+
+        (d.note?'<span style="color:var(--text3)">'+d.note+'</span>':'')+
+        '<div style="margin-left:auto;display:flex;gap:8px">'+
+        '<button onclick="editDotazione('+d.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button>'+
+        '<button onclick="deleteDotazione('+d.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button>'+
+        '</div></div>').join(''):'<div style="font-size:12px;color:var(--text3);padding:4px 0">Nessuna attrezzatura assegnata</div>')+
+      '</div></div>';
+  }).join('');
 }
 
 function updateSqSelect(){
@@ -1410,16 +1466,68 @@ function addDotazioneSquadra(){
   const squadra=document.getElementById('dot-sq-nome').value;
   const attr=document.getElementById('dot-sq-attr').value.trim();
   if(!squadra||!attr){showToast('Compila squadra e attrezzatura');return;}
-  dotazioniSqDB.push({
-    id:Date.now(),squadra,attr,
+  const d={
+    id:editingDotazioneId||Date.now(),squadra,attr,
     sn:document.getElementById('dot-sq-sn').value.trim(),
     data:document.getElementById('dot-sq-data').value,
     stato:document.getElementById('dot-sq-stato').value,
     note:document.getElementById('dot-sq-note').value
-  });
-  saveScorteDB();renderSquadre();
-  ['dot-sq-nome','dot-sq-attr','dot-sq-sn','dot-sq-data','dot-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  showToast('Dotazione registrata');
+  };
+  if(editingDotazioneId){
+    const i=dotazioniSqDB.findIndex(x=>x.id===editingDotazioneId);
+    if(i!==-1){dotazioniSqDB[i]=d;showToast('Dotazione aggiornata');}
+  }else{
+    dotazioniSqDB.push(d);showToast('Dotazione registrata');
+  }
+  saveScorteDB();renderSquadre();clearDotazioneForm();
+}
+function editDotazione(id){
+  const d=dotazioniSqDB.find(x=>x.id===id);if(!d)return;
+  editingDotazioneId=id;
+  document.getElementById('dot-sq-nome').value=d.squadra||'';
+  document.getElementById('dot-sq-attr').value=d.attr||'';
+  document.getElementById('dot-sq-sn').value=d.sn||'';
+  document.getElementById('dot-sq-data').value=d.data||'';
+  document.getElementById('dot-sq-stato').value=d.stato||'Consegnata';
+  document.getElementById('dot-sq-note').value=d.note||'';
+  document.getElementById('btn-salva-dot').textContent='Salva modifiche';
+  document.getElementById('dot-form-title').textContent='Modifica dotazione: '+d.attr;
+  document.getElementById('dot-form-title').scrollIntoView({behavior:'smooth'});
+}
+function clearDotazioneForm(){
+  editingDotazioneId=null;
+  document.getElementById('btn-salva-dot').textContent='Registra dotazione';
+  document.getElementById('dot-form-title').textContent='Dotazione attrezzature — Squadre';
+  ['dot-sq-attr','dot-sq-sn','dot-sq-data','dot-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('dot-sq-stato').value='Consegnata';
+  document.getElementById('dot-sq-nome').value='';
+}
+function deleteDotazione(id){
+  if(!confirm('Rimuovere questa attrezzatura dalla dotazione?'))return;
+  dotazioniSqDB=dotazioniSqDB.filter(d=>d.id!==id);
+  saveScorteDB();renderSquadre();showToast('Dotazione rimossa');
+}
+
+function stampaModuloConsegnaSquadra(squadraId){
+  const s=squadreDB.find(x=>x.id===squadraId);if(!s)return;
+  const items=dotazioniSqDB.filter(d=>d.squadra===s.nome&&d.stato!=='Restituita');
+  const w=window.open('','_blank');
+  const rows=items.map(d=>'<tr><td style="border:1px solid #ccc;padding:6px 10px">'+d.attr+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.sn||'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.data?new Date(d.data).toLocaleDateString('it-IT'):'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.note||'—')+'</td></tr>').join('');
+  w.document.write('<!DOCTYPE html><html><head><title>Modulo Consegna - '+s.nome+'</title><style>'+
+    'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}'+
+    'h2{margin-bottom:2px}.sub{color:#666;font-size:11px;margin-bottom:20px}'+
+    'table{border-collapse:collapse;width:100%;margin-bottom:20px}th{border:1px solid #ccc;padding:6px 10px;background:#f0f0f0;text-align:left}'+
+    '.decl{font-size:12px;line-height:1.6;margin:24px 0;padding:14px;border:1px solid #ccc;background:#fafafa}'+
+    '.sign-row{display:flex;justify-content:space-between;margin-top:50px}'+
+    '.sign-box{width:45%}.sign-line{border-top:1px solid #333;margin-top:45px;padding-top:4px;font-size:11px;color:#555}'+
+    'button{margin-top:26px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
+    '</style></head><body>');
+  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2><div class="sub">Modulo di Consegna Attrezzature — Squadra '+s.nome+' (Capo squadra: '+s.capo+') — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<table><thead><tr><th>Attrezzatura</th><th>N. Seriale/Inventario</th><th>Data consegna</th><th>Note</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="border:1px solid #ccc;padding:8px;color:#888">Nessuna attrezzatura attualmente in dotazione</td></tr>')+'</tbody></table>');
+  w.document.write('<div class="decl">Il sottoscritto, in qualità di capo squadra, dichiara di aver ricevuto in dotazione le attrezzature sopra elencate, di averle trovate in condizioni idonee all\'uso e si impegna, a nome della squadra, a un utilizzo corretto e conforme alle norme di sicurezza vigenti, segnalando tempestivamente all\'azienda eventuali guasti, danni o smarrimenti.</div>');
+  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma capo squadra</div></div><div class="sign-box"><div class="sign-line">Firma per DCE Carpenteria Metallica S.r.l.</div></div></div>');
+  w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
 }
 // ============ END FASE 2 SCORTE ============
 
