@@ -400,14 +400,54 @@
 
         <!-- Registro Saldatori -->
         <div class="form-card">
-          <div class="form-card-title">Registro Saldatori</div>
+          <div class="form-card-title" id="sald-form-title">Registro Saldatori</div>
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
             <input type="text" id="sald-nome" placeholder="Nome saldatore" style="flex:1;min-width:150px">
             <input type="text" id="sald-postazione" placeholder="Postazione (es. P1)" style="width:130px">
-            <button class="btn btn-primary" onclick="addSaldatore()">+ Aggiungi</button>
+            <button class="btn btn-primary" id="btn-salva-sald" onclick="addSaldatore()">+ Aggiungi</button>
+            <button class="btn btn-ghost" onclick="clearSaldatoreForm()">Annulla</button>
           </div>
           <div id="saldatori-lista">
             <div class="empty-state"><div class="icon">👷</div><p>Nessun saldatore registrato</p></div>
+          </div>
+        </div>
+
+        <!-- Dotazione DPI/attrezzature saldatori -->
+        <div class="form-card">
+          <div class="form-card-title" id="dotsald-form-title">Dotazione DPI/Attrezzature — Saldatori</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Saldatore</label>
+              <select id="dotsald-nome">
+                <option value="">— seleziona saldatore —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>DPI / Attrezzatura</label>
+              <input type="text" id="dotsald-attr" placeholder="es. Maschera saldatura, guanti, tuta ignifuga">
+            </div>
+            <div class="form-group">
+              <label>N. Seriale / Inventario</label>
+              <input type="text" id="dotsald-sn" placeholder="es. DPI-012">
+            </div>
+            <div class="form-group">
+              <label>Data consegna</label>
+              <input type="date" id="dotsald-data">
+            </div>
+            <div class="form-group">
+              <label>Stato</label>
+              <select id="dotsald-stato">
+                <option>Consegnata</option><option>Restituita</option><option>Da restituire</option><option>Da sostituire</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Note</label>
+              <input type="text" id="dotsald-note" placeholder="es. taglia, condizioni">
+            </div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-dotsald" onclick="addDotazioneSaldatore()">Registra dotazione</button>
+            <button class="btn btn-ghost" onclick="clearDotazioneSaldForm()">Annulla</button>
           </div>
         </div>
 
@@ -1121,7 +1161,7 @@ function calcF1(){
 }
 
 // ============ FASE 2 SCORTE ============
-let saldatoriDB=[], consumiOfficDB=[], squadreDB=[], consumiSqDB=[], dotazioniSqDB=[];
+let saldatoriDB=[], consumiOfficDB=[], squadreDB=[], consumiSqDB=[], dotazioniSqDB=[], dotazioniSaldDB=[];
 
 function saveScorteDB(){
   try{
@@ -1130,6 +1170,7 @@ function saveScorteDB(){
     localStorage.setItem('dce-squadre',JSON.stringify(squadreDB));
     localStorage.setItem('dce-consumisq',JSON.stringify(consumiSqDB));
     localStorage.setItem('dce-dotazionisq',JSON.stringify(dotazioniSqDB));
+    localStorage.setItem('dce-dotazionisald',JSON.stringify(dotazioniSaldDB));
   }catch(e){}
 }
 
@@ -1140,13 +1181,14 @@ function loadScorteDB(){
     squadreDB=JSON.parse(localStorage.getItem('dce-squadre')||'[]');
     consumiSqDB=JSON.parse(localStorage.getItem('dce-consumisq')||'[]');
     dotazioniSqDB=JSON.parse(localStorage.getItem('dce-dotazionisq')||'[]');
-  }catch(e){saldatoriDB=[];consumiOfficDB=[];squadreDB=[];consumiSqDB=[];dotazioniSqDB=[];}
+    dotazioniSaldDB=JSON.parse(localStorage.getItem('dce-dotazionisald')||'[]');
+  }catch(e){saldatoriDB=[];consumiOfficDB=[];squadreDB=[];consumiSqDB=[];dotazioniSqDB=[];dotazioniSaldDB=[];}
 }
 
 async function saveScorte(){
   saveScorteDB();
   if(typeof saveToCloud==='function'&&currentUser){
-    const ok=await saveToCloud('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB});
+    const ok=await saveToCloud('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB,dotazioniSald:dotazioniSaldDB});
     showToast(ok?'Fase 2 salvata ✓ (locale + cloud)':'Fase 2 salvata solo in locale');
   }else{
     showToast('Fase 2 salvata (solo locale)');
@@ -1169,21 +1211,52 @@ function calcF2(){
 }
 
 // --- SALDATORI ---
+let editingSaldatoreId=null, editingDotazioneSaldId=null;
+
 function addSaldatore(){
   const nome=document.getElementById('sald-nome').value.trim();
   const post=document.getElementById('sald-postazione').value.trim();
   if(!nome){showToast('Inserisci il nome del saldatore');return;}
-  if(saldatoriDB.find(s=>s.nome===nome)){showToast('Saldatore gia presente');return;}
-  saldatoriDB.push({id:Date.now(),nome,postazione:post});
-  saveScorteDB();renderSaldatori();updateSaldSelect();calcF2();
+  const dup=saldatoriDB.find(s=>s.nome===nome&&s.id!==editingSaldatoreId);
+  if(dup){showToast('Saldatore gia presente');return;}
+  if(editingSaldatoreId){
+    const i=saldatoriDB.findIndex(s=>s.id===editingSaldatoreId);
+    if(i!==-1){
+      const vecchioNome=saldatoriDB[i].nome;
+      saldatoriDB[i]={id:editingSaldatoreId,nome,postazione:post};
+      if(vecchioNome!==nome){
+        consumiOfficDB.forEach(c=>{if(c.saldatore===vecchioNome)c.saldatore=nome;});
+        dotazioniSaldDB.forEach(d=>{if(d.saldatore===vecchioNome)d.saldatore=nome;});
+      }
+      showToast('Saldatore aggiornato');
+    }
+  }else{
+    saldatoriDB.push({id:Date.now(),nome,postazione:post});showToast('Saldatore aggiunto');
+  }
+  saveScorteDB();renderSaldatori();updateSaldSelect();calcF2();clearSaldatoreForm();
+}
+function editSaldatore(id){
+  const s=saldatoriDB.find(x=>x.id===id);if(!s)return;
+  editingSaldatoreId=id;
+  document.getElementById('sald-nome').value=s.nome||'';
+  document.getElementById('sald-postazione').value=s.postazione||'';
+  document.getElementById('btn-salva-sald').textContent='Salva modifiche';
+  document.getElementById('sald-form-title').textContent='Modifica: '+s.nome;
+  document.getElementById('sald-form-title').scrollIntoView({behavior:'smooth'});
+}
+function clearSaldatoreForm(){
+  editingSaldatoreId=null;
+  document.getElementById('btn-salva-sald').textContent='+ Aggiungi';
+  document.getElementById('sald-form-title').textContent='Registro Saldatori';
   document.getElementById('sald-nome').value='';
   document.getElementById('sald-postazione').value='';
-  showToast('Saldatore aggiunto');
 }
 
 function deleteSaldatore(id){
-  if(!confirm('Eliminare questo saldatore?'))return;
+  if(!confirm('Eliminare questo saldatore e le relative dotazioni?'))return;
+  const s=saldatoriDB.find(x=>x.id===id);
   saldatoriDB=saldatoriDB.filter(s=>s.id!==id);
+  if(s)dotazioniSaldDB=dotazioniSaldDB.filter(d=>d.saldatore!==s.nome);
   saveScorteDB();renderSaldatori();updateSaldSelect();calcF2();
   showToast('Saldatore rimosso');
 }
@@ -1191,31 +1264,117 @@ function deleteSaldatore(id){
 function renderSaldatori(){
   const el=document.getElementById('saldatori-lista');if(!el)return;
   if(!saldatoriDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessun saldatore registrato</p></div>';return;}
-  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+
-    saldatoriDB.map(s=>{
-      const consumi=consumiOfficDB.filter(c=>c.saldatore&&s.nome&&c.saldatore.trim().toLowerCase()===s.nome.trim().toLowerCase());
-      const tot=consumi.reduce((acc,c)=>acc+(parseInt(c.qty)||0),0);
-      const perTipo={};
-      consumi.forEach(c=>{if(!perTipo[c.tipo])perTipo[c.tipo]=0;perTipo[c.tipo]+=parseInt(c.qty)||0;});
-      const tipiHtml=Object.entries(perTipo).map(([t,n])=>'<span style="font-size:11px;color:var(--text2)">'+t.replace('Disco ','').replace(' (sbavatura)','')+':<b style="color:var(--text)"> '+n+'</b></span>').join(' &nbsp;|&nbsp; ');
-      return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px">'+
-        '<span style="font-size:18px">👷</span>'+
-        '<div><div style="font-weight:500;color:var(--text)">'+s.nome+'</div>'+
-        (s.postazione?'<div style="font-size:11px;color:var(--text3)">Postazione: '+s.postazione+'</div>':'')+
-        (tot>0?'<div style="font-size:11px;margin-top:4px">'+tipiHtml+'</div>':'')+
-        '<div style="font-size:11px;color:var(--accent);margin-top:2px">Totale: <b>'+tot+'</b> dischi</div></div>'+
-        '<button onclick="deleteSaldatore('+s.id+')" style="margin-left:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px">x</button>'+
-        '</div>';
-    }).join('')+'</div>';
+  const statoColor=st=>st==='Consegnata'?'tag-green':st==='Restituita'?'tag-gray':st==='Da sostituire'?'tag-red':'tag-orange';
+  el.innerHTML=saldatoriDB.map(s=>{
+    const consumi=consumiOfficDB.filter(c=>c.saldatore&&s.nome&&c.saldatore.trim().toLowerCase()===s.nome.trim().toLowerCase());
+    const tot=consumi.reduce((acc,c)=>acc+(parseInt(c.qty)||0),0);
+    const perTipo={};
+    consumi.forEach(c=>{if(!perTipo[c.tipo])perTipo[c.tipo]=0;perTipo[c.tipo]+=parseInt(c.qty)||0;});
+    const tipiHtml=Object.entries(perTipo).map(([t,n])=>'<span style="font-size:11px;color:var(--text2)">'+t.replace('Disco ','').replace(' (sbavatura)','')+':<b style="color:var(--text)"> '+n+'</b></span>').join(' &nbsp;|&nbsp; ');
+    const dotazioni=dotazioniSaldDB.filter(d=>d.saldatore===s.nome);
+    return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
+      '<span style="font-size:14px;font-weight:500;color:var(--text)">👷 '+s.nome+'</span>'+
+      (s.postazione?'<span class="tag tag-blue" style="font-size:10px">Postazione: '+s.postazione+'</span>':'')+
+      '<div style="margin-left:auto;display:flex;gap:6px">'+
+      '<button onclick="stampaModuloConsegnaSaldatore('+s.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo consegna</button>'+
+      '<button onclick="editSaldatore('+s.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
+      '<button onclick="deleteSaldatore('+s.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>'+
+      '</div></div>'+
+      (tot>0?'<div style="font-size:11px;margin-bottom:2px">'+tipiHtml+' &nbsp;|&nbsp; <span style="color:var(--accent)">Totale: <b>'+tot+'</b> dischi</span></div>':'<div style="font-size:12px;color:var(--text3)">Nessun consumo registrato</div>')+
+      '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">'+
+      '<div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">DPI/Attrezzature in dotazione ('+dotazioni.length+')</div>'+
+      (dotazioni.length?dotazioni.map(d=>'<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap;align-items:center">'+
+        '<span style="color:var(--text);font-weight:500">'+d.attr+'</span>'+
+        (d.sn?'<span style="color:var(--text3);font-family:var(--font-mono);font-size:11px">'+d.sn+'</span>':'')+
+        '<span class="tag '+statoColor(d.stato)+'" style="font-size:10px">'+d.stato+'</span>'+
+        (d.data?'<span style="color:var(--text3)">dal '+new Date(d.data).toLocaleDateString('it-IT')+'</span>':'')+
+        (d.note?'<span style="color:var(--text3)">'+d.note+'</span>':'')+
+        '<div style="margin-left:auto;display:flex;gap:8px">'+
+        '<button onclick="editDotazioneSaldatore('+d.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button>'+
+        '<button onclick="deleteDotazioneSaldatore('+d.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button>'+
+        '</div></div>').join(''):'<div style="font-size:12px;color:var(--text3);padding:4px 0">Nessun DPI/attrezzatura assegnata</div>')+
+      '</div></div>';
+  }).join('');
 }
 
 function updateSaldSelect(){
   const sel=document.getElementById('cons-sald-nome');
   const filt=document.getElementById('filter-sald');
-  if(!sel||!filt)return;
+  const dotSel=document.getElementById('dotsald-nome');
   const opts='<option value="">— seleziona saldatore —</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
-  sel.innerHTML=opts;
-  filt.innerHTML='<option value="">Tutti i saldatori</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
+  if(sel)sel.innerHTML=opts;
+  if(dotSel){const cur=dotSel.value;dotSel.innerHTML=opts;if(cur)dotSel.value=cur;}
+  if(filt)filt.innerHTML='<option value="">Tutti i saldatori</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
+}
+
+// --- DOTAZIONE DPI/ATTREZZATURE SALDATORI ---
+function addDotazioneSaldatore(){
+  const saldatore=document.getElementById('dotsald-nome').value;
+  const attr=document.getElementById('dotsald-attr').value.trim();
+  if(!saldatore||!attr){showToast('Compila saldatore e DPI/attrezzatura');return;}
+  const d={
+    id:editingDotazioneSaldId||Date.now(),saldatore,attr,
+    sn:document.getElementById('dotsald-sn').value.trim(),
+    data:document.getElementById('dotsald-data').value,
+    stato:document.getElementById('dotsald-stato').value,
+    note:document.getElementById('dotsald-note').value
+  };
+  if(editingDotazioneSaldId){
+    const i=dotazioniSaldDB.findIndex(x=>x.id===editingDotazioneSaldId);
+    if(i!==-1){dotazioniSaldDB[i]=d;showToast('Dotazione aggiornata');}
+  }else{
+    dotazioniSaldDB.push(d);showToast('Dotazione registrata');
+  }
+  saveScorteDB();renderSaldatori();clearDotazioneSaldForm();
+}
+function editDotazioneSaldatore(id){
+  const d=dotazioniSaldDB.find(x=>x.id===id);if(!d)return;
+  editingDotazioneSaldId=id;
+  document.getElementById('dotsald-nome').value=d.saldatore||'';
+  document.getElementById('dotsald-attr').value=d.attr||'';
+  document.getElementById('dotsald-sn').value=d.sn||'';
+  document.getElementById('dotsald-data').value=d.data||'';
+  document.getElementById('dotsald-stato').value=d.stato||'Consegnata';
+  document.getElementById('dotsald-note').value=d.note||'';
+  document.getElementById('btn-salva-dotsald').textContent='Salva modifiche';
+  document.getElementById('dotsald-form-title').textContent='Modifica dotazione: '+d.attr;
+  document.getElementById('dotsald-form-title').scrollIntoView({behavior:'smooth'});
+}
+function clearDotazioneSaldForm(){
+  editingDotazioneSaldId=null;
+  document.getElementById('btn-salva-dotsald').textContent='Registra dotazione';
+  document.getElementById('dotsald-form-title').textContent='Dotazione DPI/Attrezzature — Saldatori';
+  ['dotsald-attr','dotsald-sn','dotsald-data','dotsald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('dotsald-stato').value='Consegnata';
+  document.getElementById('dotsald-nome').value='';
+}
+function deleteDotazioneSaldatore(id){
+  if(!confirm('Rimuovere questo DPI/attrezzatura dalla dotazione?'))return;
+  dotazioniSaldDB=dotazioniSaldDB.filter(d=>d.id!==id);
+  saveScorteDB();renderSaldatori();showToast('Dotazione rimossa');
+}
+
+function stampaModuloConsegnaSaldatore(saldatoreId){
+  const s=saldatoriDB.find(x=>x.id===saldatoreId);if(!s)return;
+  const items=dotazioniSaldDB.filter(d=>d.saldatore===s.nome&&d.stato!=='Restituita');
+  const w=window.open('','_blank');
+  const rows=items.map(d=>'<tr><td style="border:1px solid #ccc;padding:6px 10px">'+d.attr+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.sn||'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.data?new Date(d.data).toLocaleDateString('it-IT'):'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.note||'—')+'</td></tr>').join('');
+  w.document.write('<!DOCTYPE html><html><head><title>Modulo Consegna - '+s.nome+'</title><style>'+
+    'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}'+
+    'h2{margin-bottom:2px}.sub{color:#666;font-size:11px;margin-bottom:20px}'+
+    'table{border-collapse:collapse;width:100%;margin-bottom:20px}th{border:1px solid #ccc;padding:6px 10px;background:#f0f0f0;text-align:left}'+
+    '.decl{font-size:12px;line-height:1.6;margin:24px 0;padding:14px;border:1px solid #ccc;background:#fafafa}'+
+    '.sign-row{display:flex;justify-content:space-between;margin-top:50px}'+
+    '.sign-box{width:45%}.sign-line{border-top:1px solid #333;margin-top:45px;padding-top:4px;font-size:11px;color:#555}'+
+    'button{margin-top:26px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
+    '</style></head><body>');
+  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2><div class="sub">Modulo di Consegna DPI/Attrezzature — Saldatore '+s.nome+(s.postazione?' (Postazione '+s.postazione+')':'')+' — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<table><thead><tr><th>DPI / Attrezzatura</th><th>N. Seriale/Inventario</th><th>Data consegna</th><th>Note</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="border:1px solid #ccc;padding:8px;color:#888">Nessun DPI/attrezzatura attualmente in dotazione</td></tr>')+'</tbody></table>');
+  w.document.write('<div class="decl">Il sottoscritto dichiara di aver ricevuto in dotazione i DPI/le attrezzature sopra elencate, di averle trovate in condizioni idonee all\'uso e si impegna a un utilizzo corretto e conforme alle norme di sicurezza vigenti, segnalando tempestivamente all\'azienda eventuali guasti, danni, usura o necessità di sostituzione.</div>');
+  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma saldatore</div></div><div class="sign-box"><div class="sign-line">Firma per DCE Carpenteria Metallica S.r.l.</div></div></div>');
+  w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
 }
 
 // --- CONSUMI OFFICINA ---
@@ -1844,7 +2003,7 @@ async function loadAllFromCloud(){
     if(assegnazioniDati){assegnazioniDB=assegnazioniDati.assegnazioni||[];saveAssegnazioniDB();}
     const scorte=await loadFromCloud('fase2-scorte');
     if(scorte){
-      saldatoriDB=scorte.saldatori||[];consumiOfficDB=scorte.consumiOffic||[];squadreDB=scorte.squadre||[];consumiSqDB=scorte.consumiSq||[];dotazioniSqDB=scorte.dotazioniSq||[];
+      saldatoriDB=scorte.saldatori||[];consumiOfficDB=scorte.consumiOffic||[];squadreDB=scorte.squadre||[];consumiSqDB=scorte.consumiSq||[];dotazioniSqDB=scorte.dotazioniSq||[];dotazioniSaldDB=scorte.dotazioniSald||[];
       saveScorteDB();
     }
     const permessi=await loadFromCloud('permessi-fornitori');
