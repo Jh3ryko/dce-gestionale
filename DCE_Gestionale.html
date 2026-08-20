@@ -390,6 +390,10 @@
       </div>
 
       <!-- TAB NAVIGATION -->
+      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 10px">
+        <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">👷 Reparto Operativo</span>
+        <span style="flex:1;height:1px;background:var(--border)"></span>
+      </div>
       <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
         <button id="tab-officina" onclick="switchF2Tab('officina')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Officina — Saldatori</button>
         <button id="tab-squadre" onclick="switchF2Tab('squadre')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Squadre Montaggio</button>
@@ -1358,7 +1362,7 @@ function deleteDotazioneSaldatore(id){
 function stampaModuloConsegnaSaldatore(saldatoreId){
   const s=saldatoriDB.find(x=>x.id===saldatoreId);if(!s)return;
   const items=dotazioniSaldDB.filter(d=>d.saldatore===s.nome&&d.stato!=='Restituita');
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=items.map(d=>'<tr><td style="border:1px solid #ccc;padding:6px 10px">'+d.attr+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.sn||'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.data?new Date(d.data).toLocaleDateString('it-IT'):'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.note||'—')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Modulo Consegna - '+s.nome+'</title><style>'+
     'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}'+
@@ -1440,7 +1444,7 @@ function deleteConsumoOffic(id){
 }
 
 function stampaConsumiOfficina(){
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=consumiOfficDB.map(c=>'<tr><td>'+(c.data||'')+'</td><td>'+c.saldatore+'</td><td>'+c.tipo+'</td><td>'+(c.diametro||'')+'</td><td>'+c.qty+'</td><td>'+(c.note||'')+'</td></tr>').join('');
   const tot=consumiOfficDB.reduce((a,c)=>a+(parseInt(c.qty)||0),0);
   w.document.write('<!DOCTYPE html><html><head><title>Consumi Officina DCE</title><style>body{font-family:Arial,font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px}th{background:#f0f0f0}@media print{button{display:none}}</style></head><body>');
@@ -1609,7 +1613,7 @@ function deleteConsumoSq(id){
 }
 
 function stampaConsumiSquadre(){
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=consumiSqDB.map(c=>'<tr><td>'+(c.data||'')+'</td><td>'+c.squadra+'</td><td>'+c.tipo+'</td><td>'+(c.diametro||'')+'</td><td>'+c.qty+'</td><td>'+(c.note||'')+'</td></tr>').join('');
   const tot=consumiSqDB.reduce((a,c)=>a+(parseInt(c.qty)||0),0);
   w.document.write('<!DOCTYPE html><html><head><title>Consumi Squadre DCE</title><style>body{font-family:Arial,font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px}th{background:#f0f0f0}@media print{button{display:none}}</style></head><body>');
@@ -1670,7 +1674,7 @@ function deleteDotazione(id){
 function stampaModuloConsegnaSquadra(squadraId){
   const s=squadreDB.find(x=>x.id===squadraId);if(!s)return;
   const items=dotazioniSqDB.filter(d=>d.squadra===s.nome&&d.stato!=='Restituita');
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=items.map(d=>'<tr><td style="border:1px solid #ccc;padding:6px 10px">'+d.attr+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.sn||'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.data?new Date(d.data).toLocaleDateString('it-IT'):'—')+'</td><td style="border:1px solid #ccc;padding:6px 10px">'+(d.note||'—')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Modulo Consegna - '+s.nome+'</title><style>'+
     'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}'+
@@ -1895,7 +1899,7 @@ async function saveAssegnazioniCloud(){
 
 function stampaModuloAssegnazione(id){
   const m=mezziDB.find(x=>x.id===id);if(!m)return;
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const riga=(label,val)=>'<tr><td style="padding:6px 10px;font-weight:600;color:#444;width:180px;border:1px solid #ccc">'+label+'</td><td style="padding:6px 10px;border:1px solid #ccc">'+(val||'—')+'</td></tr>';
   w.document.write('<!DOCTYPE html><html><head><title>Modulo Assegnazione - '+m.targa+'</title><style>'+
     'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}'+
@@ -2107,7 +2111,7 @@ function addManutenzione(){
   showToast('Intervento registrato');
 }
 function stampaRegistroAttr(){
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=attrezzatureDB.map(a=>'<tr><td>'+(a.tipo||'')+'</td><td>'+(a.marca||'')+'</td><td>'+(a.modello||'')+'</td><td>'+(a.seriale||'')+'</td><td>'+(a.alim||'')+'</td><td>'+(a.stato||'')+'</td><td>'+(a.posizione||'')+(a.codpos?' ['+a.codpos+']':'')+'</td><td>'+(a.dotazione||'')+'</td><td>'+(a.prop||'')+'</td><td>'+(a.note||'')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Registro Attrezzature DCE</title><style>body{font-family:Arial,sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px 7px}th{background:#f0f0f0}tr:nth-child(even){background:#fafafa}button{margin-top:12px;padding:8px 16px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
   w.document.write('<h2>Registro Attrezzature - DCE Carpenteria Metallica S.r.l.</h2>');
@@ -2200,7 +2204,7 @@ function renderFornitori(){
   }).join('');
 }
 function stampaRegistroFornitori(){
-  const w=window.open('','_blank');
+  const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=fornitoriDB.map(f=>'<tr><td>'+(f.ragione||'')+'</td><td>'+(f.categoria||'')+'</td><td>'+(f.piva||'')+'</td><td>'+(f.referente||'')+'</td><td>'+(f.telefono||'')+'</td><td>'+(f.email||'')+'</td><td>'+(f.pagamento||'')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Registro Fornitori DCE</title><style>body{font-family:Arial,sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px 7px}th{background:#f0f0f0}tr:nth-child(even){background:#fafafa}button{margin-top:12px;padding:8px 16px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
   w.document.write('<h2>Registro Fornitori - DCE Carpenteria Metallica S.r.l.</h2>');
