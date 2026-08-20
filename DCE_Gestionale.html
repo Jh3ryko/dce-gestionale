@@ -152,7 +152,7 @@
     <div class="sidebar-section-label">Fasi del progetto</div>
     <button class="nav-item" onclick="showModule('fase0')"><span class="nav-dot" style="background:#9a9890"></span>Fase 0 — Fotografia iniziale<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 1 — Magazzino<span class="nav-badge tag-orange">attiva</span></button>
-    <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Scorte<span class="nav-badge tag-orange">attiva</span></button>
+    <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Reparto Operativo<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase3')"><span class="nav-dot" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 4 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase5')"><span class="nav-dot" style="background:#b55a4a"></span>Fase 5 — Digitalizzazione<span class="nav-badge tag-gray">prossima</span></button>
@@ -193,7 +193,7 @@
       <div class="phases-grid">
         <div class="phase-card in-progress" onclick="showModule('fase0')"><div class="phase-num" style="color:var(--text3)">Fase 0</div><div class="phase-title">Fotografia iniziale</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase0" style="width:0%;background:var(--text3)"></div></div></div>
         <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Riorganizzazione magazzino</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase1" style="width:0%;background:var(--green)"></div></div></div>
-        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--purple)">Fase 2</div><div class="phase-title">Scorte e inventario</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:0%;background:var(--purple)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--purple)">Fase 2</div><div class="phase-title">Reparto Operativo</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:0%;background:var(--purple)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase3')"><div class="phase-num" style="color:var(--accent)">Fase 3</div><div class="phase-title">Flusso materiali</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase3" style="width:0%;background:var(--accent)"></div></div></div>
         <div class="phase-card in-progress" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--blue)">Fase 4</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase4" style="width:0%;background:var(--blue)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase5')"><div class="phase-num" style="color:var(--red)">Fase 5</div><div class="phase-title">Digitalizzazione ARCA</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase5" style="width:0%;background:var(--red)"></div></div></div>
@@ -385,15 +385,11 @@
     <!-- FASE 2 — SCORTE -->
     <div class="module" id="mod-fase2">
       <div class="section-header">
-        <h1>Fase 2 — Scorte e Consumi</h1>
+        <h1>Fase 2 — Reparto Operativo</h1>
         <p>Gestione consumi officina (saldatori) e squadre di montaggio — dischi e dotazione attrezzature.</p>
       </div>
 
       <!-- TAB NAVIGATION -->
-      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 10px">
-        <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">👷 Reparto Operativo</span>
-        <span style="flex:1;height:1px;background:var(--border)"></span>
-      </div>
       <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
         <button id="tab-officina" onclick="switchF2Tab('officina')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Officina — Saldatori</button>
         <button id="tab-squadre" onclick="switchF2Tab('squadre')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Squadre Montaggio</button>
@@ -1113,7 +1109,7 @@
 
 <script>
 const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Scorte',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori'};
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori'};
 
 function showModule(id) {
   if(id==='fornitori'&&!hasFornitoriAccess()){showToast('Non hai i permessi per accedere ai Fornitori');return;}
