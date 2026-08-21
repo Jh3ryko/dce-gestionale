@@ -126,10 +126,13 @@
       <label>Email</label>
       <input type="text" id="login-email" placeholder="es. user@dcecarpenteria.it" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <div class="form-group" style="margin-bottom:20px">
+    <div class="form-group" style="margin-bottom:16px">
       <label>Password</label>
       <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:20px;cursor:pointer;font-size:13px;color:var(--text2)">
+      <input type="checkbox" id="login-remember" style="width:15px;height:15px;cursor:pointer">Ricordami su questo dispositivo
+    </label>
     <div id="login-error" style="color:var(--red);font-size:12px;margin-bottom:12px;min-height:16px"></div>
     <button class="btn btn-primary" style="width:100%;padding:10px" onclick="doLogin()">Accedi</button>
     <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--text3)">Accesso riservato al personale autorizzato</div>
@@ -1918,14 +1921,37 @@ function stampaModuloAssegnazione(id){
 // SUPABASE — Auth nativo con JWT sicuro
 const SUPABASE_URL='https://oejkxzxnqhyiwchqsdmh.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lamt4enhucWh5aXdjaHFzZG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTcyNDUsImV4cCI6MjA5NzYzMzI0NX0.qU08AKKzChgXdo5M5Oz1G7e3_5yNbrkP7FoUz1tHUow';
-let currentUser=null, accessToken=null;
+let currentUser=null, accessToken=null, refreshTokenVal=null;
+
+async function refreshAccessToken(){
+  if(!refreshTokenVal)return false;
+  try{
+    const res=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{
+      method:'POST',headers:{'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
+      body:JSON.stringify({refresh_token:refreshTokenVal})
+    });
+    const data=await res.json();
+    if(!res.ok||data.error||!data.access_token)return false;
+    accessToken=data.access_token;refreshTokenVal=data.refresh_token;
+    const store=localStorage.getItem('dce-remember')==='1'?localStorage:sessionStorage;
+    store.setItem('dce-token',accessToken);store.setItem('dce-refresh',refreshTokenVal);
+    return true;
+  }catch(e){return false;}
+}
 
 async function sbFetch(path,method='GET',body=null,extra={}){
   const token=accessToken||SUPABASE_ANON;
   const headers={'apikey':SUPABASE_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation',...extra};
   const opts={method,headers};if(body)opts.body=JSON.stringify(body);
-  try{const res=await fetch(SUPABASE_URL+path,opts);if(!res.ok){const err=await res.text();throw new Error(err);}const text=await res.text();return text?JSON.parse(text):[];}
-  catch(e){console.warn('sbFetch:',e);return[];}
+  try{
+    let res=await fetch(SUPABASE_URL+path,opts);
+    if(res.status===401&&accessToken){
+      const ok=await refreshAccessToken();
+      if(ok){headers.Authorization='Bearer '+accessToken;res=await fetch(SUPABASE_URL+path,{...opts,headers});}
+    }
+    if(!res.ok){const err=await res.text();throw new Error(err);}
+    const text=await res.text();return text?JSON.parse(text):[];
+  }catch(e){console.warn('sbFetch:',e);return[];}
 }
 
 async function doLogin(){
@@ -1943,7 +1969,14 @@ async function doLogin(){
     const data=await res.json();
     if(!res.ok||data.error){errEl.style.color='var(--red)';errEl.textContent=data.error_description||data.msg||'Email o password errati.';return;}
     accessToken=data.access_token;
-    sessionStorage.setItem('dce-token',accessToken);
+    refreshTokenVal=data.refresh_token||null;
+    const remember=document.getElementById('login-remember').checked;
+    localStorage.setItem('dce-remember',remember?'1':'0');
+    const store=remember?localStorage:sessionStorage;
+    const other=remember?sessionStorage:localStorage;
+    other.removeItem('dce-token');other.removeItem('dce-user');other.removeItem('dce-refresh');
+    store.setItem('dce-token',accessToken);
+    if(refreshTokenVal)store.setItem('dce-refresh',refreshTokenVal);
     const uid=data.user?.id||'';
     let profile=await sbFetch('/rest/v1/profiles?id=eq.'+uid+'&select=nome,ruolo');
     if(!profile.length){
@@ -1953,7 +1986,7 @@ async function doLogin(){
     const nome=profile.length?profile[0].nome:email.split('@')[0];
     const ruolo=profile.length?profile[0].ruolo:'viewer';
     currentUser={email:data.user.email,nome,ruolo,id:uid};
-    sessionStorage.setItem('dce-user',JSON.stringify(currentUser));
+    store.setItem('dce-user',JSON.stringify(currentUser));
     await auditLog('login','sistema','Accesso da '+nome+' ('+ruolo+')');
     errEl.textContent='';
     document.getElementById('login-screen').style.display='none';
@@ -1966,11 +1999,13 @@ async function doLogin(){
 
 async function doLogout(){
   try{await fetch(SUPABASE_URL+'/auth/v1/logout',{method:'POST',headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+(accessToken||'')}});}catch(e){}
-  accessToken=null;currentUser=null;
-  sessionStorage.removeItem('dce-user');sessionStorage.removeItem('dce-token');
+  accessToken=null;currentUser=null;refreshTokenVal=null;
+  sessionStorage.removeItem('dce-user');sessionStorage.removeItem('dce-token');sessionStorage.removeItem('dce-refresh');
+  localStorage.removeItem('dce-user');localStorage.removeItem('dce-token');localStorage.removeItem('dce-refresh');localStorage.removeItem('dce-remember');
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('login-email').value='';document.getElementById('login-pass').value='';
+  const rem=document.getElementById('login-remember');if(rem)rem.checked=false;
 }
 
 async function auditLog(azione,sezione,dettaglio=''){
@@ -2242,16 +2277,31 @@ async function saveFornitoriPermessi(){
 // ============ END FORNITORI ============
 
 window.addEventListener('load',async()=>{
-  // Ripristina sessione da sessionStorage
-  const savedToken=sessionStorage.getItem('dce-token');
-  const savedUser=sessionStorage.getItem('dce-user');
+  // Ripristina sessione: prima localStorage (Ricordami), poi sessionStorage
+  const remember=localStorage.getItem('dce-remember')==='1';
+  const store=remember?localStorage:sessionStorage;
+  const savedToken=store.getItem('dce-token');
+  const savedUser=store.getItem('dce-user');
+  const savedRefresh=store.getItem('dce-refresh');
   if(savedToken&&savedUser){
     accessToken=savedToken;
+    refreshTokenVal=savedRefresh||null;
     currentUser=JSON.parse(savedUser);
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
-    loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
+    if(refreshTokenVal){
+      const ok=await refreshAccessToken();
+      if(!ok){
+        // refresh token non più valido: richiedi nuovo login
+        store.removeItem('dce-token');store.removeItem('dce-user');store.removeItem('dce-refresh');
+        if(remember)localStorage.removeItem('dce-remember');
+        accessToken=null;currentUser=null;refreshTokenVal=null;
+      }
+    }
+    if(currentUser){
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('app').style.display='flex';
+      document.getElementById('topbar-user').textContent=currentUser.nome+' · '+currentUser.ruolo;
+      loadAllFromCloud().catch(e=>console.warn('loadCloud:',e));
+    }
   }
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
