@@ -851,12 +851,21 @@
           <div class="form-group"><label>Stato generale</label><select id="mz-stato"><option value="">— seleziona —</option><option>Ottimo</option><option>Buono</option><option>Accettabile</option><option>Da revisionare</option><option>Fuori servizio</option></select></div>
         </div>
         <div style="margin-top:12px">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:13px;color:var(--text2)">
+            <input type="checkbox" id="mz-noleggio" style="width:15px;height:15px;cursor:pointer">Mezzo a noleggio (scadenze gestite dal noleggiatore)
+          </label>
           <div class="form-card-title">Scadenze</div>
           <div class="form-grid cols-3">
             <div class="form-group"><label>Scad. Assicurazione</label><input type="date" id="mz-assic"></div>
+            <div class="form-group"><label>Importo assicurazione (€)</label><input type="number" id="mz-assic-importo" placeholder="es. 1008"></div>
+            <div class="form-group"><label>Frequenza rinnovo assicurazione</label><select id="mz-assic-freq"><option value="">— seleziona —</option><option>Ogni 6 mesi</option><option>Ogni 12 mesi</option></select></div>
+            <div class="form-group"><label>Scad. Bollo</label><input type="date" id="mz-bollo"></div>
             <div class="form-group"><label>Scad. Revisione / Collaudo</label><input type="date" id="mz-revisione"></div>
             <div class="form-group"><label>Scad. Verifica INAIL</label><input type="date" id="mz-inail"></div>
-            <div class="form-group"><label>Prossimo tagliando</label><input type="date" id="mz-tagliando"></div>
+            <div class="form-group"><label>Data ultimo tagliando</label><input type="date" id="mz-tag-ultimo-data"></div>
+            <div class="form-group"><label>Km ultimo tagliando</label><input type="number" id="mz-tag-ultimo-km"></div>
+            <div class="form-group"><label>Prossimo tagliando (data)</label><input type="date" id="mz-tagliando"></div>
+            <div class="form-group"><label>Km previsti prossimo tagliando</label><input type="number" id="mz-tag-prossimo-km"></div>
             <div class="form-group"><label>Scad. estintore a bordo</label><input type="date" id="mz-estintore"></div>
             <div class="form-group"><label>Altra scadenza</label><input type="date" id="mz-altra-scad"></div>
           </div>
@@ -865,7 +874,17 @@
         <div class="actions-bar" style="border:none;padding:12px 0 0;margin:0">
           <button class="btn btn-primary" id="btn-salva-mezzo" onclick="addMezzo()">Aggiungi mezzo</button>
           <button class="btn btn-ghost" onclick="clearMezzoForm()">Annulla</button>
+          <button class="btn btn-ghost" onclick="importaMezziDaExcel()" style="margin-left:auto">📥 Importa dati riepilogo scadenze</button>
         </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Registra lettura Km</div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label>Mezzo</label><select id="km-targa"><option value="">— seleziona mezzo —</option></select></div>
+          <div class="form-group"><label>Data lettura</label><input type="date" id="km-data"></div>
+          <div class="form-group"><label>Km rilevati</label><input type="number" id="km-valore"></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addKmLog()">Registra lettura</button></div>
       </div>
       <div class="form-card">
         <div class="form-card-title">Parco mezzi censito</div>
@@ -1804,43 +1823,90 @@ function loadCharter(){
 }
 
 // MEZZI
-let mezziDB=[],interventiDB=[],assegnazioniDB=[],editingMezzoId=null;
-function saveMezziDB(){try{localStorage.setItem('dce-mezzi',JSON.stringify(mezziDB));localStorage.setItem('dce-interventi',JSON.stringify(interventiDB));}catch(e){}}
-function loadMezziDB(){try{mezziDB=JSON.parse(localStorage.getItem('dce-mezzi')||'[]');interventiDB=JSON.parse(localStorage.getItem('dce-interventi')||'[]');}catch(e){mezziDB=[];interventiDB=[];}}
+let mezziDB=[],interventiDB=[],assegnazioniDB=[],kmLogDB=[],editingMezzoId=null;
+function saveMezziDB(){try{localStorage.setItem('dce-mezzi',JSON.stringify(mezziDB));localStorage.setItem('dce-interventi',JSON.stringify(interventiDB));localStorage.setItem('dce-kmlog',JSON.stringify(kmLogDB));}catch(e){}}
+function loadMezziDB(){try{mezziDB=JSON.parse(localStorage.getItem('dce-mezzi')||'[]');interventiDB=JSON.parse(localStorage.getItem('dce-interventi')||'[]');kmLogDB=JSON.parse(localStorage.getItem('dce-kmlog')||'[]');}catch(e){mezziDB=[];interventiDB=[];kmLogDB=[];}}
 function saveAssegnazioniDB(){try{localStorage.setItem('dce-assegnazioni',JSON.stringify(assegnazioniDB));}catch(e){}}
 function loadAssegnazioniDB(){try{assegnazioniDB=JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]');}catch(e){assegnazioniDB=[];}}
 function daysDiff(d){if(!d)return null;const dt=new Date(d),now=new Date();now.setHours(0,0,0,0);return Math.ceil((dt-now)/(864e5));}
 function scadenzaTag(d,label){if(!d)return '';const days=daysDiff(d),fmt=new Date(d).toLocaleDateString('it-IT');if(days<0)return'<span class="tag tag-red">⚠ '+label+': SCADUTA ('+fmt+')</span>';if(days<=30)return'<span class="tag tag-red">🔴 '+label+': '+fmt+' ('+days+'gg)</span>';if(days<=90)return'<span class="tag tag-orange">🟠 '+label+': '+fmt+' ('+days+'gg)</span>';return'<span class="tag tag-green">✓ '+label+': '+fmt+'</span>';}
 function statoColor(s){return{Ottimo:'tag-green',Buono:'tag-green',Accettabile:'tag-orange','Da revisionare':'tag-red','Fuori servizio':'tag-red'}[s]||'tag-gray';}
 
-function getMezzoData(){return{tipo:document.getElementById('mz-tipo').value,modello:document.getElementById('mz-modello').value.trim(),targa:document.getElementById('mz-targa').value.trim(),anno:document.getElementById('mz-anno').value,portata:document.getElementById('mz-portata').value,assegnatario:document.getElementById('mz-assegnatario').value,stato:document.getElementById('mz-stato').value,assic:document.getElementById('mz-assic').value,revisione:document.getElementById('mz-revisione').value,inail:document.getElementById('mz-inail').value,tagliando:document.getElementById('mz-tagliando').value,estintore:document.getElementById('mz-estintore').value,altraScad:document.getElementById('mz-altra-scad').value,note:document.getElementById('mz-note').value};}
+function getMezzoData(){return{tipo:document.getElementById('mz-tipo').value,modello:document.getElementById('mz-modello').value.trim(),targa:document.getElementById('mz-targa').value.trim(),anno:document.getElementById('mz-anno').value,portata:document.getElementById('mz-portata').value,assegnatario:document.getElementById('mz-assegnatario').value,stato:document.getElementById('mz-stato').value,noleggio:document.getElementById('mz-noleggio').checked,assic:document.getElementById('mz-assic').value,assicImporto:document.getElementById('mz-assic-importo').value,assicFreq:document.getElementById('mz-assic-freq').value,bollo:document.getElementById('mz-bollo').value,revisione:document.getElementById('mz-revisione').value,inail:document.getElementById('mz-inail').value,tagUltimoData:document.getElementById('mz-tag-ultimo-data').value,tagUltimoKm:document.getElementById('mz-tag-ultimo-km').value,tagliando:document.getElementById('mz-tagliando').value,tagProssimoKm:document.getElementById('mz-tag-prossimo-km').value,estintore:document.getElementById('mz-estintore').value,altraScad:document.getElementById('mz-altra-scad').value,note:document.getElementById('mz-note').value};}
 
 function addMezzo(){
   const d=getMezzoData();if(!d.tipo||!d.targa){showToast('Compila almeno tipo e targa/matricola');return;}
   if(editingMezzoId){const idx=mezziDB.findIndex(m=>m.id===editingMezzoId);if(idx!==-1){mezziDB[idx]={...mezziDB[idx],...d};showToast('Mezzo aggiornato ✓');}editingMezzoId=null;document.getElementById('btn-salva-mezzo').textContent='Aggiungi mezzo';document.getElementById('mezzi-form-title').textContent='Aggiungi / Modifica mezzo';}
   else{d.id=Date.now();mezziDB.push(d);showToast('Mezzo aggiunto al registro');}
-  saveMezziDB();renderMezzi();renderAlerts();clearMezzoForm();
+  saveMezziDB();renderMezzi();renderAlerts();updateKmTargaSelect();clearMezzoForm();
 }
 
 function editMezzo(id){
   const m=mezziDB.find(x=>x.id===id);if(!m)return;editingMezzoId=id;
-  document.getElementById('mz-tipo').value=m.tipo||'';document.getElementById('mz-modello').value=m.modello||'';document.getElementById('mz-targa').value=m.targa||'';document.getElementById('mz-anno').value=m.anno||'';document.getElementById('mz-portata').value=m.portata||'';document.getElementById('mz-assegnatario').value=m.assegnatario||'';document.getElementById('mz-stato').value=m.stato||'';document.getElementById('mz-assic').value=m.assic||'';document.getElementById('mz-revisione').value=m.revisione||'';document.getElementById('mz-inail').value=m.inail||'';document.getElementById('mz-tagliando').value=m.tagliando||'';document.getElementById('mz-estintore').value=m.estintore||'';document.getElementById('mz-altra-scad').value=m.altraScad||'';document.getElementById('mz-note').value=m.note||'';
+  document.getElementById('mz-tipo').value=m.tipo||'';document.getElementById('mz-modello').value=m.modello||'';document.getElementById('mz-targa').value=m.targa||'';document.getElementById('mz-anno').value=m.anno||'';document.getElementById('mz-portata').value=m.portata||'';document.getElementById('mz-assegnatario').value=m.assegnatario||'';document.getElementById('mz-stato').value=m.stato||'';document.getElementById('mz-noleggio').checked=!!m.noleggio;document.getElementById('mz-assic').value=m.assic||'';document.getElementById('mz-assic-importo').value=m.assicImporto||'';document.getElementById('mz-assic-freq').value=m.assicFreq||'';document.getElementById('mz-bollo').value=m.bollo||'';document.getElementById('mz-revisione').value=m.revisione||'';document.getElementById('mz-inail').value=m.inail||'';document.getElementById('mz-tag-ultimo-data').value=m.tagUltimoData||'';document.getElementById('mz-tag-ultimo-km').value=m.tagUltimoKm||'';document.getElementById('mz-tagliando').value=m.tagliando||'';document.getElementById('mz-tag-prossimo-km').value=m.tagProssimoKm||'';document.getElementById('mz-estintore').value=m.estintore||'';document.getElementById('mz-altra-scad').value=m.altraScad||'';document.getElementById('mz-note').value=m.note||'';
   document.getElementById('btn-salva-mezzo').textContent='💾 Salva modifiche';document.getElementById('mezzi-form-title').textContent='Modifica mezzo: '+m.targa;
   document.getElementById('mezzi-form-card').scrollIntoView({behavior:'smooth'});showToast('Modifica in corso');
 }
 
-function deleteMezzo(id){if(!confirm('Eliminare questo mezzo?'))return;mezziDB=mezziDB.filter(m=>m.id!==id);saveMezziDB();renderMezzi();renderAlerts();showToast('Mezzo rimosso');}
+function deleteMezzo(id){
+  if(!confirm('Eliminare questo mezzo?'))return;
+  const m=mezziDB.find(x=>x.id===id);
+  mezziDB=mezziDB.filter(m=>m.id!==id);
+  if(m)kmLogDB=kmLogDB.filter(k=>k.targa!==m.targa);
+  saveMezziDB();renderMezzi();renderAlerts();updateKmTargaSelect();showToast('Mezzo rimosso');
+}
 
-function clearMezzoForm(){editingMezzoId=null;document.getElementById('btn-salva-mezzo').textContent='Aggiungi mezzo';document.getElementById('mezzi-form-title').textContent='Aggiungi / Modifica mezzo';['mz-tipo','mz-modello','mz-targa','mz-anno','mz-portata','mz-assegnatario','mz-stato','mz-assic','mz-revisione','mz-inail','mz-tagliando','mz-estintore','mz-altra-scad','mz-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function clearMezzoForm(){editingMezzoId=null;document.getElementById('btn-salva-mezzo').textContent='Aggiungi mezzo';document.getElementById('mezzi-form-title').textContent='Aggiungi / Modifica mezzo';document.getElementById('mz-noleggio').checked=false;['mz-tipo','mz-modello','mz-targa','mz-anno','mz-portata','mz-assegnatario','mz-stato','mz-assic','mz-assic-importo','mz-assic-freq','mz-bollo','mz-revisione','mz-inail','mz-tag-ultimo-data','mz-tag-ultimo-km','mz-tagliando','mz-tag-prossimo-km','mz-estintore','mz-altra-scad','mz-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 
 function renderMezzi(){
   const el=document.getElementById('mezzi-lista');
   if(!mezziDB.length){el.innerHTML='<div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito</p></div>';return;}
   el.innerHTML=mezziDB.map(m=>{
-    const scadenze=[scadenzaTag(m.assic,'Assicurazione'),scadenzaTag(m.revisione,'Revisione'),scadenzaTag(m.inail,'INAIL'),scadenzaTag(m.tagliando,'Tagliando'),scadenzaTag(m.estintore,'Estintore'),scadenzaTag(m.altraScad,'Altra scad.')].filter(Boolean).join(' ');
+    const scadenze=m.noleggio?[]:[scadenzaTag(m.assic,'Assicurazione'),scadenzaTag(m.bollo,'Bollo'),scadenzaTag(m.revisione,'Revisione'),scadenzaTag(m.inail,'INAIL'),scadenzaTag(m.tagliando,'Tagliando'),scadenzaTag(m.estintore,'Estintore'),scadenzaTag(m.altraScad,'Altra scad.')].filter(Boolean);
+    const scadenzeHtml=scadenze.join(' ');
     const intM=interventiDB.filter(i=>i.targa===m.targa),aperti=intM.filter(i=>i.stato==='Aperto'||i.stato==='In corso').length;
-    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+(m.assegnatario?'<span class="tag tag-blue">👤 '+m.assegnatario+'</span>':'')+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(scadenze?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenze+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
+    const kmM=kmLogDB.filter(k=>k.targa===m.targa).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+    const kmInfo=[m.assicImporto?'Premio: € '+m.assicImporto+(m.assicFreq?' ('+m.assicFreq+')':''):'',m.tagUltimoData?'Ultimo tagliando: '+new Date(m.tagUltimoData).toLocaleDateString('it-IT')+(m.tagUltimoKm?' a '+Number(m.tagUltimoKm).toLocaleString('it-IT')+' km':''):'',m.tagProssimoKm?'Prossimo previsto a '+Number(m.tagProssimoKm).toLocaleString('it-IT')+' km':''].filter(Boolean).join(' &nbsp;|&nbsp; ');
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+(m.assegnatario?'<span class="tag tag-blue">👤 '+m.assegnatario+'</span>':'')+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
   }).join('');
+}
+
+function updateKmTargaSelect(){
+  const sel=document.getElementById('km-targa');if(!sel)return;const cur=sel.value;
+  sel.innerHTML='<option value="">— seleziona mezzo —</option>'+mezziDB.map(m=>'<option value="'+m.targa+'">'+m.targa+(m.modello?' — '+m.modello:'')+'</option>').join('');
+  if(cur)sel.value=cur;
+}
+function addKmLog(){
+  const targa=document.getElementById('km-targa').value,km=document.getElementById('km-valore').value;
+  if(!targa||!km){showToast('Seleziona un mezzo e inserisci i km');return;}
+  kmLogDB.push({id:Date.now(),targa,data:document.getElementById('km-data').value,km});
+  saveMezziDB();renderMezzi();
+  document.getElementById('km-valore').value='';document.getElementById('km-data').value='';
+  showToast('Lettura km registrata');
+}
+function deleteKmLog(id){if(!confirm('Eliminare questa lettura km?'))return;kmLogDB=kmLogDB.filter(k=>k.id!==id);saveMezziDB();renderMezzi();showToast('Lettura rimossa');}
+
+function importaMezziDaExcel(){
+  const datiImport=[
+    {tipo:'Autovettura aziendale',modello:'Renault Megane',targa:'DJ532WE',stato:'Buono',assic:'2027-01-10',assicImporto:'1008',assicFreq:'Ogni 6 mesi',bollo:'2026-06-30',revisione:'2027-11-01',tagUltimoData:'2026-02-28',tagUltimoKm:'365443',tagliando:'2027-02-28',tagProssimoKm:'380443',note:'',km:[{data:'2025-01-15',km:'343989'},{data:'2025-07-15',km:'352872'},{data:'2026-02-15',km:'365443'}]},
+    {tipo:'Autovettura aziendale',modello:'Audi Q2',targa:'GG690DH',stato:'Buono',assic:'2026-09-11',assicImporto:'1435',assicFreq:'Ogni 6 mesi',bollo:'',revisione:'2027-08-01',tagUltimoData:'2026-02-02',tagUltimoKm:'150424',tagliando:'2027-02-02',tagProssimoKm:'165424',note:'Bollo da pagare',km:[{data:'2026-02-15',km:'150424'}]},
+    {tipo:'Furgone',modello:"Fiat Doblò",targa:'EP488SM',stato:'Buono',assic:'2026-11-27',assicImporto:'670',assicFreq:'Ogni 6 mesi',bollo:'2026-07-30',revisione:'2027-05-01',tagUltimoData:'2026-03-02',tagUltimoKm:'204791',tagliando:'2027-03-02',tagProssimoKm:'219791',note:'',km:[{data:'2025-01-15',km:'186273'},{data:'2025-07-15',km:'194209'},{data:'2026-02-15',km:'204791'}]},
+    {tipo:'Autovettura aziendale',modello:'Fiat Punto',targa:'CT151PV',stato:'Buono',assic:'2027-01-06',assicImporto:'640',assicFreq:'Ogni 6 mesi',bollo:'2027-02-28',revisione:'2027-03-01',tagUltimoData:'2026-03-15',tagUltimoKm:'163188',tagliando:'2027-03-15',tagProssimoKm:'178188',note:'',km:[{data:'2025-01-15',km:'163188'}]},
+    {tipo:'Furgone',modello:"Fiat Doblò",targa:'DT725PB',stato:'Buono',assic:'2027-01-20',assicImporto:'520.5',assicFreq:'Ogni 6 mesi',bollo:'2027-04-30',revisione:'2026-09-01',tagUltimoData:'2025-08-06',tagUltimoKm:'273429',tagliando:'2026-08-06',tagProssimoKm:'288429',note:'',km:[{data:'2025-01-15',km:'260770'},{data:'2025-07-15',km:'272559'},{data:'2026-02-15',km:'280613'}]},
+    {tipo:'Autocarro',modello:'Iveco',targa:'GF652EF',stato:'Buono',assic:'2026-12-23',assicImporto:'840',assicFreq:'Ogni 6 mesi',bollo:'',revisione:'2027-09-01',tagUltimoData:'2026-06-04',tagUltimoKm:'',tagliando:'2027-06-04',tagProssimoKm:'15000',note:'Bollo da pagare',km:[{data:'2025-01-15',km:'106427'},{data:'2025-07-15',km:'127193'},{data:'2026-02-15',km:'144171'}]},
+    {tipo:'Autovettura aziendale',modello:'DS7 Crossback',targa:'GF754PF',stato:'Buono',assic:'2027-02-24',assicImporto:'1296',assicFreq:'Ogni 12 mesi',bollo:'2026-06-30',revisione:'2027-06-01',tagUltimoData:'',tagUltimoKm:'',tagliando:'',tagProssimoKm:'',note:'',km:[]},
+    {tipo:'Autovettura aziendale',modello:'Audi A4',targa:'GW274LL',stato:'Buono',noleggio:true,assic:'',assicImporto:'',assicFreq:'',bollo:'',revisione:'',tagUltimoData:'',tagUltimoKm:'',tagliando:'',tagProssimoKm:'',note:'Mezzo a noleggio: assicurazione, bollo e revisione inclusi nel canone.',km:[]},
+  ];
+  let aggiunti=0,saltati=0;
+  datiImport.forEach(d=>{
+    if(mezziDB.find(m=>m.targa===d.targa)){saltati++;return;}
+    const km=d.km;const mezzo={...d};delete mezzo.km;mezzo.id=Date.now()+Math.floor(Math.random()*1000);mezzo.noleggio=!!mezzo.noleggio;
+    mezziDB.push(mezzo);
+    km.forEach(k=>kmLogDB.push({id:Date.now()+Math.floor(Math.random()*100000),targa:d.targa,data:k.data,km:k.km}));
+    aggiunti++;
+  });
+  saveMezziDB();renderMezzi();renderAlerts();updateKmTargaSelect();
+  showToast(aggiunti?('Importati '+aggiunti+' mezzi'+(saltati?' ('+saltati+' già presenti, saltati)':'')):'Tutti i mezzi erano già presenti, nessuna modifica');
 }
 
 function addIntervento(){
@@ -1861,7 +1927,7 @@ function renderInterventi(){
 function renderAlerts(){
   const el=document.getElementById('mezzi-alerts');if(!mezziDB.length){el.innerHTML='';return;}
   const urgenti=[];
-  mezziDB.forEach(m=>{[{label:'Assicurazione',date:m.assic},{label:'Revisione',date:m.revisione},{label:'INAIL',date:m.inail},{label:'Tagliando',date:m.tagliando},{label:'Estintore',date:m.estintore}].forEach(c=>{if(!c.date)return;const days=daysDiff(c.date);if(days!==null&&days<=30)urgenti.push({mezzo:m.targa+(m.modello?' '+m.modello:''),label:c.label,days,date:c.date});});});
+  mezziDB.forEach(m=>{if(m.noleggio)return;[{label:'Assicurazione',date:m.assic},{label:'Bollo',date:m.bollo},{label:'Revisione',date:m.revisione},{label:'INAIL',date:m.inail},{label:'Tagliando',date:m.tagliando},{label:'Estintore',date:m.estintore}].forEach(c=>{if(!c.date)return;const days=daysDiff(c.date);if(days!==null&&days<=30)urgenti.push({mezzo:m.targa+(m.modello?' '+m.modello:''),label:c.label,days,date:c.date});});});
   if(!urgenti.length){el.innerHTML='';return;}
   el.innerHTML='<div style="background:var(--red-bg);border:1px solid rgba(181,90,74,0.3);border-radius:var(--radius-lg);padding:14px;margin-bottom:16px"><div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:8px">⚠ Scadenze imminenti o scadute (entro 30 giorni)</div>'+urgenti.map(u=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;font-size:12px"><span style="font-family:var(--font-mono);color:var(--accent)">'+u.mezzo+'</span><span style="color:var(--text2)">'+u.label+'</span><span style="color:'+(u.days<0?'var(--red)':'var(--accent)')+'">'+( u.days<0?'SCADUTA':u.days===0?'OGGI':'tra '+u.days+' giorni')+' ('+new Date(u.date).toLocaleDateString('it-IT')+')</span></div>').join('')+'</div>';
 }
@@ -1884,7 +1950,7 @@ function renderAssegnazioni(){
 async function saveMezziCloud(){
   saveMezziDB();
   if(typeof saveToCloud==='function'&&currentUser){
-    const ok=await saveToCloud('mezzi-registro',{mezzi:mezziDB,interventi:interventiDB});
+    const ok=await saveToCloud('mezzi-registro',{mezzi:mezziDB,interventi:interventiDB,kmLog:kmLogDB});
     showToast(ok?'Mezzi e interventi salvati ✓ (locale + cloud)':'Salvati solo in locale');
   }else{showToast('Salvati (solo locale)');}
 }
@@ -2033,7 +2099,7 @@ async function loadAllFromCloud(){
       Object.entries(d).forEach(([id,val])=>{const el=document.getElementById(id);if(!el)return;if(el.type==='checkbox'){el.checked=val;const it=el.closest('.check-item');if(it)it.classList.toggle('checked',val);}else el.value=val;});
     }
     const mezziDati=await loadFromCloud('mezzi-registro');
-    if(mezziDati){mezziDB=mezziDati.mezzi||[];interventiDB=mezziDati.interventi||[];saveMezziDB();}
+    if(mezziDati){mezziDB=mezziDati.mezzi||[];interventiDB=mezziDati.interventi||[];kmLogDB=mezziDati.kmLog||[];saveMezziDB();}
     const assegnazioniDati=await loadFromCloud('assegnazioni-registro');
     if(assegnazioniDati){assegnazioniDB=assegnazioniDati.assegnazioni||[];saveAssegnazioniDB();}
     const scorte=await loadFromCloud('fase2-scorte');
@@ -2046,7 +2112,7 @@ async function loadAllFromCloud(){
     const fornDati=await loadFromCloud('fornitori');
     if(fornDati){fornitoriDB=fornDati.fornitori||[];acquistiDB=fornDati.acquisti||[];saveFornitoriDB();}
     applyFornitoriVisibility();
-    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();updateDashboardStats();},100);
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();updateDashboardStats();},100);
   }catch(e){console.warn(e);}
 }
 
@@ -2306,7 +2372,7 @@ window.addEventListener('load',async()=>{
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
   loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();
-  renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();
+  renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();
   renderAttrezzature();
   renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
   renderConsumiOfficina();renderConsumiSquadre();
