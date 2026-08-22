@@ -1113,12 +1113,13 @@
 
     <!-- MATERIALI -->
     <div class="module" id="mod-materiali">
-      <div class="section-header"><h1>Registro Materiali</h1><p>Catalogo materiali di consumo, tracciamento previsto/effettivo per squadra e report di scostamento.</p></div>
+      <div class="section-header"><h1>Registro Materiali</h1><p>Catalogo materiali, cantieri, consegne alle squadre e report finale per cantiere.</p></div>
 
       <!-- TAB NAVIGATION -->
       <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
         <button id="tab-mat-catalogo" onclick="switchMatTab('catalogo')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Catalogo</button>
-        <button id="tab-mat-consumo" onclick="switchMatTab('consumo')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consumo per Squadra</button>
+        <button id="tab-mat-cantieri" onclick="switchMatTab('cantieri')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Cantieri</button>
+        <button id="tab-mat-consegne" onclick="switchMatTab('consegne')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consegne</button>
         <button id="tab-mat-report" onclick="switchMatTab('report')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Report</button>
       </div>
 
@@ -1151,7 +1152,9 @@
             <div class="form-group"><label>Prezzo unitario (€)</label><input type="number" id="mat-prezzo" placeholder="es. 4.50"></div>
             <div class="form-group"><label>Sconto (%)</label><input type="number" id="mat-sconto" placeholder="es. 10"></div>
             <div class="form-group"><label>Fornitore</label><select id="mat-fornitore"><option value="">— seleziona fornitore —</option></select></div>
-            <div class="form-group span-2"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
+            <div class="form-group"><label>Giacenza attuale</label><input type="number" id="mat-giacenza" placeholder="es. 200"></div>
+            <div class="form-group"><label>Scorta minima (alert)</label><input type="number" id="mat-scorta-min" placeholder="es. 20"></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
             <button class="btn btn-primary" id="btn-salva-mat" onclick="addMateriale()">Aggiungi materiale</button>
@@ -1164,56 +1167,91 @@
         </div>
       </div>
 
-      <!-- TAB CONSUMO -->
-      <div id="mat-tab-consumo" style="display:none">
+      <!-- TAB CANTIERI -->
+      <div id="mat-tab-cantieri" style="display:none">
         <div class="form-card">
-          <div class="form-card-title">Registra consumo per squadra</div>
+          <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
           <div class="form-grid cols-3">
-            <div class="form-group"><label>Materiale</label><select id="cm-materiale"><option value="">— seleziona materiale —</option></select></div>
-            <div class="form-group"><label>Squadra</label><select id="cm-squadra" onchange="autoCompilaCantiere()"><option value="">— seleziona squadra —</option></select></div>
-            <div class="form-group"><label>Cantiere</label><input type="text" id="cm-cantiere" placeholder="autocompilato dalla squadra"></div>
-            <div class="form-group"><label>Quantità prevista</label><input type="number" id="cm-previsto" placeholder="es. 20"></div>
-            <div class="form-group"><label>Quantità effettiva</label><input type="number" id="cm-effettivo" placeholder="es. 24"></div>
-            <div class="form-group"><label>Data</label><input type="date" id="cm-data"></div>
-            <div class="form-group span-3"><label>Note</label><input type="text" id="cm-note" placeholder="note libere"></div>
+            <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
+            <div class="form-group"><label>Cliente</label><input type="text" id="cant-cliente" placeholder="es. Zincheria De Lucchi"></div>
+            <div class="form-group"><label>Squadra assegnata</label><select id="cant-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Data apertura</label><input type="date" id="cant-apertura"></div>
+            <div class="form-group"><label>Data chiusura</label><input type="date" id="cant-chiusura"></div>
+            <div class="form-group"><label>Stato</label><select id="cant-stato"><option>Aperto</option><option>Chiuso</option></select></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="cant-note" placeholder="note libere"></div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-cm" onclick="addConsumoMateriale()">Registra consumo</button>
-            <button class="btn btn-ghost" onclick="clearConsumoMatForm()">Annulla</button>
+            <button class="btn btn-primary" id="btn-salva-cant" onclick="addCantiere()">Apri cantiere</button>
+            <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
           </div>
         </div>
         <div class="form-card">
-          <div class="form-card-title">Storico consumi</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select id="cm-filter-squadra" onchange="renderConsumoMateriali()"><option value="">Tutte le squadre</option></select>
-            <select id="cm-filter-materiale" onchange="renderConsumoMateriali()"><option value="">Tutti i materiali</option></select>
+          <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="prev-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Quantità prevista</label><input type="number" id="prev-quantita" placeholder="es. 50"></div>
           </div>
-          <div id="cm-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessun consumo registrato</p></div></div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
+          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
+        </div>
+      </div>
+
+      <!-- TAB CONSEGNE -->
+      <div id="mat-tab-consegne" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Registra consegna materiale</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="cs-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Squadra</label><select id="cs-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Quantità consegnata *</label><input type="number" id="cs-quantita" placeholder="es. 50"></div>
+            <div class="form-group"><label>Data</label><input type="date" id="cs-data"></div>
+            <div class="form-group span-2"><label>Note</label><input type="text" id="cs-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-cs" onclick="addConsegna()">Registra consegna</button>
+            <button class="btn btn-ghost" onclick="clearConsegnaForm()">Annulla</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Storico consegne</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="cs-filter-cantiere" onchange="renderConsegne()"><option value="">Tutti i cantieri</option></select>
+            <select id="cs-filter-materiale" onchange="renderConsegne()"><option value="">Tutti i materiali</option></select>
+          </div>
+          <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
         </div>
       </div>
 
       <!-- TAB REPORT -->
       <div id="mat-tab-report" style="display:none">
         <div class="form-card">
-          <div class="form-card-title">📊 Scostamento previsto / effettivo per materiale</div>
+          <div class="form-card-title">Seleziona cantiere</div>
+          <select id="rep-cantiere" onchange="renderReportMateriali()" style="max-width:400px"><option value="">— tutti i cantieri (vista globale) —</option></select>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">📊 Previsto / Effettivo per materiale <span id="rep-titolo-cantiere" style="font-weight:400;color:var(--text3);font-size:12px"></span></div>
           <div id="mat-report-materiali"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
         </div>
         <div class="form-card">
-          <div class="form-card-title">👷 Costo totale consumato per squadra</div>
+          <div class="form-card-title">👷 Costo totale consegnato per squadra</div>
           <div id="mat-report-squadre"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
         </div>
         <div class="form-card">
-          <div class="form-card-title">⚠ Materiali con maggiore scostamento</div>
+          <div class="form-card-title">⚠ Materiali sotto scorta minima</div>
+          <div id="mat-report-scorta"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
           <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
         </div>
         <div class="actions-bar" style="border:none;padding:0;margin:0"><button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button></div>
       </div>
     </div>
-
-  </div>
-</main>
-</div>
-
 <!-- AUDIT MODAL -->
 <div id="audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9997;align-items:center;justify-content:center">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:900px;max-height:80vh;display:flex;flex-direction:column">
@@ -1242,7 +1280,7 @@ function showModule(id) {
   document.getElementById('breadcrumb').innerHTML='<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
-  if(id==='materiali'){renderMateriali();updateMaterialeSelects();renderConsumoMateriali();renderReportMateriali();}
+  if(id==='materiali'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();renderReportMateriali();}
 }
 
 function toggleCheck(id) {
@@ -2215,8 +2253,8 @@ async function loadAllFromCloud(){
     if(fornDati){fornitoriDB=fornDati.fornitori||[];acquistiDB=fornDati.acquisti||[];saveFornitoriDB();}
     applyFornitoriVisibility();
     const matDati=await loadFromCloud('materiali-registro');
-    if(matDati){materialiDB=matDati.materiali||[];consumoMatDB=matDati.consumo||[];saveMaterialiDB();}
-    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();updateMaterialeSelects();renderConsumoMateriali();updateDashboardStats();},100);
+    if(matDati){materialiDB=matDati.materiali||[];cantieriDB=matDati.cantieri||[];previstoDB=matDati.previsto||[];consegneDB=matDati.consegne||[];saveMaterialiDB();}
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();updateDashboardStats();},100);
   }catch(e){console.warn(e);}
 }
 
@@ -2447,11 +2485,12 @@ async function saveFornitoriPermessi(){
 }
 // ============ END FORNITORI ============
 
-// ============ MATERIALI ============
-let materialiDB=[], consumoMatDB=[], editingMaterialeId=null, editingConsumoMatId=null;
+// ============ MATERIALI (Catalogo + Cantieri + Consegne + Report) ============
+let materialiDB=[], cantieriDB=[], previstoDB=[], consegneDB=[];
+let editingMaterialeId=null, editingCantiereId=null, editingConsegnaId=null;
 
 function switchMatTab(tab){
-  ['catalogo','consumo','report'].forEach(t=>{
+  ['catalogo','cantieri','consegne','report'].forEach(t=>{
     document.getElementById('mat-tab-'+t).style.display=(t===tab)?'':'none';
     document.getElementById('tab-mat-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
     document.getElementById('tab-mat-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
@@ -2459,29 +2498,43 @@ function switchMatTab(tab){
   if(tab==='report')renderReportMateriali();
 }
 
-function saveMaterialiDB(){try{localStorage.setItem('dce-materiali',JSON.stringify(materialiDB));localStorage.setItem('dce-consumomat',JSON.stringify(consumoMatDB));}catch(e){}}
-function loadMaterialiDB(){try{materialiDB=JSON.parse(localStorage.getItem('dce-materiali')||'[]');consumoMatDB=JSON.parse(localStorage.getItem('dce-consumomat')||'[]');}catch(e){materialiDB=[];consumoMatDB=[];}}
+function saveMaterialiDB(){
+  try{
+    localStorage.setItem('dce-materiali',JSON.stringify(materialiDB));
+    localStorage.setItem('dce-cantieri',JSON.stringify(cantieriDB));
+    localStorage.setItem('dce-previsto',JSON.stringify(previstoDB));
+    localStorage.setItem('dce-consegne',JSON.stringify(consegneDB));
+  }catch(e){}
+}
+function loadMaterialiDB(){
+  try{
+    materialiDB=JSON.parse(localStorage.getItem('dce-materiali')||'[]');
+    cantieriDB=JSON.parse(localStorage.getItem('dce-cantieri')||'[]');
+    previstoDB=JSON.parse(localStorage.getItem('dce-previsto')||'[]');
+    consegneDB=JSON.parse(localStorage.getItem('dce-consegne')||'[]');
+  }catch(e){materialiDB=[];cantieriDB=[];previstoDB=[];consegneDB=[];}
+}
 
 function updateMaterialeSelects(){
   const fornOpts='<option value="">— seleziona fornitore —</option>'+fornitoriDB.map(f=>'<option value="'+f.id+'">'+f.ragione+'</option>').join('');
   const fSel=document.getElementById('mat-fornitore');if(fSel){const cur=fSel.value;fSel.innerHTML=fornOpts;if(cur)fSel.value=cur;}
 
   const matOpts='<option value="">— seleziona materiale —</option>'+materialiDB.map(m=>'<option value="'+m.id+'">'+m.nome+(m.um?' ('+m.um+')':'')+'</option>').join('');
-  ['cm-materiale'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=matOpts;if(cur)el.value=cur;}});
+  ['prev-materiale','cs-materiale'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=matOpts;if(cur)el.value=cur;}});
   const matFilterOpts='<option value="">Tutti i materiali</option>'+materialiDB.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('');
-  const mf=document.getElementById('cm-filter-materiale');if(mf){const cur=mf.value;mf.innerHTML=matFilterOpts;if(cur)mf.value=cur;}
+  const mf=document.getElementById('cs-filter-materiale');if(mf){const cur=mf.value;mf.innerHTML=matFilterOpts;if(cur)mf.value=cur;}
 
   const sqOpts='<option value="">— seleziona squadra —</option>'+squadreDB.map(s=>'<option value="'+s.id+'">'+s.nome+'</option>').join('');
-  const cmSq=document.getElementById('cm-squadra');if(cmSq){const cur=cmSq.value;cmSq.innerHTML=sqOpts;if(cur)cmSq.value=cur;}
-  const sqFilterOpts='<option value="">Tutte le squadre</option>'+squadreDB.map(s=>'<option value="'+s.id+'">'+s.nome+'</option>').join('');
-  const sf=document.getElementById('cm-filter-squadra');if(sf){const cur=sf.value;sf.innerHTML=sqFilterOpts;if(cur)sf.value=cur;}
+  ['cant-squadra','cs-squadra'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=sqOpts;if(cur)el.value=cur;}});
+
+  const cantOpts='<option value="">— seleziona cantiere —</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');
+  ['prev-cantiere','cs-cantiere'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=cantOpts;if(cur)el.value=cur;}});
+  const cantFilterOpts='<option value="">Tutti i cantieri</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');
+  const cf=document.getElementById('cs-filter-cantiere');if(cf){const cur=cf.value;cf.innerHTML=cantFilterOpts;if(cur)cf.value=cur;}
+  const rf=document.getElementById('rep-cantiere');if(rf){const cur=rf.value;rf.innerHTML='<option value="">— tutti i cantieri (vista globale) —</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');if(cur)rf.value=cur;}
 }
 
-function autoCompilaCantiere(){
-  const sqId=document.getElementById('cm-squadra').value;
-  const s=squadreDB.find(x=>String(x.id)===String(sqId));
-  document.getElementById('cm-cantiere').value=s?(s.cantiere||''):'';
-}
+function prezzoNetto(m){const p=parseFloat(m.prezzo)||0,s=parseFloat(m.sconto)||0;return p*(1-s/100);}
 
 // --- CATALOGO ---
 function addMateriale(){
@@ -2494,6 +2547,8 @@ function addMateriale(){
     prezzo:document.getElementById('mat-prezzo').value,
     sconto:document.getElementById('mat-sconto').value,
     fornitoreId:document.getElementById('mat-fornitore').value,
+    giacenza:document.getElementById('mat-giacenza').value,
+    scortaMin:document.getElementById('mat-scorta-min').value,
     note:document.getElementById('mat-note').value
   };
   if(editingMaterialeId){
@@ -2513,6 +2568,8 @@ function editMateriale(id){
   document.getElementById('mat-prezzo').value=m.prezzo||'';
   document.getElementById('mat-sconto').value=m.sconto||'';
   document.getElementById('mat-fornitore').value=m.fornitoreId||'';
+  document.getElementById('mat-giacenza').value=m.giacenza||'';
+  document.getElementById('mat-scorta-min').value=m.scortaMin||'';
   document.getElementById('mat-note').value=m.note||'';
   document.getElementById('btn-salva-mat').textContent='Salva modifiche';
   document.getElementById('mat-form-title').textContent='Modifica: '+m.nome;
@@ -2522,17 +2579,13 @@ function clearMaterialeForm(){
   editingMaterialeId=null;
   document.getElementById('btn-salva-mat').textContent='Aggiungi materiale';
   document.getElementById('mat-form-title').textContent='Aggiungi / Modifica materiale';
-  ['mat-preset','mat-nome','mat-categoria','mat-prezzo','mat-sconto','mat-fornitore','mat-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['mat-preset','mat-nome','mat-categoria','mat-prezzo','mat-sconto','mat-fornitore','mat-giacenza','mat-scorta-min','mat-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('mat-um').value='pz';
 }
 function deleteMateriale(id){
-  if(!confirm('Eliminare questo materiale? Lo storico consumi collegato resterà ma senza riferimento al catalogo.'))return;
+  if(!confirm('Eliminare questo materiale? Lo storico consegne collegato resterà ma senza riferimento al catalogo.'))return;
   materialiDB=materialiDB.filter(m=>m.id!==id);
   saveMaterialiDB();renderMateriali();updateMaterialeSelects();showToast('Materiale rimosso');
-}
-function prezzoNetto(m){
-  const p=parseFloat(m.prezzo)||0,s=parseFloat(m.sconto)||0;
-  return p*(1-s/100);
 }
 function renderMateriali(){
   const el=document.getElementById('mat-lista');if(!el)return;
@@ -2541,10 +2594,14 @@ function renderMateriali(){
   el.innerHTML=materialiDB.map(m=>{
     const forn=fornitoriDB.find(f=>String(f.id)===String(m.fornitoreId));
     const netto=prezzoNetto(m);
+    const giac=m.giacenza!==''&&m.giacenza!==undefined&&m.giacenza!==null?parseFloat(m.giacenza):null;
+    const scortaMin=parseFloat(m.scortaMin)||0;
+    const sottoScorta=giac!==null&&giac<=scortaMin;
     return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px;background:var(--bg3);display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
       '<span style="font-size:14px;font-weight:500;color:var(--text)">'+m.nome+'</span>'+
       (m.categoria?'<span class="tag tag-orange" style="font-size:10px">'+m.categoria+'</span>':'')+
       (m.um?'<span class="tag tag-gray" style="font-size:10px">'+m.um+'</span>':'')+
+      (giac!==null?'<span class="tag '+(sottoScorta?'tag-red':'tag-green')+'" style="font-size:10px">'+(sottoScorta?'⚠ ':'')+'Giacenza: '+giac+' '+(m.um||'')+'</span>':'')+
       (m.prezzo?'<span style="font-size:12px;color:var(--accent)">€ '+parseFloat(m.prezzo).toFixed(2)+(m.sconto?' <span style="color:var(--text3)">(−'+m.sconto+'% → € '+netto.toFixed(2)+')</span>':'')+'</span>':'')+
       (forn?'<span style="font-size:11px;color:var(--text3)">🏭 '+forn.ragione+'</span>':'')+
       (m.note?'<span style="font-size:11px;color:var(--text3)">'+m.note+'</span>':'')+
@@ -2555,66 +2612,172 @@ function renderMateriali(){
   }).join('');
 }
 
-// --- CONSUMO PER SQUADRA ---
-function addConsumoMateriale(){
-  const materialeId=document.getElementById('cm-materiale').value;
-  const squadraId=document.getElementById('cm-squadra').value;
-  if(!materialeId||!squadraId){showToast('Seleziona materiale e squadra');return;}
+// --- CANTIERI ---
+function addCantiere(){
+  const nome=document.getElementById('cant-nome').value.trim();
+  if(!nome){showToast('Inserisci il nome del cantiere');return;}
   const d={
-    id:editingConsumoMatId||Date.now(),materialeId,squadraId,
-    cantiere:document.getElementById('cm-cantiere').value,
-    previsto:document.getElementById('cm-previsto').value,
-    effettivo:document.getElementById('cm-effettivo').value,
-    data:document.getElementById('cm-data').value,
-    note:document.getElementById('cm-note').value
+    id:editingCantiereId||Date.now(),nome,
+    cliente:document.getElementById('cant-cliente').value,
+    squadraId:document.getElementById('cant-squadra').value,
+    apertura:document.getElementById('cant-apertura').value,
+    chiusura:document.getElementById('cant-chiusura').value,
+    stato:document.getElementById('cant-stato').value,
+    note:document.getElementById('cant-note').value
   };
-  if(editingConsumoMatId){
-    const i=consumoMatDB.findIndex(c=>c.id===editingConsumoMatId);
-    if(i!==-1){consumoMatDB[i]=d;showToast('Consumo aggiornato');}
+  if(editingCantiereId){
+    const i=cantieriDB.findIndex(c=>c.id===editingCantiereId);
+    if(i!==-1){cantieriDB[i]=d;showToast('Cantiere aggiornato');}
   }else{
-    consumoMatDB.push(d);showToast('Consumo registrato');
+    if(!d.apertura)d.apertura=new Date().toISOString().slice(0,10);
+    cantieriDB.push(d);showToast('Cantiere aperto');
   }
-  saveMaterialiDB();renderConsumoMateriali();clearConsumoMatForm();
+  saveMaterialiDB();renderCantieri();updateMaterialeSelects();clearCantiereForm();
 }
-function editConsumoMateriale(id){
-  const c=consumoMatDB.find(x=>x.id===id);if(!c)return;
-  editingConsumoMatId=id;
-  document.getElementById('cm-materiale').value=c.materialeId||'';
-  document.getElementById('cm-squadra').value=c.squadraId||'';
-  document.getElementById('cm-cantiere').value=c.cantiere||'';
-  document.getElementById('cm-previsto').value=c.previsto||'';
-  document.getElementById('cm-effettivo').value=c.effettivo||'';
-  document.getElementById('cm-data').value=c.data||'';
-  document.getElementById('cm-note').value=c.note||'';
-  document.getElementById('btn-salva-cm').textContent='Salva modifiche';
-  document.getElementById('btn-salva-cm').scrollIntoView({behavior:'smooth'});
+function editCantiere(id){
+  const c=cantieriDB.find(x=>x.id===id);if(!c)return;
+  editingCantiereId=id;
+  document.getElementById('cant-nome').value=c.nome||'';
+  document.getElementById('cant-cliente').value=c.cliente||'';
+  document.getElementById('cant-squadra').value=c.squadraId||'';
+  document.getElementById('cant-apertura').value=c.apertura||'';
+  document.getElementById('cant-chiusura').value=c.chiusura||'';
+  document.getElementById('cant-stato').value=c.stato||'Aperto';
+  document.getElementById('cant-note').value=c.note||'';
+  document.getElementById('btn-salva-cant').textContent='Salva modifiche';
+  document.getElementById('cant-form-title').textContent='Modifica: '+c.nome;
+  document.getElementById('cant-form-title').scrollIntoView({behavior:'smooth'});
+}
+function clearCantiereForm(){
+  editingCantiereId=null;
+  document.getElementById('btn-salva-cant').textContent='Apri cantiere';
+  document.getElementById('cant-form-title').textContent='Apri nuovo cantiere';
+  ['cant-nome','cant-cliente','cant-squadra','cant-apertura','cant-chiusura','cant-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('cant-stato').value='Aperto';
+}
+function deleteCantiere(id){
+  if(!confirm('Eliminare questo cantiere? Obiettivi previsti e consegne collegate resteranno ma senza riferimento al cantiere.'))return;
+  cantieriDB=cantieriDB.filter(c=>c.id!==id);
+  saveMaterialiDB();renderCantieri();updateMaterialeSelects();showToast('Cantiere rimosso');
+}
+function chiudiCantiere(id){
+  const c=cantieriDB.find(x=>x.id===id);if(!c)return;
+  if(!confirm('Chiudere il cantiere "'+c.nome+'"? Potrai comunque riaprirlo in seguito.'))return;
+  c.stato='Chiuso';c.chiusura=c.chiusura||new Date().toISOString().slice(0,10);
+  saveMaterialiDB();renderCantieri();updateMaterialeSelects();showToast('Cantiere chiuso — vedi il report finale nella scheda Report');
+}
+function riapriCantiere(id){
+  const c=cantieriDB.find(x=>x.id===id);if(!c)return;
+  c.stato='Aperto';
+  saveMaterialiDB();renderCantieri();updateMaterialeSelects();showToast('Cantiere riaperto');
+}
+function renderCantieri(){
+  const el=document.getElementById('cant-lista');if(!el)return;
+  const c=document.getElementById('cant-count');if(c)c.textContent=cantieriDB.length;
+  if(!cantieriDB.length){el.innerHTML='<div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div>';return;}
+  const ordinati=cantieriDB.slice().sort((a,b)=>(a.stato==='Chiuso'?1:0)-(b.stato==='Chiuso'?1:0));
+  el.innerHTML=ordinati.map(c=>{
+    const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
+    const nConsegne=consegneDB.filter(x=>String(x.cantiereId)===String(c.id)).length;
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px;background:var(--bg3)">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span style="font-size:14px;font-weight:500;color:var(--text)">🏗️ '+c.nome+'</span>'+
+      '<span class="tag '+(c.stato==='Chiuso'?'tag-gray':'tag-green')+'">'+c.stato+'</span>'+
+      (c.cliente?'<span class="tag tag-blue" style="font-size:10px">'+c.cliente+'</span>':'')+
+      (sq?'<span class="tag tag-orange" style="font-size:10px">👷 '+sq.nome+'</span>':'')+
+      '<div style="margin-left:auto;display:flex;gap:6px">'+
+      (c.stato==='Aperto'?'<button onclick="chiudiCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔒 Chiudi cantiere</button>':'<button onclick="riapriCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔓 Riapri</button>')+
+      '<button onclick="vaiReportCantiere('+c.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">📊 Report</button>'+
+      '<button onclick="editCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎</button>'+
+      '<button onclick="deleteCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕</button>'+
+      '</div></div>'+
+      '<div style="font-size:12px;color:var(--text3);margin-top:6px">Aperto: '+(c.apertura?new Date(c.apertura).toLocaleDateString('it-IT'):'—')+(c.chiusura?' &nbsp;·&nbsp; Chiuso: '+new Date(c.chiusura).toLocaleDateString('it-IT'):'')+' &nbsp;·&nbsp; Consegne registrate: '+nConsegne+'</div>'+
+      (c.note?'<div style="font-size:12px;color:var(--text3);margin-top:2px">'+c.note+'</div>':'')+
+      '</div>';
+  }).join('');
+}
+function vaiReportCantiere(cantiereId){
+  switchMatTab('report');
+  document.getElementById('rep-cantiere').value=cantiereId;
+  renderReportMateriali();
+}
+
+// --- OBIETTIVO PREVISTO (per cantiere + materiale) ---
+function addPrevisto(){
+  const cantiereId=document.getElementById('prev-cantiere').value;
+  const materialeId=document.getElementById('prev-materiale').value;
+  const quantita=document.getElementById('prev-quantita').value;
+  if(!cantiereId||!materialeId||!quantita){showToast('Compila cantiere, materiale e quantità');return;}
+  const esistente=previstoDB.find(p=>String(p.cantiereId)===String(cantiereId)&&String(p.materialeId)===String(materialeId));
+  if(esistente){esistente.quantita=quantita;showToast('Obiettivo aggiornato');}
+  else{previstoDB.push({id:Date.now(),cantiereId,materialeId,quantita});showToast('Obiettivo impostato');}
+  saveMaterialiDB();
+  document.getElementById('prev-quantita').value='';
+}
+
+// --- CONSEGNE ---
+function addConsegna(){
+  const cantiereId=document.getElementById('cs-cantiere').value;
+  const materialeId=document.getElementById('cs-materiale').value;
+  const quantita=parseFloat(document.getElementById('cs-quantita').value);
+  if(!cantiereId||!materialeId||!quantita){showToast('Compila cantiere, materiale e quantità');return;}
+  const mat=materialiDB.find(m=>String(m.id)===String(materialeId));
+  if(editingConsegnaId){
+    const i=consegneDB.findIndex(c=>c.id===editingConsegnaId);
+    if(i!==-1){
+      const vecchia=parseFloat(consegneDB[i].quantita)||0;
+      const delta=quantita-vecchia;
+      if(mat)mat.giacenza=((parseFloat(mat.giacenza)||0)-delta).toString();
+      consegneDB[i]={...consegneDB[i],cantiereId,materialeId,squadraId:document.getElementById('cs-squadra').value,quantita:quantita.toString(),data:document.getElementById('cs-data').value,note:document.getElementById('cs-note').value};
+      showToast('Consegna aggiornata');
+    }
+    editingConsegnaId=null;document.getElementById('btn-salva-cs').textContent='Registra consegna';
+  }else{
+    consegneDB.push({id:Date.now(),cantiereId,materialeId,squadraId:document.getElementById('cs-squadra').value,quantita:quantita.toString(),data:document.getElementById('cs-data').value||new Date().toISOString().slice(0,10),note:document.getElementById('cs-note').value});
+    if(mat)mat.giacenza=((parseFloat(mat.giacenza)||0)-quantita).toString();
+    showToast('Consegna registrata — giacenza aggiornata');
+  }
+  saveMaterialiDB();renderConsegne();renderMateriali();clearConsegnaForm();
+}
+function editConsegna(id){
+  const c=consegneDB.find(x=>x.id===id);if(!c)return;
+  editingConsegnaId=id;
+  document.getElementById('cs-cantiere').value=c.cantiereId||'';
+  document.getElementById('cs-materiale').value=c.materialeId||'';
+  document.getElementById('cs-squadra').value=c.squadraId||'';
+  document.getElementById('cs-quantita').value=c.quantita||'';
+  document.getElementById('cs-data').value=c.data||'';
+  document.getElementById('cs-note').value=c.note||'';
+  document.getElementById('btn-salva-cs').textContent='Salva modifiche';
+  document.getElementById('btn-salva-cs').scrollIntoView({behavior:'smooth'});
   showToast('Modifica in corso');
 }
-function clearConsumoMatForm(){
-  editingConsumoMatId=null;
-  document.getElementById('btn-salva-cm').textContent='Registra consumo';
-  ['cm-materiale','cm-squadra','cm-cantiere','cm-previsto','cm-effettivo','cm-data','cm-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+function clearConsegnaForm(){
+  editingConsegnaId=null;
+  document.getElementById('btn-salva-cs').textContent='Registra consegna';
+  ['cs-cantiere','cs-materiale','cs-squadra','cs-quantita','cs-data','cs-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
-function deleteConsumoMateriale(id){
-  if(!confirm('Eliminare questa registrazione di consumo?'))return;
-  consumoMatDB=consumoMatDB.filter(c=>c.id!==id);
-  saveMaterialiDB();renderConsumoMateriali();showToast('Consumo rimosso');
+function deleteConsegna(id){
+  if(!confirm('Eliminare questa consegna? La quantità verrà ripristinata in giacenza.'))return;
+  const c=consegneDB.find(x=>x.id===id);
+  if(c){const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));if(mat)mat.giacenza=((parseFloat(mat.giacenza)||0)+(parseFloat(c.quantita)||0)).toString();}
+  consegneDB=consegneDB.filter(c=>c.id!==id);
+  saveMaterialiDB();renderConsegne();renderMateriali();showToast('Consegna rimossa, giacenza ripristinata');
 }
-function renderConsumoMateriali(){
-  const el=document.getElementById('cm-lista');if(!el)return;
-  const filtSq=document.getElementById('cm-filter-squadra')?.value||'';
-  const filtMat=document.getElementById('cm-filter-materiale')?.value||'';
-  let list=consumoMatDB.slice();
-  if(filtSq)list=list.filter(c=>String(c.squadraId)===String(filtSq));
+function renderConsegne(){
+  const el=document.getElementById('cs-lista');if(!el)return;
+  const filtCant=document.getElementById('cs-filter-cantiere')?.value||'';
+  const filtMat=document.getElementById('cs-filter-materiale')?.value||'';
+  let list=consegneDB.slice();
+  if(filtCant)list=list.filter(c=>String(c.cantiereId)===String(filtCant));
   if(filtMat)list=list.filter(c=>String(c.materialeId)===String(filtMat));
-  if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>Nessun consumo registrato</p></div>';return;}
-  el.innerHTML='<table class="data-table"><thead><tr><th>Materiale</th><th>Squadra</th><th>Cantiere</th><th>Previsto</th><th>Effettivo</th><th>Scostamento</th><th>Data</th><th></th></tr></thead><tbody>'+
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div>';return;}
+  el.innerHTML='<table class="data-table"><thead><tr><th>Cantiere</th><th>Materiale</th><th>Squadra</th><th>Quantità</th><th>Data</th><th></th></tr></thead><tbody>'+
     list.slice().reverse().map(c=>{
+      const cant=cantieriDB.find(x=>String(x.id)===String(c.cantiereId));
       const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
       const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
-      const prev=parseFloat(c.previsto)||0,eff=parseFloat(c.effettivo)||0;
-      const scost=prev>0?(((eff-prev)/prev)*100):null;
-      return '<tr><td>'+(mat?mat.nome:'—')+'</td><td>'+(sq?sq.nome:'—')+'</td><td>'+(c.cantiere||'—')+'</td><td>'+(c.previsto||'—')+(mat?.um?' '+mat.um:'')+'</td><td>'+(c.effettivo||'—')+(mat?.um?' '+mat.um:'')+'</td><td>'+(scost!==null?'<span style="color:'+(scost>0?'var(--red)':'var(--green)')+'">'+(scost>0?'+':'')+scost.toFixed(0)+'%</span>':'—')+'</td><td>'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td><td><button onclick="editConsumoMateriale('+c.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="deleteConsumoMateriale('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></td></tr>';
+      return '<tr><td>'+(cant?cant.nome:'—')+'</td><td>'+(mat?mat.nome:'—')+'</td><td>'+(sq?sq.nome:'—')+'</td><td>'+(c.quantita||'—')+(mat?.um?' '+mat.um:'')+'</td><td>'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td><td><button onclick="editConsegna('+c.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="deleteConsegna('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></td></tr>';
     }).join('')+'</tbody></table>';
 }
 
@@ -2625,47 +2788,64 @@ function barRow(label,pct,extra){
   return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:3px"><span>'+label+'</span><span>'+extra+'</span></div><div style="background:var(--bg2);border-radius:4px;height:8px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:'+color+'"></div></div></div>';
 }
 function renderReportMateriali(){
-  const elM=document.getElementById('mat-report-materiali'),elS=document.getElementById('mat-report-squadre'),elT=document.getElementById('mat-report-top');
+  const elM=document.getElementById('mat-report-materiali'),elS=document.getElementById('mat-report-squadre'),elScorta=document.getElementById('mat-report-scorta'),elT=document.getElementById('mat-report-top'),elTitolo=document.getElementById('rep-titolo-cantiere');
   if(!elM)return;
-  if(!consumoMatDB.length){elM.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';elS.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';elT.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';return;}
+  const cantiereId=document.getElementById('rep-cantiere')?.value||'';
+  const cant=cantiereId?cantieriDB.find(c=>String(c.id)===String(cantiereId)):null;
+  if(elTitolo)elTitolo.textContent=cant?('— '+cant.nome+(cant.stato==='Chiuso'?' (REPORT FINALE — chiuso il '+(cant.chiusura?new Date(cant.chiusura).toLocaleDateString('it-IT'):'—')+')':' (in corso)')):'';
 
-  // Aggregazione per materiale
-  const perMat={};
-  consumoMatDB.forEach(c=>{
-    const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
-    const key=mat?mat.nome:'Materiale eliminato';
-    if(!perMat[key])perMat[key]={previsto:0,effettivo:0,costo:0,um:mat?mat.um:''};
-    const prev=parseFloat(c.previsto)||0,eff=parseFloat(c.effettivo)||0;
-    perMat[key].previsto+=prev;perMat[key].effettivo+=eff;
-    if(mat)perMat[key].costo+=eff*prezzoNetto(mat);
-  });
-  elM.innerHTML=Object.entries(perMat).map(([nome,v])=>{
-    const pct=v.previsto>0?(v.effettivo/v.previsto*100):(v.effettivo>0?150:0);
-    return barRow(nome,pct,v.effettivo.toFixed(0)+' / '+v.previsto.toFixed(0)+' '+(v.um||'')+(v.costo?' — € '+v.costo.toFixed(2):''));
-  }).join('');
+  const consegneFiltrate=cantiereId?consegneDB.filter(c=>String(c.cantiereId)===String(cantiereId)):consegneDB;
+  const previstoFiltrato=cantiereId?previstoDB.filter(p=>String(p.cantiereId)===String(cantiereId)):previstoDB;
 
-  // Aggregazione per squadra (costo totale)
-  const perSq={};
-  consumoMatDB.forEach(c=>{
-    const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
-    const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
-    const key=sq?sq.nome:'Squadra eliminata';
-    if(!perSq[key])perSq[key]=0;
-    const eff=parseFloat(c.effettivo)||0;
-    if(mat)perSq[key]+=eff*prezzoNetto(mat);
-  });
-  const maxCosto=Math.max(1,...Object.values(perSq));
-  elS.innerHTML=Object.entries(perSq).sort((a,b)=>b[1]-a[1]).map(([nome,costo])=>barRow(nome,(costo/maxCosto*100),'€ '+costo.toFixed(2))).join('')||'<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';
+  if(!consegneFiltrate.length&&!previstoFiltrato.length){
+    elM.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile per questa selezione</p></div>';
+    elS.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';
+    elT.innerHTML='<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';
+  }else{
+    const perMat={};
+    previstoFiltrato.forEach(p=>{
+      const mat=materialiDB.find(m=>String(m.id)===String(p.materialeId));
+      const key=mat?mat.nome:'Materiale eliminato';
+      if(!perMat[key])perMat[key]={previsto:0,effettivo:0,costo:0,um:mat?mat.um:''};
+      perMat[key].previsto+=parseFloat(p.quantita)||0;
+    });
+    consegneFiltrate.forEach(c=>{
+      const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
+      const key=mat?mat.nome:'Materiale eliminato';
+      if(!perMat[key])perMat[key]={previsto:0,effettivo:0,costo:0,um:mat?mat.um:''};
+      const q=parseFloat(c.quantita)||0;
+      perMat[key].effettivo+=q;
+      if(mat)perMat[key].costo+=q*prezzoNetto(mat);
+    });
+    elM.innerHTML=Object.entries(perMat).map(([nome,v])=>{
+      const pct=v.previsto>0?(v.effettivo/v.previsto*100):(v.effettivo>0?150:0);
+      return barRow(nome,pct,v.effettivo.toFixed(0)+' / '+(v.previsto>0?v.previsto.toFixed(0):'—')+' '+(v.um||'')+(v.costo?' — € '+v.costo.toFixed(2):''));
+    }).join('')||'<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';
 
-  // Top scostamenti
-  const scostamenti=Object.entries(perMat).map(([nome,v])=>({nome,scost:v.previsto>0?((v.effettivo-v.previsto)/v.previsto*100):null,v})).filter(x=>x.scost!==null).sort((a,b)=>Math.abs(b.scost)-Math.abs(a.scost)).slice(0,5);
-  elT.innerHTML=scostamenti.length?scostamenti.map(x=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text)">'+x.nome+'</span><span style="color:'+(x.scost>0?'var(--red)':'var(--green)')+';font-weight:500">'+(x.scost>0?'+':'')+x.scost.toFixed(0)+'%</span></div>').join(''):'<div class="empty-state"><p>Nessun dato con scostamento calcolabile (serve un valore previsto > 0)</p></div>';
+    const perSq={};
+    consegneFiltrate.forEach(c=>{
+      const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
+      const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
+      const key=sq?sq.nome:'Squadra non specificata';
+      if(!perSq[key])perSq[key]=0;
+      if(mat)perSq[key]+=(parseFloat(c.quantita)||0)*prezzoNetto(mat);
+    });
+    const maxCosto=Math.max(1,...Object.values(perSq));
+    elS.innerHTML=Object.entries(perSq).sort((a,b)=>b[1]-a[1]).map(([nome,costo])=>barRow(nome,(costo/maxCosto*100),'€ '+costo.toFixed(2))).join('')||'<div class="empty-state"><p>Nessun dato ancora disponibile</p></div>';
+
+    const scostamenti=Object.entries(perMat).map(([nome,v])=>({nome,scost:v.previsto>0?((v.effettivo-v.previsto)/v.previsto*100):null})).filter(x=>x.scost!==null).sort((a,b)=>Math.abs(b.scost)-Math.abs(a.scost)).slice(0,5);
+    elT.innerHTML=scostamenti.length?scostamenti.map(x=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text)">'+x.nome+'</span><span style="color:'+(x.scost>0?'var(--red)':'var(--green)')+';font-weight:500">'+(x.scost>0?'+':'')+x.scost.toFixed(0)+'%</span></div>').join(''):'<div class="empty-state"><p>Nessun obiettivo previsto impostato per calcolare lo scostamento</p></div>';
+  }
+
+  // Scorta minima: sempre globale, non filtrato per cantiere (la giacenza è del magazzino, non del cantiere)
+  const sottoScorta=materialiDB.filter(m=>{const g=parseFloat(m.giacenza);const s=parseFloat(m.scortaMin)||0;return !isNaN(g)&&g<=s;});
+  if(elScorta)elScorta.innerHTML=sottoScorta.length?sottoScorta.map(m=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text)">'+m.nome+'</span><span style="color:var(--red);font-weight:500">'+m.giacenza+' '+(m.um||'')+' (minimo: '+(m.scortaMin||0)+')</span></div>').join(''):'<div class="empty-state"><p>Tutti i materiali sono sopra la scorta minima</p></div>';
 }
 
 async function saveMateriali(){
   saveMaterialiDB();
   if(typeof saveToCloud==='function'&&currentUser){
-    const ok=await saveToCloud('materiali-registro',{materiali:materialiDB,consumo:consumoMatDB});
+    const ok=await saveToCloud('materiali-registro',{materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB});
     showToast(ok?'Materiali salvati ✓ (locale + cloud)':'Materiali salvati solo in locale');
   }else{showToast('Materiali salvati (solo locale)');}
 }
@@ -2706,7 +2886,7 @@ window.addEventListener('load',async()=>{
   renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
   renderConsumiOfficina();renderConsumiSquadre();
   renderFornitori();updateAcquistoFornitoreSelect();applyFornitoriVisibility();
-  renderMateriali();updateMaterialeSelects();renderConsumoMateriali();
+  renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();
   updateDashboardStats();
 });
 </script>
