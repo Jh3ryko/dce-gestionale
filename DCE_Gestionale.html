@@ -166,7 +166,6 @@
     <button class="nav-item" onclick="showModule('mezzi')"><span class="nav-dot" style="background:#4a7eb5"></span>Automezzi e Muletti<span class="nav-badge tag-blue">attivo</span></button>
     <button class="nav-item" onclick="showModule('attrezzature')"><span class="nav-dot" style="background:#7a68b5"></span>Attrezzature<span class="nav-badge tag-purple">attivo</span></button>
     <button class="nav-item" id="nav-fornitori" style="display:none" onclick="showModule('fornitori')"><span class="nav-dot" style="background:#d4883a"></span>Fornitori<span class="nav-badge tag-orange">🔒</span></button>
-    <button class="nav-item" onclick="showModule('materiali')"><span class="nav-dot" style="background:#4a9d7f"></span>Materiali<span class="nav-badge tag-green">nuovo</span></button>
   </div>
   <div class="sidebar-footer">Danilo Iacovone<br>Resp. Magazzino e Logistica</div>
 </aside>
@@ -678,7 +677,18 @@
 
     <!-- FASE 3 — FLUSSO MATERIALI -->
     <div class="module" id="mod-fase3">
-      <div class="section-header"><h1>Fase 3 — Flusso materiali in entrata e uscita</h1><p>Ricezione merci, movimentazione interna, spedizioni, gestione fornitori.</p></div>
+      <div class="section-header"><h1>Fase 3 — Flusso materiali e magazzino</h1><p>Ricezione, movimentazione, spedizioni, catalogo materiali, cantieri e consumi — il magazzino come punto focale della fase.</p></div>
+
+      <!-- TAB NAVIGATION -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border);flex-wrap:wrap">
+        <button id="tab-f3-panoramica" onclick="switchF3Tab('panoramica')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Panoramica</button>
+        <button id="tab-f3-catalogo" onclick="switchF3Tab('catalogo')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Catalogo</button>
+        <button id="tab-f3-cantieri" onclick="switchF3Tab('cantieri')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Cantieri</button>
+        <button id="tab-f3-consegne" onclick="switchF3Tab('consegne')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consegne</button>
+        <button id="tab-f3-report" onclick="switchF3Tab('report')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Report</button>
+      </div>
+
+      <div id="f3-tab-panoramica">
       <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f3-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f3-fill" style="width:0%"></div></div></div>
       <div class="form-card">
         <div class="form-card-title">3.1 · Ricezione merci</div>
@@ -714,6 +724,146 @@
         <button class="btn btn-primary" onclick="saveModule('fase3')">Salva Fase 3</button>
         <button class="btn btn-ghost" onclick="showModule('fase2')">← Fase 2</button>
         <button class="btn btn-ghost" onclick="showModule('fase4')">Fase 4 →</button>
+      </div>
+      </div>
+
+<!-- TAB CATALOGO -->
+      <div id="f3-tab-catalogo" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title" id="mat-form-title">Aggiungi / Modifica materiale</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Materiale (rapido)</label>
+              <select id="mat-preset" onchange="if(this.value)document.getElementById('mat-nome').value=this.value">
+                <option value="">— scegli o scrivi sotto —</option>
+                <option>Disco Lamellare (L)</option><option>Disco Piano/Sbavatura (P)</option><option>Disco da Taglio (T)</option>
+                <option>Silicone / Sigillante</option><option>Bulloneria (viti/bulloni)</option><option>Bulloneria (dadi/rondelle)</option>
+                <option>Filo/Elettrodo saldatura</option><option>Gas saldatura</option><option>Vernice / Primer</option>
+                <option>Nastro / Guaina</option><option>Guanti / DPI monouso</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Nome materiale *</label><input type="text" id="mat-nome" placeholder="es. Silicone / Sigillante"></div>
+            <div class="form-group"><label>Categoria</label>
+              <select id="mat-categoria">
+                <option value="">— seleziona —</option>
+                <option>Dischi</option><option>Sigillanti/Adesivi</option><option>Bulloneria e Fissaggi</option>
+                <option>Saldatura</option><option>Vernici e Trattamenti</option><option>DPI monouso</option><option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Unità di misura</label>
+              <select id="mat-um"><option>pz</option><option>kg</option><option>lt</option><option>mt</option><option>scatola</option><option>tubo</option><option>rotolo</option><option>confezione</option></select>
+            </div>
+            <div class="form-group"><label>Prezzo unitario (€)</label><input type="number" id="mat-prezzo" placeholder="es. 4.50"></div>
+            <div class="form-group"><label>Sconto (%)</label><input type="number" id="mat-sconto" placeholder="es. 10"></div>
+            <div class="form-group"><label>Fornitore</label><select id="mat-fornitore"><option value="">— seleziona fornitore —</option></select></div>
+            <div class="form-group"><label>Giacenza attuale</label><input type="number" id="mat-giacenza" placeholder="es. 200"></div>
+            <div class="form-group"><label>Scorta minima (alert)</label><input type="number" id="mat-scorta-min" placeholder="es. 20"></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-mat" onclick="addMateriale()">Aggiungi materiale</button>
+            <button class="btn btn-ghost" onclick="clearMaterialeForm()">Annulla</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Materiali censiti (<span id="mat-count">0</span>)</div>
+          <div id="mat-lista"><div class="empty-state"><div class="icon">🧰</div><p>Nessun materiale censito</p></div></div>
+        </div>
+      </div>
+
+      
+      </div>
+
+<!-- TAB CANTIERI -->
+      <div id="f3-tab-cantieri" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
+            <div class="form-group"><label>Cliente</label><input type="text" id="cant-cliente" placeholder="es. Zincheria De Lucchi"></div>
+            <div class="form-group"><label>Squadra assegnata</label><select id="cant-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Data apertura</label><input type="date" id="cant-apertura"></div>
+            <div class="form-group"><label>Data chiusura</label><input type="date" id="cant-chiusura"></div>
+            <div class="form-group"><label>Stato</label><select id="cant-stato"><option>Aperto</option><option>Chiuso</option></select></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="cant-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-cant" onclick="addCantiere()">Apri cantiere</button>
+            <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="prev-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Quantità prevista</label><input type="number" id="prev-quantita" placeholder="es. 50"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
+          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
+        </div>
+      </div>
+
+      
+      </div>
+
+<!-- TAB CONSEGNE -->
+      <div id="f3-tab-consegne" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Registra consegna materiale</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="cs-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Squadra</label><select id="cs-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Quantità consegnata *</label><input type="number" id="cs-quantita" placeholder="es. 50"></div>
+            <div class="form-group"><label>Data</label><input type="date" id="cs-data"></div>
+            <div class="form-group span-2"><label>Note</label><input type="text" id="cs-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-cs" onclick="addConsegna()">Registra consegna</button>
+            <button class="btn btn-ghost" onclick="clearConsegnaForm()">Annulla</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Storico consegne</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="cs-filter-cantiere" onchange="renderConsegne()"><option value="">Tutti i cantieri</option></select>
+            <select id="cs-filter-materiale" onchange="renderConsegne()"><option value="">Tutti i materiali</option></select>
+          </div>
+          <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
+        </div>
+      </div>
+
+      
+      </div>
+
+<!-- TAB REPORT -->
+      <div id="f3-tab-report" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Seleziona cantiere</div>
+          <select id="rep-cantiere" onchange="renderReportMateriali()" style="max-width:400px"><option value="">— tutti i cantieri (vista globale) —</option></select>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">📊 Previsto / Effettivo per materiale <span id="rep-titolo-cantiere" style="font-weight:400;color:var(--text3);font-size:12px"></span></div>
+          <div id="mat-report-materiali"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">👷 Costo totale consegnato per squadra</div>
+          <div id="mat-report-squadre"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">⚠ Materiali sotto scorta minima</div>
+          <div id="mat-report-scorta"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
+          <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:0;margin:0"><button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button></div>
+
       </div>
     </div>
 
@@ -1110,148 +1260,10 @@
         <div id="forn-lista"><div class="empty-state"><div class="icon">📦</div><p>Nessun fornitore registrato</p></div></div>
       </div>
     </div>
+  </div>
+</main>
+</div>
 
-    <!-- MATERIALI -->
-    <div class="module" id="mod-materiali">
-      <div class="section-header"><h1>Registro Materiali</h1><p>Catalogo materiali, cantieri, consegne alle squadre e report finale per cantiere.</p></div>
-
-      <!-- TAB NAVIGATION -->
-      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
-        <button id="tab-mat-catalogo" onclick="switchMatTab('catalogo')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Catalogo</button>
-        <button id="tab-mat-cantieri" onclick="switchMatTab('cantieri')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Cantieri</button>
-        <button id="tab-mat-consegne" onclick="switchMatTab('consegne')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consegne</button>
-        <button id="tab-mat-report" onclick="switchMatTab('report')" style="flex:1;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Report</button>
-      </div>
-
-      <!-- TAB CATALOGO -->
-      <div id="mat-tab-catalogo">
-        <div class="form-card">
-          <div class="form-card-title" id="mat-form-title">Aggiungi / Modifica materiale</div>
-          <div class="form-grid cols-3">
-            <div class="form-group">
-              <label>Materiale (rapido)</label>
-              <select id="mat-preset" onchange="if(this.value)document.getElementById('mat-nome').value=this.value">
-                <option value="">— scegli o scrivi sotto —</option>
-                <option>Disco Lamellare (L)</option><option>Disco Piano/Sbavatura (P)</option><option>Disco da Taglio (T)</option>
-                <option>Silicone / Sigillante</option><option>Bulloneria (viti/bulloni)</option><option>Bulloneria (dadi/rondelle)</option>
-                <option>Filo/Elettrodo saldatura</option><option>Gas saldatura</option><option>Vernice / Primer</option>
-                <option>Nastro / Guaina</option><option>Guanti / DPI monouso</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Nome materiale *</label><input type="text" id="mat-nome" placeholder="es. Silicone / Sigillante"></div>
-            <div class="form-group"><label>Categoria</label>
-              <select id="mat-categoria">
-                <option value="">— seleziona —</option>
-                <option>Dischi</option><option>Sigillanti/Adesivi</option><option>Bulloneria e Fissaggi</option>
-                <option>Saldatura</option><option>Vernici e Trattamenti</option><option>DPI monouso</option><option>Altro</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Unità di misura</label>
-              <select id="mat-um"><option>pz</option><option>kg</option><option>lt</option><option>mt</option><option>scatola</option><option>tubo</option><option>rotolo</option><option>confezione</option></select>
-            </div>
-            <div class="form-group"><label>Prezzo unitario (€)</label><input type="number" id="mat-prezzo" placeholder="es. 4.50"></div>
-            <div class="form-group"><label>Sconto (%)</label><input type="number" id="mat-sconto" placeholder="es. 10"></div>
-            <div class="form-group"><label>Fornitore</label><select id="mat-fornitore"><option value="">— seleziona fornitore —</option></select></div>
-            <div class="form-group"><label>Giacenza attuale</label><input type="number" id="mat-giacenza" placeholder="es. 200"></div>
-            <div class="form-group"><label>Scorta minima (alert)</label><input type="number" id="mat-scorta-min" placeholder="es. 20"></div>
-            <div class="form-group span-3"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-mat" onclick="addMateriale()">Aggiungi materiale</button>
-            <button class="btn btn-ghost" onclick="clearMaterialeForm()">Annulla</button>
-          </div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">Materiali censiti (<span id="mat-count">0</span>)</div>
-          <div id="mat-lista"><div class="empty-state"><div class="icon">🧰</div><p>Nessun materiale censito</p></div></div>
-        </div>
-      </div>
-
-      <!-- TAB CANTIERI -->
-      <div id="mat-tab-cantieri" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
-            <div class="form-group"><label>Cliente</label><input type="text" id="cant-cliente" placeholder="es. Zincheria De Lucchi"></div>
-            <div class="form-group"><label>Squadra assegnata</label><select id="cant-squadra"><option value="">— seleziona squadra —</option></select></div>
-            <div class="form-group"><label>Data apertura</label><input type="date" id="cant-apertura"></div>
-            <div class="form-group"><label>Data chiusura</label><input type="date" id="cant-chiusura"></div>
-            <div class="form-group"><label>Stato</label><select id="cant-stato"><option>Aperto</option><option>Chiuso</option></select></div>
-            <div class="form-group span-3"><label>Note</label><input type="text" id="cant-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-cant" onclick="addCantiere()">Apri cantiere</button>
-            <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
-          </div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
-            <div class="form-group"><label>Materiale</label><select id="prev-materiale"><option value="">— seleziona materiale —</option></select></div>
-            <div class="form-group"><label>Quantità prevista</label><input type="number" id="prev-quantita" placeholder="es. 50"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
-          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
-        </div>
-      </div>
-
-      <!-- TAB CONSEGNE -->
-      <div id="mat-tab-consegne" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Registra consegna materiale</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
-            <div class="form-group"><label>Materiale</label><select id="cs-materiale"><option value="">— seleziona materiale —</option></select></div>
-            <div class="form-group"><label>Squadra</label><select id="cs-squadra"><option value="">— seleziona squadra —</option></select></div>
-            <div class="form-group"><label>Quantità consegnata *</label><input type="number" id="cs-quantita" placeholder="es. 50"></div>
-            <div class="form-group"><label>Data</label><input type="date" id="cs-data"></div>
-            <div class="form-group span-2"><label>Note</label><input type="text" id="cs-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-cs" onclick="addConsegna()">Registra consegna</button>
-            <button class="btn btn-ghost" onclick="clearConsegnaForm()">Annulla</button>
-          </div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">Storico consegne</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select id="cs-filter-cantiere" onchange="renderConsegne()"><option value="">Tutti i cantieri</option></select>
-            <select id="cs-filter-materiale" onchange="renderConsegne()"><option value="">Tutti i materiali</option></select>
-          </div>
-          <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
-        </div>
-      </div>
-
-      <!-- TAB REPORT -->
-      <div id="mat-tab-report" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Seleziona cantiere</div>
-          <select id="rep-cantiere" onchange="renderReportMateriali()" style="max-width:400px"><option value="">— tutti i cantieri (vista globale) —</option></select>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">📊 Previsto / Effettivo per materiale <span id="rep-titolo-cantiere" style="font-weight:400;color:var(--text3);font-size:12px"></span></div>
-          <div id="mat-report-materiali"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">👷 Costo totale consegnato per squadra</div>
-          <div id="mat-report-squadre"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">⚠ Materiali sotto scorta minima</div>
-          <div id="mat-report-scorta"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
-          <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="actions-bar" style="border:none;padding:0;margin:0"><button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button></div>
-      </div>
-    </div>
 <!-- AUDIT MODAL -->
 <div id="audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9997;align-items:center;justify-content:center">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:900px;max-height:80vh;display:flex;flex-direction:column">
@@ -1268,8 +1280,8 @@
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg">Salvato</span></div>
 
 <script>
-const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori','materiali'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori',materiali:'Materiali'};
+const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori'];
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali e magazzino',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori'};
 
 function showModule(id) {
   if(id==='fornitori'&&!hasFornitoriAccess()){showToast('Non hai i permessi per accedere ai Fornitori');return;}
@@ -1280,7 +1292,7 @@ function showModule(id) {
   document.getElementById('breadcrumb').innerHTML='<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
-  if(id==='materiali'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();renderReportMateriali();}
+  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();}
 }
 
 function toggleCheck(id) {
@@ -2489,11 +2501,11 @@ async function saveFornitoriPermessi(){
 let materialiDB=[], cantieriDB=[], previstoDB=[], consegneDB=[];
 let editingMaterialeId=null, editingCantiereId=null, editingConsegnaId=null;
 
-function switchMatTab(tab){
-  ['catalogo','cantieri','consegne','report'].forEach(t=>{
-    document.getElementById('mat-tab-'+t).style.display=(t===tab)?'':'none';
-    document.getElementById('tab-mat-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
-    document.getElementById('tab-mat-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
+function switchF3Tab(tab){
+  ['panoramica','catalogo','cantieri','consegne','report'].forEach(t=>{
+    document.getElementById('f3-tab-'+t).style.display=(t===tab)?'':'none';
+    document.getElementById('tab-f3-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
+    document.getElementById('tab-f3-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
   });
   if(tab==='report')renderReportMateriali();
 }
@@ -2697,7 +2709,8 @@ function renderCantieri(){
   }).join('');
 }
 function vaiReportCantiere(cantiereId){
-  switchMatTab('report');
+  showModule('fase3');
+  switchF3Tab('report');
   document.getElementById('rep-cantiere').value=cantiereId;
   renderReportMateriali();
 }
