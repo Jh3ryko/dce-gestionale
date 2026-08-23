@@ -156,7 +156,7 @@
     <button class="nav-item" onclick="showModule('fase0')"><span class="nav-dot" style="background:#9a9890"></span>Fase 0 — Fotografia iniziale<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 1 — Magazzino<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Reparto Operativo<span class="nav-badge tag-orange">attiva</span></button>
-    <button class="nav-item" onclick="showModule('fase3')"><span class="nav-dot" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-gray">prossima</span></button>
+    <button class="nav-item" onclick="showModule('fase3')"><span class="nav-dot" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-orange">attivo</span></button>
     <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 4 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase5')"><span class="nav-dot" style="background:#b55a4a"></span>Fase 5 — Digitalizzazione<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase6')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 6 — Personale & SOP<span class="nav-badge tag-gray">prossima</span></button>
@@ -771,11 +771,13 @@
         </div>
       </div>
 
-      
-      </div>
 
 <!-- TAB CANTIERI -->
       <div id="f3-tab-cantieri" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
+          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
+        </div>
         <div class="form-card">
           <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
           <div class="form-grid cols-3">
@@ -801,14 +803,8 @@
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
         </div>
-        <div class="form-card">
-          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
-          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
-        </div>
       </div>
 
-      
-      </div>
 
 <!-- TAB CONSEGNE -->
       <div id="f3-tab-consegne" style="display:none">
@@ -837,8 +833,6 @@
         </div>
       </div>
 
-      
-      </div>
 
 <!-- TAB REPORT -->
       <div id="f3-tab-report" style="display:none">
