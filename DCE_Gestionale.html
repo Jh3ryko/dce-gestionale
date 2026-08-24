@@ -187,7 +187,7 @@
       <button class="btn btn-ghost" id="btn-install-app" onclick="installApp()" style="display:none">📲 Installa</button>
       <button class="btn btn-ghost" id="btn-alert-center" onclick="showAlertCenter()" title="Centro alert" style="position:relative">🔔<span id="alert-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;line-height:1.4;min-width:15px;text-align:center">0</span></button>
       <button class="btn btn-ghost" onclick="showAuditLog()" title="Solo admin">📋 Log</button>
-      <button class="btn btn-ghost" onclick="exportData()">Esporta</button>
+      <button class="btn btn-ghost" onclick="exportData()" title="Backup tecnico completo — non stampabile">💾 Backup</button>
       <button class="btn btn-primary" onclick="saveAll()">Salva tutto</button>
       <button class="btn btn-ghost" onclick="doLogout()" style="color:var(--red)">Esci</button>
     </div>
@@ -412,6 +412,26 @@
       <!-- ===== TAB OFFICINA ===== -->
       <div id="f2-tab-officina">
 
+        <!-- Riepilogo consumi officina -->
+        <div class="form-card">
+          <div class="form-card-title">Riepilogo consumi officina</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="filter-sald" onchange="renderConsumiOfficina()" style="width:200px">
+              <option value="">Tutti i saldatori</option>
+            </select>
+            <select id="filter-sald-tipo" onchange="renderConsumiOfficina()" style="width:200px">
+              <option value="">Tutti i tipi disco</option>
+              <option>Disco taglio lamiera</option><option>Disco taglio pietra</option>
+              <option>Disco lamellare</option><option>Disco abrasivo (sbavatura)</option>
+              <option>Disco flessibile</option><option>Disco smerigliatrice diritta</option>
+            </select>
+            <button class="btn btn-ghost" onclick="stampaConsumiOfficina()">Stampa</button>
+          </div>
+          <div id="consumi-officina-lista">
+            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
+          </div>
+        </div>
+
         <!-- Registro Saldatori -->
         <div class="form-card">
           <div class="form-card-title" id="sald-form-title">Registro Saldatori</div>
@@ -505,8 +525,14 @@
               <input type="date" id="cons-sald-data">
             </div>
             <div class="form-group">
+              <label>Cantiere</label>
+              <select id="cons-sald-cantiere">
+                <option value="">— nessuno / generico —</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label>Note</label>
-              <input type="text" id="cons-sald-note" placeholder="es. lavoro specifico, commessa">
+              <input type="text" id="cons-sald-note" placeholder="es. lavoro specifico">
             </div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
@@ -514,30 +540,25 @@
           </div>
         </div>
 
-        <!-- Riepilogo consumi officina -->
-        <div class="form-card">
-          <div class="form-card-title">Riepilogo consumi officina</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select id="filter-sald" onchange="renderConsumiOfficina()" style="width:200px">
-              <option value="">Tutti i saldatori</option>
-            </select>
-            <select id="filter-sald-tipo" onchange="renderConsumiOfficina()" style="width:200px">
-              <option value="">Tutti i tipi disco</option>
-              <option>Disco taglio lamiera</option><option>Disco taglio pietra</option>
-              <option>Disco lamellare</option><option>Disco abrasivo (sbavatura)</option>
-              <option>Disco flessibile</option><option>Disco smerigliatrice diritta</option>
-            </select>
-            <button class="btn btn-ghost" onclick="stampaConsumiOfficina()">Stampa</button>
-          </div>
-          <div id="consumi-officina-lista">
-            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
-          </div>
-        </div>
 
       </div><!-- /tab-officina -->
 
       <!-- ===== TAB SQUADRE ===== -->
       <div id="f2-tab-squadre" style="display:none">
+        <!-- Riepilogo squadre -->
+        <div class="form-card">
+          <div class="form-card-title">Riepilogo consumi squadre</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="filter-sq" onchange="renderConsumiSquadre()" style="width:200px">
+              <option value="">Tutte le squadre</option>
+            </select>
+            <button class="btn btn-ghost" onclick="stampaConsumiSquadre()">Stampa</button>
+          </div>
+          <div id="consumi-squadre-lista">
+            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
+          </div>
+        </div>
+
 
         <!-- Registro Squadre -->
         <div class="form-card">
@@ -613,8 +634,14 @@
               <input type="date" id="cons-sq-data">
             </div>
             <div class="form-group">
-              <label>Cantiere / Note</label>
-              <input type="text" id="cons-sq-note" placeholder="es. Cantiere Roma, commessa 123">
+              <label>Cantiere</label>
+              <select id="cons-sq-cantiere">
+                <option value="">— nessuno / generico —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Note</label>
+              <input type="text" id="cons-sq-note" placeholder="note libere">
             </div>
           </div>
           <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
@@ -661,19 +688,6 @@
           </div>
         </div>
 
-        <!-- Riepilogo squadre -->
-        <div class="form-card">
-          <div class="form-card-title">Riepilogo consumi squadre</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select id="filter-sq" onchange="renderConsumiSquadre()" style="width:200px">
-              <option value="">Tutte le squadre</option>
-            </select>
-            <button class="btn btn-ghost" onclick="stampaConsumiSquadre()">Stampa</button>
-          </div>
-          <div id="consumi-squadre-lista">
-            <div class="empty-state"><div class="icon">📊</div><p>Nessun consumo registrato</p></div>
-          </div>
-        </div>
 
       </div><!-- /tab-squadre -->
 
@@ -867,7 +881,10 @@
           <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
           <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
         </div>
-        <div class="actions-bar" style="border:none;padding:0;margin:0"><button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button></div>
+        <div class="actions-bar" style="border:none;padding:0;margin:0">
+          <button class="btn btn-ghost" onclick="stampaReportCantiere()">🖨 Stampa report</button>
+          <button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button>
+        </div>
 
       </div>
     </div>
@@ -1317,6 +1334,7 @@ function showModule(id) {
   document.getElementById('breadcrumb').innerHTML='<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
+  if(id==='fase2'){updateMaterialeSelects();}
   if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();}
 }
 
@@ -1586,10 +1604,11 @@ function addConsumoSaldatore(){
     diametro:document.getElementById('cons-sald-diam').value,
     qty:parseInt(qty),
     data:document.getElementById('cons-sald-data').value,
+    cantiereId:document.getElementById('cons-sald-cantiere').value,
     note:document.getElementById('cons-sald-note').value
   });
   saveScorteDB();renderConsumiOfficina();renderSaldatori();
-  ['cons-sald-nome','cons-sald-tipo','cons-sald-diam','cons-sald-qty','cons-sald-data','cons-sald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});;
+  ['cons-sald-nome','cons-sald-tipo','cons-sald-diam','cons-sald-qty','cons-sald-data','cons-sald-cantiere','cons-sald-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});;
   showToast('Consumo registrato');
 }
 
@@ -1618,16 +1637,17 @@ function renderConsumiOfficina(){
   });
   html+='</div>';
 
-  html+='<table class="data-table"><thead><tr><th>Data</th><th>Saldatore</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Note</th><th></th></tr></thead><tbody>'+
-    list.map(c=>'<tr>'+
+  html+='<table class="data-table"><thead><tr><th>Data</th><th>Saldatore</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Cantiere</th><th>Note</th><th></th></tr></thead><tbody>'+
+    list.map(c=>{const cant=cantieriDB.find(x=>String(x.id)===String(c.cantiereId));return '<tr>'+
       '<td style="white-space:nowrap">'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td>'+
       '<td style="font-weight:500;color:var(--text)">'+c.saldatore+'</td>'+
       '<td>'+c.tipo+'</td>'+
       '<td>'+(c.diametro||'—')+'</td>'+
       '<td><span style="font-weight:600;color:var(--accent)">'+c.qty+'</span></td>'+
+      '<td>'+(cant?'🏗️ '+cant.nome:'<span style="color:var(--text3)">—</span>')+'</td>'+
       '<td style="color:var(--text3)">'+(c.note||'—')+'</td>'+
       '<td><button onclick="deleteConsumoOffic('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer">x</button></td>'+
-      '</tr>').join('')+
+      '</tr>';}).join('')+
     '</tbody></table>';
   el.innerHTML=html;
 }
@@ -1765,10 +1785,11 @@ function addConsumoSquadra(){
     diametro:document.getElementById('cons-sq-diam').value,
     qty:parseInt(qty),
     data:document.getElementById('cons-sq-data').value,
+    cantiereId:document.getElementById('cons-sq-cantiere').value,
     note:document.getElementById('cons-sq-note').value
   });
   saveScorteDB();renderConsumiSquadre();renderSquadre();
-  ['cons-sq-nome','cons-sq-tipo','cons-sq-diam','cons-sq-qty','cons-sq-data','cons-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['cons-sq-nome','cons-sq-tipo','cons-sq-diam','cons-sq-qty','cons-sq-data','cons-sq-cantiere','cons-sq-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   showToast('Consumo registrato');
 }
 
@@ -1789,16 +1810,17 @@ function renderConsumiSquadre(){
       '<span style="color:var(--text2)">Totale dischi: <b style="color:var(--text)">'+tot+'</b></span></div>';
   });
   html+='</div>';
-  html+='<table class="data-table"><thead><tr><th>Data</th><th>Squadra</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Cantiere/Note</th><th></th></tr></thead><tbody>'+
-    list.map(c=>'<tr>'+
+  html+='<table class="data-table"><thead><tr><th>Data</th><th>Squadra</th><th>Tipo disco</th><th>Diam.</th><th>Qty</th><th>Cantiere</th><th>Note</th><th></th></tr></thead><tbody>'+
+    list.map(c=>{const cant=cantieriDB.find(x=>String(x.id)===String(c.cantiereId));return '<tr>'+
       '<td style="white-space:nowrap">'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td>'+
       '<td style="font-weight:500;color:var(--text)">'+c.squadra+'</td>'+
       '<td>'+c.tipo+'</td>'+
       '<td>'+(c.diametro||'—')+'</td>'+
       '<td><span style="font-weight:600;color:var(--accent)">'+c.qty+'</span></td>'+
+      '<td>'+(cant?'🏗️ '+cant.nome:'<span style="color:var(--text3)">—</span>')+'</td>'+
       '<td style="color:var(--text3)">'+(c.note||'—')+'</td>'+
       '<td><button onclick="deleteConsumoSq('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer">x</button></td>'+
-      '</tr>').join('')+'</tbody></table>';
+      '</tr>';}).join('')+'</tbody></table>';
   el.innerHTML=html;
 }
 
@@ -1967,9 +1989,24 @@ function exportData(){
   try{all.mezzi=JSON.parse(localStorage.getItem('dce-mezzi')||'[]');}catch(e){}
   try{all.interventi=JSON.parse(localStorage.getItem('dce-interventi')||'[]');}catch(e){}
   try{all.assegnazioni=JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]');}catch(e){}
+  try{all.kmLog=JSON.parse(localStorage.getItem('dce-kmlog')||'[]');}catch(e){}
+  try{all.attrezzature=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');}catch(e){}
+  try{all.manutenzioni=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){}
+  try{all.fornitori=JSON.parse(localStorage.getItem('dce-fornitori')||'[]');}catch(e){}
+  try{all.acquisti=JSON.parse(localStorage.getItem('dce-acquisti')||'[]');}catch(e){}
+  try{all.saldatori=JSON.parse(localStorage.getItem('dce-saldatori')||'[]');}catch(e){}
+  try{all.consumiOfficina=JSON.parse(localStorage.getItem('dce-consumioffic')||'[]');}catch(e){}
+  try{all.squadre=JSON.parse(localStorage.getItem('dce-squadre')||'[]');}catch(e){}
+  try{all.consumiSquadre=JSON.parse(localStorage.getItem('dce-consumisq')||'[]');}catch(e){}
+  try{all.dotazioniSquadre=JSON.parse(localStorage.getItem('dce-dotazionisq')||'[]');}catch(e){}
+  try{all.dotazioniSaldatori=JSON.parse(localStorage.getItem('dce-dotazionisald')||'[]');}catch(e){}
+  try{all.materiali=JSON.parse(localStorage.getItem('dce-materiali')||'[]');}catch(e){}
+  try{all.cantieri=JSON.parse(localStorage.getItem('dce-cantieri')||'[]');}catch(e){}
+  try{all.previsto=JSON.parse(localStorage.getItem('dce-previsto')||'[]');}catch(e){}
+  try{all.consegne=JSON.parse(localStorage.getItem('dce-consegne')||'[]');}catch(e){}
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='DCE_dati_'+new Date().toISOString().split('T')[0]+'.json';a.click();
-  showToast('Dati esportati');
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='DCE_backup_dati_'+new Date().toISOString().split('T')[0]+'.json';a.click();
+  showToast('Backup dati scaricato (file tecnico, non per la stampa)');
 }
 
 function showToast(msg){
@@ -2637,7 +2674,7 @@ function updateMaterialeSelects(){
   ['cant-squadra','cs-squadra'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=sqOpts;if(cur)el.value=cur;}});
 
   const cantOpts='<option value="">— seleziona cantiere —</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');
-  ['prev-cantiere','cs-cantiere'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=cantOpts;if(cur)el.value=cur;}});
+  ['prev-cantiere','cs-cantiere','cons-sald-cantiere','cons-sq-cantiere'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=cantOpts;if(cur)el.value=cur;}});
   const cantFilterOpts='<option value="">Tutti i cantieri</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');
   const cf=document.getElementById('cs-filter-cantiere');if(cf){const cur=cf.value;cf.innerHTML=cantFilterOpts;if(cur)cf.value=cur;}
   const rf=document.getElementById('rep-cantiere');if(rf){const cur=rf.value;rf.innerHTML='<option value="">— tutti i cantieri (vista globale) —</option>'+cantieriDB.map(c=>'<option value="'+c.id+'">'+c.nome+(c.stato==='Chiuso'?' (chiuso)':'')+'</option>').join('');if(cur)rf.value=cur;}
@@ -2875,6 +2912,8 @@ function deleteConsegna(id){
   consegneDB=consegneDB.filter(c=>c.id!==id);
   saveMaterialiDB();renderConsegne();renderMateriali();showToast('Consegna rimossa, giacenza ripristinata');
 }
+let expandedConsegnaGroup=null;
+function toggleConsegnaGroup(key){expandedConsegnaGroup=(expandedConsegnaGroup===key)?null:key;renderConsegne();}
 function renderConsegne(){
   const el=document.getElementById('cs-lista');if(!el)return;
   const filtCant=document.getElementById('cs-filter-cantiere')?.value||'';
@@ -2883,13 +2922,42 @@ function renderConsegne(){
   if(filtCant)list=list.filter(c=>String(c.cantiereId)===String(filtCant));
   if(filtMat)list=list.filter(c=>String(c.materialeId)===String(filtMat));
   if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div>';return;}
-  el.innerHTML='<table class="data-table"><thead><tr><th>Cantiere</th><th>Materiale</th><th>Squadra</th><th>Quantità</th><th>Data</th><th></th></tr></thead><tbody>'+
-    list.slice().reverse().map(c=>{
-      const cant=cantieriDB.find(x=>String(x.id)===String(c.cantiereId));
-      const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
-      const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
-      return '<tr><td>'+(cant?cant.nome:'—')+'</td><td>'+(mat?mat.nome:'—')+'</td><td>'+(sq?sq.nome:'—')+'</td><td>'+(c.quantita||'—')+(mat?.um?' '+mat.um:'')+'</td><td>'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td><td><button onclick="editConsegna('+c.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="deleteConsegna('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></td></tr>';
-    }).join('')+'</tbody></table>';
+
+  // Raggruppa per cantiere + materiale: una voce unica con il totale sommato
+  const gruppi={};
+  list.forEach(c=>{
+    const key=c.cantiereId+'|'+c.materialeId;
+    if(!gruppi[key])gruppi[key]={cantiereId:c.cantiereId,materialeId:c.materialeId,tot:0,count:0,items:[]};
+    gruppi[key].tot+=parseFloat(c.quantita)||0;
+    gruppi[key].count++;
+    gruppi[key].items.push(c);
+  });
+  const gruppiArr=Object.entries(gruppi).map(([key,g])=>({key,...g})).sort((a,b)=>{
+    const ca=cantieriDB.find(x=>String(x.id)===String(a.cantiereId)),cb=cantieriDB.find(x=>String(x.id)===String(b.cantiereId));
+    return (ca?ca.nome:'').localeCompare(cb?cb.nome:'');
+  });
+
+  el.innerHTML=gruppiArr.map(g=>{
+    const cant=cantieriDB.find(x=>String(x.id)===String(g.cantiereId));
+    const mat=materialiDB.find(m=>String(m.id)===String(g.materialeId));
+    const aperto=expandedConsegnaGroup===g.key;
+    const dettaglio=aperto?('<table class="data-table" style="margin-top:8px"><thead><tr><th>Data</th><th>Squadra</th><th>Quantità</th><th>Note</th><th></th></tr></thead><tbody>'+
+      g.items.slice().sort((a,b)=>(a.data||'').localeCompare(b.data||'')).map(c=>{
+        const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
+        return '<tr><td>'+(c.data?new Date(c.data).toLocaleDateString('it-IT'):'—')+'</td><td>'+(sq?sq.nome:'—')+'</td><td>'+(c.quantita||'—')+(mat?.um?' '+mat.um:'')+'</td><td style="color:var(--text3)">'+(c.note||'—')+'</td><td><button onclick="event.stopPropagation();editConsegna('+c.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="event.stopPropagation();deleteConsegna('+c.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></td></tr>';
+      }).join('')+'</tbody></table>'):'';
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:8px;overflow:hidden">'+
+      '<div onclick="toggleConsegnaGroup(\''+g.key+'\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:var(--bg3)">'+
+      '<span style="font-size:11px;color:var(--text3);transition:transform 0.15s;transform:rotate('+(aperto?90:0)+'deg)">▶</span>'+
+      '<span style="font-weight:500;color:var(--text)">🏗️ '+(cant?cant.nome:'Cantiere eliminato')+'</span>'+
+      '<span style="color:var(--text3)">—</span>'+
+      '<span style="color:var(--text2)">'+(mat?mat.nome:'Materiale eliminato')+'</span>'+
+      '<span style="margin-left:auto;font-weight:600;color:var(--accent)">Tot: '+g.tot+' '+(mat?.um||'')+'</span>'+
+      '<span class="tag tag-gray" style="font-size:10px">'+g.count+' consegn'+(g.count===1?'a':'e')+'</span>'+
+      '</div>'+
+      (aperto?'<div style="padding:0 14px 12px">'+dettaglio+'</div>':'')+
+      '</div>';
+  }).join('');
 }
 
 // --- REPORT ---
@@ -2959,6 +3027,55 @@ async function saveMateriali(){
     const ok=await saveToCloud('materiali-registro',{materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB});
     showToast(ok?'Materiali salvati ✓ (locale + cloud)':'Materiali salvati solo in locale');
   }else{showToast('Materiali salvati (solo locale)');}
+}
+
+function stampaReportCantiere(){
+  const cantiereId=document.getElementById('rep-cantiere')?.value||'';
+  const cant=cantiereId?cantieriDB.find(c=>String(c.id)===String(cantiereId)):null;
+  const consegneFiltrate=cantiereId?consegneDB.filter(c=>String(c.cantiereId)===String(cantiereId)):consegneDB;
+  const previstoFiltrato=cantiereId?previstoDB.filter(p=>String(p.cantiereId)===String(cantiereId)):previstoDB;
+  const perMat={};
+  previstoFiltrato.forEach(p=>{
+    const mat=materialiDB.find(m=>String(m.id)===String(p.materialeId));
+    const key=mat?mat.nome:'Materiale eliminato';
+    if(!perMat[key])perMat[key]={previsto:0,effettivo:0,costo:0,um:mat?mat.um:''};
+    perMat[key].previsto+=parseFloat(p.quantita)||0;
+  });
+  consegneFiltrate.forEach(c=>{
+    const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
+    const key=mat?mat.nome:'Materiale eliminato';
+    if(!perMat[key])perMat[key]={previsto:0,effettivo:0,costo:0,um:mat?mat.um:''};
+    const q=parseFloat(c.quantita)||0;
+    perMat[key].effettivo+=q;
+    if(mat)perMat[key].costo+=q*prezzoNetto(mat);
+  });
+  const perSq={};
+  consegneFiltrate.forEach(c=>{
+    const sq=squadreDB.find(s=>String(s.id)===String(c.squadraId));
+    const mat=materialiDB.find(m=>String(m.id)===String(c.materialeId));
+    const key=sq?sq.nome:'Squadra non specificata';
+    if(!perSq[key])perSq[key]=0;
+    if(mat)perSq[key]+=(parseFloat(c.quantita)||0)*prezzoNetto(mat);
+  });
+  const w=window.open('','_blank');
+  if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
+  const totCosto=Object.values(perMat).reduce((s,v)=>s+v.costo,0);
+  const righeMat=Object.entries(perMat).map(([nome,v])=>{
+    const scost=v.previsto>0?(((v.effettivo-v.previsto)/v.previsto)*100).toFixed(0)+'%':'—';
+    return '<tr><td>'+nome+'</td><td>'+(v.previsto||'—')+' '+(v.um||'')+'</td><td>'+v.effettivo+' '+(v.um||'')+'</td><td>'+scost+'</td><td>€ '+v.costo.toFixed(2)+'</td></tr>';
+  }).join('');
+  const righeSq=Object.entries(perSq).sort((a,b)=>b[1]-a[1]).map(([nome,costo])=>'<tr><td>'+nome+'</td><td>€ '+costo.toFixed(2)+'</td></tr>').join('');
+  w.document.write('<!DOCTYPE html><html><head><title>Report Materiali'+(cant?' - '+cant.nome:'')+'</title><style>'+
+    'body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:30px}h2{margin-bottom:2px}.sub{color:#666;font-size:11px;margin-bottom:22px}'+
+    'table{border-collapse:collapse;width:100%;margin-bottom:24px}th,td{border:1px solid #ccc;padding:6px 10px;text-align:left}th{background:#f0f0f0}'+
+    '.tot{font-weight:bold;background:#fafafa}button{margin-top:10px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
+    '</style></head><body>');
+  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2>');
+  w.document.write('<div class="sub">'+(cant?('Report Materiali — Cantiere: '+cant.nome+(cant.cliente?' ('+cant.cliente+')':'')+' — Stato: '+cant.stato+(cant.stato==='Chiuso'?' — REPORT FINALE':'')):'Report Materiali — Vista globale (tutti i cantieri)')+' — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<h3>Previsto / Effettivo per materiale</h3><table><thead><tr><th>Materiale</th><th>Previsto</th><th>Effettivo</th><th>Scostamento</th><th>Costo</th></tr></thead><tbody>'+(righeMat||'<tr><td colspan="5" style="color:#888">Nessun dato</td></tr>')+'<tr class="tot"><td colspan="4">Totale costo materiali</td><td>€ '+totCosto.toFixed(2)+'</td></tr></tbody></table>');
+  w.document.write('<h3>Costo per squadra</h3><table><thead><tr><th>Squadra</th><th>Costo</th></tr></thead><tbody>'+(righeSq||'<tr><td colspan="2" style="color:#888">Nessun dato</td></tr>')+'</tbody></table>');
+  w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
 }
 // ============ END MATERIALI ============
 
