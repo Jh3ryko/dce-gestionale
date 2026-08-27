@@ -137,7 +137,10 @@
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label>Password</label>
-      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <div style="position:relative">
+        <input type="password" id="login-pass" placeholder="••••••••" style="padding-right:40px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')doLogin()">
+        <button type="button" onclick="togglePasswordVisibility()" title="Mostra/nascondi password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:4px;color:var(--text3)">👁️</button>
+      </div>
     </div>
     <label style="display:flex;align-items:center;gap:8px;margin-bottom:20px;cursor:pointer;font-size:13px;color:var(--text2)">
       <input type="checkbox" id="login-remember" style="width:15px;height:15px;cursor:pointer">Ricordami su questo dispositivo
@@ -2300,6 +2303,12 @@ async function sbFetch(path,method='GET',body=null,extra={}){
   }catch(e){console.warn('sbFetch:',e);return[];}
 }
 
+function togglePasswordVisibility(){
+  const field=document.getElementById('login-pass');
+  const btn=field.nextElementSibling;
+  if(field.type==='password'){field.type='text';btn.textContent='🙈';}
+  else{field.type='password';btn.textContent='👁️';}
+}
 async function doLogin(){
   const errEl=document.getElementById('login-error');
   const email=document.getElementById('login-email').value.trim().toLowerCase();
