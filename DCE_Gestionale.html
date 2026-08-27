@@ -129,7 +129,7 @@
     <div style="text-align:center;margin-bottom:28px">
       <div style="font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">DCE</div>
       <div style="font-size:18px;font-weight:500;color:var(--text)">Gestionale Operativo</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:4px">DCE Carpenteria Metallica S.r.l.</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">DCE S.r.l. — Carpenteria Metallica</div>
     </div>
     <div class="form-group" style="margin-bottom:12px">
       <label>Email</label>
@@ -199,7 +199,7 @@
 
     <!-- DASHBOARD -->
     <div class="module active" id="mod-dashboard">
-      <div class="section-header"><h1>Panoramica progetto</h1><p>DCE Carpenteria Metallica — Vidigulfo (PV)</p></div>
+      <div class="section-header"><h1>Panoramica progetto</h1><p id="dash-azienda-line">DCE S.r.l. — Carpenteria Metallica — Vidigulfo (PV)</p></div>
       <div class="dash-grid">
         <div class="stat-card"><div class="stat-label">Avanzamento globale</div><div class="stat-value stat-accent" id="dash-global">0%</div><div class="stat-sub">Media fasi del progetto</div></div>
         <div class="stat-card"><div class="stat-label">Documenti prodotti</div><div class="stat-value stat-green">3</div><div class="stat-sub">Report, planimetria, guida</div></div>
@@ -225,7 +225,7 @@
       <div class="form-card">
         <div class="form-card-title">Intestazione documento</div>
         <div class="form-grid cols-3">
-          <div class="form-group"><label>Azienda</label><input type="text" id="ch-azienda" placeholder="es. DCE Carpenteria Metallica S.r.l."></div>
+          <div class="form-group"><label>Azienda</label><input type="text" id="ch-azienda" placeholder="es. DCE S.r.l. — Carpenteria Metallica"></div>
           <div class="form-group"><label>Sede</label><input type="text" id="ch-sede" placeholder="es. Vidigulfo (PV)"></div>
           <div class="form-group"><label>Data documento</label><input type="date" id="ch-data"></div>
           <div class="form-group"><label>Titolo progetto</label><input type="text" id="ch-titolo" placeholder="es. Riorganizzazione e ottimizzazione magazzino"></div>
@@ -314,8 +314,8 @@
       <div class="form-card">
         <div class="form-card-title">0.1 · Profilo aziendale</div>
         <div class="form-grid">
-          <div class="form-group"><label>Ragione sociale</label><input type="text" id="f0-ragione" oninput="calcF0()"></div>
-          <div class="form-group"><label>Sede operativa</label><input type="text" id="f0-sede" oninput="calcF0()"></div>
+          <div class="form-group"><label>Ragione sociale</label><input type="text" id="f0-ragione" value="DCE S.r.l." oninput="calcF0()"></div>
+          <div class="form-group"><label>Sede operativa</label><input type="text" id="f0-sede" value="Via Caduti 22/B, 27018 Vidigulfo (PV)" oninput="calcF0()"></div>
           <div class="form-group"><label>Codice ATECO</label><input type="text" id="f0-ateco" oninput="calcF0()"></div>
           <div class="form-group"><label>N° dipendenti (stimato)</label><input type="number" id="f0-dip" oninput="calcF0()"></div>
           <div class="form-group"><label>CCNL applicato</label><input type="text" id="f0-ccnl" oninput="calcF0()"></div>
@@ -1071,7 +1071,7 @@
         <div class="form-card-title">Registro interventi</div>
         <div id="interventi-lista"><div class="empty-state"><div class="icon">🔧</div><p>Nessun intervento registrato</p></div></div>
         <div class="form-grid" style="margin-top:16px">
-          <div class="form-group"><label>Mezzo (targa/matricola)</label><input type="text" id="int-targa"></div>
+          <div class="form-group"><label>Mezzo</label><select id="int-targa"><option value="">— seleziona mezzo —</option></select></div>
           <div class="form-group"><label>Data evento</label><input type="date" id="int-data"></div>
           <div class="form-group"><label>Tipo evento</label><select id="int-tipo"><option value="">— seleziona —</option><option>Danno rilevato</option><option>Riparazione</option><option>Tagliando / Manutenzione ordinaria</option><option>Revisione periodica</option><option>Verifica INAIL</option><option>Sostituzione componente</option><option>Incidente</option><option>Altro</option></select></div>
           <div class="form-group"><label>Stato</label><select id="int-stato"><option>Aperto</option><option>In corso</option><option>Risolto</option></select></div>
@@ -1079,13 +1079,13 @@
           <div class="form-group"><label>Costo (€)</label><input type="number" id="int-costo"></div>
           <div class="form-group"><label>Eseguito da</label><input type="text" id="int-eseguito"></div>
         </div>
-        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addIntervento()">Registra intervento</button></div>
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" id="btn-salva-int" onclick="addIntervento()">Registra intervento</button></div>
       </div>
       <div class="form-card">
         <div class="form-card-title">Storico assegnazioni</div>
         <div id="assegnazioni-lista"><div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div></div>
         <div class="form-grid cols-3" style="margin-top:16px">
-          <div class="form-group"><label>Mezzo (targa/matricola)</label><input type="text" id="ass-targa"></div>
+          <div class="form-group"><label>Mezzo</label><select id="ass-targa"><option value="">— seleziona mezzo —</option></select></div>
           <div class="form-group"><label>Assegnato a</label><input type="text" id="ass-nome"></div>
           <div class="form-group"><label>Tipo utilizzo</label><select id="ass-tipo"><option>In dotazione fissa</option><option>Uso temporaneo</option><option>Uso condiviso</option><option>Restituzione</option></select></div>
           <div class="form-group"><label>Data inizio</label><input type="date" id="ass-inizio"></div>
@@ -1094,7 +1094,8 @@
           <div class="form-group span-2"><label>Note</label><input type="text" id="ass-note"></div>
         </div>
         <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-          <button class="btn btn-primary" onclick="addAssegnazione()">Registra assegnazione</button>
+          <button class="btn btn-primary" id="btn-salva-ass" onclick="addAssegnazione()">Registra assegnazione</button>
+          <button class="btn btn-ghost" onclick="clearAssegnazioneForm()">Annulla</button>
           <button class="btn btn-ghost" onclick="saveAssegnazioniCloud()" style="margin-left:auto">Salva Assegnazioni</button>
         </div>
       </div>
@@ -1367,6 +1368,18 @@ function calcF0(){
   checks.forEach(id=>{const el=document.getElementById(id);if(el&&el.querySelector('input').checked)filled++;});
   const pct=Math.round((filled/total)*100);
   setBar('f0-pct','f0-fill','bar-fase0',pct);updateDashboardStats();
+  updateDashAziendaLine();
+}
+
+function updateDashAziendaLine(){
+  const el=document.getElementById('dash-azienda-line');if(!el)return;
+  const ragione=(document.getElementById('f0-ragione')?.value||'').trim()||'DCE S.r.l.';
+  const sede=(document.getElementById('f0-sede')?.value||'').trim();
+  const ateco=(document.getElementById('f0-ateco')?.value||'').trim();
+  let line=ragione+' — Carpenteria Metallica';
+  if(sede)line+=' — '+sede;
+  if(ateco)line+=' — ATECO '+ateco;
+  el.textContent=line;
 }
 
 function calcF1(){
@@ -1588,10 +1601,10 @@ function stampaModuloConsegnaSaldatore(saldatoreId){
     '.sign-box{width:45%}.sign-line{border-top:1px solid #333;margin-top:45px;padding-top:4px;font-size:11px;color:#555}'+
     'button{margin-top:26px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
     '</style></head><body>');
-  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2><div class="sub">Modulo di Consegna DPI/Attrezzature — Saldatore '+s.nome+(s.postazione?' (Postazione '+s.postazione+')':'')+' — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<h2>DCE S.r.l. — Carpenteria Metallica</h2><div class="sub">Modulo di Consegna DPI/Attrezzature — Saldatore '+s.nome+(s.postazione?' (Postazione '+s.postazione+')':'')+' — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
   w.document.write('<table><thead><tr><th>DPI / Attrezzatura</th><th>N. Seriale/Inventario</th><th>Data consegna</th><th>Note</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="border:1px solid #ccc;padding:8px;color:#888">Nessun DPI/attrezzatura attualmente in dotazione</td></tr>')+'</tbody></table>');
   w.document.write('<div class="decl">Il sottoscritto dichiara di aver ricevuto in dotazione i DPI/le attrezzature sopra elencate, di averle trovate in condizioni idonee all\'uso e si impegna a un utilizzo corretto e conforme alle norme di sicurezza vigenti, segnalando tempestivamente all\'azienda eventuali guasti, danni, usura o necessità di sostituzione.</div>');
-  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma saldatore</div></div><div class="sign-box"><div class="sign-line">Firma per DCE Carpenteria Metallica S.r.l.</div></div></div>');
+  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma saldatore</div></div><div class="sign-box"><div class="sign-line">Firma per DCE S.r.l. — Carpenteria Metallica</div></div></div>');
   w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
   w.document.close();
 }
@@ -1730,6 +1743,8 @@ function deleteSquadra(id){
   saveScorteDB();renderSquadre();updateSqSelect();renderConsumiSquadre();calcF2();showToast('Squadra rimossa');
 }
 
+let squadreDotExpanded={};
+function toggleSquadraDotDettaglio(squadraId){squadreDotExpanded[squadraId]=!squadreDotExpanded[squadraId];renderSquadre();}
 function renderSquadre(){
   const el=document.getElementById('squadre-lista');if(!el)return;
   if(!squadreDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👷</div><p>Nessuna squadra registrata</p></div>';return;}
@@ -1737,6 +1752,29 @@ function renderSquadre(){
     const totDischi=consumiSqDB.filter(c=>c.squadra===s.nome).reduce((a,c)=>a+(parseInt(c.qty)||0),0);
     const dotazioni=dotazioniSqDB.filter(d=>d.squadra===s.nome);
     const statoColor=st=>st==='Consegnata'?'tag-green':st==='Restituita'?'tag-gray':'tag-orange';
+    // Riepilogo schematico: raggruppa per attrezzo, con conteggio e stato peggiore presente
+    const gruppi={};
+    dotazioni.forEach(d=>{
+      if(!gruppi[d.attr])gruppi[d.attr]={count:0,stati:new Set()};
+      gruppi[d.attr].count++;gruppi[d.attr].stati.add(d.stato);
+    });
+    const priorita={'Da restituire':3,'Da sostituire':3,'Consegnata':1,'Restituita':0};
+    const chipStato=stati=>{let peggiore='Consegnata',max=-1;stati.forEach(st=>{const p=priorita[st]??1;if(p>max){max=p;peggiore=st;}});return peggiore;};
+    const aperto=!!squadreDotExpanded[s.id];
+    const riepilogoHtml=Object.entries(gruppi).map(([attr,g])=>{
+      const st=chipStato(g.stati);
+      return '<span class="tag '+statoColor(st)+'" style="font-size:11px">'+attr+(g.count>1?' ×'+g.count:'')+'</span>';
+    }).join(' ');
+    const dettaglioHtml=aperto?dotazioni.map(d=>'<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap;align-items:center">'+
+        '<span style="color:var(--text);font-weight:500">'+d.attr+'</span>'+
+        (d.sn?'<span style="color:var(--text3);font-family:var(--font-mono);font-size:11px">'+d.sn+'</span>':'')+
+        '<span class="tag '+statoColor(d.stato)+'" style="font-size:10px">'+d.stato+'</span>'+
+        (d.data?'<span style="color:var(--text3)">dal '+new Date(d.data).toLocaleDateString('it-IT')+'</span>':'')+
+        (d.note?'<span style="color:var(--text3)">'+d.note+'</span>':'')+
+        '<div style="margin-left:auto;display:flex;gap:8px">'+
+        '<button onclick="editDotazione('+d.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button>'+
+        '<button onclick="deleteDotazione('+d.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button>'+
+        '</div></div>').join(''):'';
     return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px">'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
       '<span style="font-size:14px;font-weight:500;color:var(--text)">'+s.nome+'</span>'+
@@ -1753,17 +1791,12 @@ function renderSquadre(){
       '<span>Dischi consumati: '+totDischi+'</span>'+
       '</div>'+
       '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">'+
-      '<div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Attrezzature in dotazione ('+dotazioni.length+')</div>'+
-      (dotazioni.length?dotazioni.map(d=>'<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap;align-items:center">'+
-        '<span style="color:var(--text);font-weight:500">'+d.attr+'</span>'+
-        (d.sn?'<span style="color:var(--text3);font-family:var(--font-mono);font-size:11px">'+d.sn+'</span>':'')+
-        '<span class="tag '+statoColor(d.stato)+'" style="font-size:10px">'+d.stato+'</span>'+
-        (d.data?'<span style="color:var(--text3)">dal '+new Date(d.data).toLocaleDateString('it-IT')+'</span>':'')+
-        (d.note?'<span style="color:var(--text3)">'+d.note+'</span>':'')+
-        '<div style="margin-left:auto;display:flex;gap:8px">'+
-        '<button onclick="editDotazione('+d.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button>'+
-        '<button onclick="deleteDotazione('+d.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button>'+
-        '</div></div>').join(''):'<div style="font-size:12px;color:var(--text3);padding:4px 0">Nessuna attrezzatura assegnata</div>')+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">Attrezzature in dotazione ('+dotazioni.length+')</span>'+
+      (dotazioni.length?'<button onclick="toggleSquadraDotDettaglio('+s.id+')" style="margin-left:auto;background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">'+(aperto?'▲ Comprimi':'▾ Dettaglio')+'</button>':'')+
+      '</div>'+
+      (dotazioni.length?'<div style="display:flex;flex-wrap:wrap;gap:6px">'+riepilogoHtml+'</div>':'<div style="font-size:12px;color:var(--text3);padding:4px 0">Nessuna attrezzatura assegnata</div>')+
+      (aperto?'<div style="margin-top:8px">'+dettaglioHtml+'</div>':'')+
       '</div></div>';
   }).join('');
 }
@@ -1905,10 +1938,10 @@ function stampaModuloConsegnaSquadra(squadraId){
     '.sign-box{width:45%}.sign-line{border-top:1px solid #333;margin-top:45px;padding-top:4px;font-size:11px;color:#555}'+
     'button{margin-top:26px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
     '</style></head><body>');
-  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2><div class="sub">Modulo di Consegna Attrezzature — Squadra '+s.nome+' (Capo squadra: '+s.capo+') — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<h2>DCE S.r.l. — Carpenteria Metallica</h2><div class="sub">Modulo di Consegna Attrezzature — Squadra '+s.nome+' (Capo squadra: '+s.capo+') — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
   w.document.write('<table><thead><tr><th>Attrezzatura</th><th>N. Seriale/Inventario</th><th>Data consegna</th><th>Note</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="border:1px solid #ccc;padding:8px;color:#888">Nessuna attrezzatura attualmente in dotazione</td></tr>')+'</tbody></table>');
   w.document.write('<div class="decl">Il sottoscritto, in qualità di capo squadra, dichiara di aver ricevuto in dotazione le attrezzature sopra elencate, di averle trovate in condizioni idonee all\'uso e si impegna, a nome della squadra, a un utilizzo corretto e conforme alle norme di sicurezza vigenti, segnalando tempestivamente all\'azienda eventuali guasti, danni o smarrimenti.</div>');
-  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma capo squadra</div></div><div class="sign-box"><div class="sign-line">Firma per DCE Carpenteria Metallica S.r.l.</div></div></div>');
+  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma capo squadra</div></div><div class="sign-box"><div class="sign-line">Firma per DCE S.r.l. — Carpenteria Metallica</div></div></div>');
   w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
   w.document.close();
 }
@@ -2077,7 +2110,7 @@ function clearMezzoForm(){editingMezzoId=null;document.getElementById('btn-salva
 
 function renderMezzi(){
   const el=document.getElementById('mezzi-lista');
-  if(!mezziDB.length){el.innerHTML='<div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito</p></div>';return;}
+  if(!mezziDB.length){el.innerHTML='<div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito</p></div>';updateMezzoTargaSelects();return;}
   el.innerHTML=mezziDB.map(m=>{
     const scadenze=m.noleggio?[]:[scadenzaTag(m.assic,'Assicurazione'),scadenzaTag(m.bollo,'Bollo'),scadenzaTag(m.revisione,'Revisione'),scadenzaTag(m.inail,'INAIL'),scadenzaTag(m.tagliando,'Tagliando'),scadenzaTag(m.estintore,'Estintore'),scadenzaTag(m.altraScad,'Altra scad.')].filter(Boolean);
     const scadenzeHtml=scadenze.join(' ');
@@ -2086,6 +2119,7 @@ function renderMezzi(){
     const kmInfo=[m.assicImporto?'Premio: € '+m.assicImporto+(m.assicFreq?' ('+m.assicFreq+')':''):'',m.tagUltimoData?'Ultimo tagliando: '+new Date(m.tagUltimoData).toLocaleDateString('it-IT')+(m.tagUltimoKm?' a '+Number(m.tagUltimoKm).toLocaleString('it-IT')+' km':''):'',m.tagProssimoKm?'Prossimo previsto a '+Number(m.tagProssimoKm).toLocaleString('it-IT')+' km':''].filter(Boolean).join(' &nbsp;|&nbsp; ');
     return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+(m.assegnatario?'<span class="tag tag-blue">👤 '+m.assegnatario+'</span>':'')+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
   }).join('');
+  updateMezzoTargaSelects();
 }
 
 function updateKmTargaSelect(){
@@ -2126,19 +2160,46 @@ function importaMezziDaExcel(){
   showToast(aggiunti?('Importati '+aggiunti+' mezzi'+(saltati?' ('+saltati+' già presenti, saltati)':'')):'Tutti i mezzi erano già presenti, nessuna modifica');
 }
 
+let editingInterventoId=null;
 function addIntervento(){
   const targa=document.getElementById('int-targa').value.trim(),tipo=document.getElementById('int-tipo').value;
-  if(!targa||!tipo){showToast('Compila almeno targa e tipo intervento');return;}
-  interventiDB.push({id:Date.now(),targa,data:document.getElementById('int-data').value,tipo,stato:document.getElementById('int-stato').value,desc:document.getElementById('int-desc').value,costo:document.getElementById('int-costo').value,eseguito:document.getElementById('int-eseguito').value});
+  if(!targa||!tipo){showToast('Compila almeno mezzo e tipo intervento');return;}
+  const d={targa,data:document.getElementById('int-data').value,tipo,stato:document.getElementById('int-stato').value,desc:document.getElementById('int-desc').value,costo:document.getElementById('int-costo').value,eseguito:document.getElementById('int-eseguito').value};
+  if(editingInterventoId){
+    const i=interventiDB.findIndex(x=>x.id===editingInterventoId);
+    if(i!==-1){interventiDB[i]={...d,id:editingInterventoId};showToast('Intervento aggiornato');}
+    editingInterventoId=null;document.getElementById('btn-salva-int').textContent='Registra intervento';
+  }else{
+    d.id=Date.now();interventiDB.push(d);showToast('Intervento registrato');
+  }
   saveMezziDB();renderMezzi();renderInterventi();
   ['int-targa','int-data','int-tipo','int-desc','int-costo','int-eseguito'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('int-stato').value='Aperto';showToast('Intervento registrato');
+  document.getElementById('int-stato').value='Aperto';
+}
+function editIntervento(id){
+  const i=interventiDB.find(x=>x.id===id);if(!i)return;
+  editingInterventoId=id;
+  document.getElementById('int-targa').value=i.targa||'';
+  document.getElementById('int-data').value=i.data||'';
+  document.getElementById('int-tipo').value=i.tipo||'';
+  document.getElementById('int-stato').value=i.stato||'Aperto';
+  document.getElementById('int-desc').value=i.desc||'';
+  document.getElementById('int-costo').value=i.costo||'';
+  document.getElementById('int-eseguito').value=i.eseguito||'';
+  document.getElementById('btn-salva-int').textContent='Salva modifiche';
+  document.getElementById('btn-salva-int').scrollIntoView({behavior:'smooth'});
+}
+function deleteIntervento(id){if(!confirm('Eliminare questo intervento?'))return;interventiDB=interventiDB.filter(i=>i.id!==id);saveMezziDB();renderInterventi();showToast('Intervento rimosso');}
+
+function updateMezzoTargaSelects(){
+  const opts='<option value="">— seleziona mezzo —</option>'+mezziDB.map(m=>'<option value="'+m.targa+'">'+m.targa+(m.modello?' — '+m.modello:'')+'</option>').join('');
+  ['int-targa','ass-targa'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;}});
 }
 
 function renderInterventi(){
   const el=document.getElementById('interventi-lista');
   if(!interventiDB.length){el.innerHTML='<div class="empty-state"><div class="icon">🔧</div><p>Nessun intervento registrato</p></div>';return;}
-  el.innerHTML='<table class="data-table" style="margin-top:8px"><thead><tr><th>Data</th><th>Mezzo</th><th>Tipo</th><th>Descrizione</th><th>Stato</th><th>Costo</th><th>Eseguito da</th></tr></thead><tbody>'+[...interventiDB].reverse().map(i=>'<tr><td style="white-space:nowrap">'+(i.data||'—')+'</td><td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">'+i.targa+'</span></td><td>'+i.tipo+'</td><td style="color:var(--text2)">'+(i.desc||'—')+'</td><td><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'">'+i.stato+'</span></td><td>'+(i.costo?'€ '+i.costo:'—')+'</td><td>'+(i.eseguito||'—')+'</td></tr>').join('')+'</tbody></table>';
+  el.innerHTML='<table class="data-table" style="margin-top:8px"><thead><tr><th>Data</th><th>Mezzo</th><th>Tipo</th><th>Descrizione</th><th>Stato</th><th>Costo</th><th>Eseguito da</th><th></th></tr></thead><tbody>'+[...interventiDB].reverse().map(i=>'<tr><td style="white-space:nowrap">'+(i.data||'—')+'</td><td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">'+i.targa+'</span></td><td>'+i.tipo+'</td><td style="color:var(--text2)">'+(i.desc||'—')+'</td><td><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'">'+i.stato+'</span></td><td>'+(i.costo?'€ '+i.costo:'—')+'</td><td>'+(i.eseguito||'—')+'</td><td><button onclick="editIntervento('+i.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="deleteIntervento('+i.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></td></tr>').join('')+'</tbody></table>';
 }
 
 function renderAlerts(){
@@ -2165,6 +2226,11 @@ function getAllAlerts(){
       if(!c.date)return;const days=daysDiff(c.date);if(days===null||days>30)return;
       alerts.push({id:'mezzo-'+m.id+'-'+c.label,tipo:'mezzo',icona:'🚛',titolo:m.targa+(m.modello?' '+m.modello:''),dettaglio:c.label+' — '+(days<0?'SCADUTA':days===0?'scade oggi':'scade tra '+days+' giorni')+' ('+new Date(c.date).toLocaleDateString('it-IT')+')',giorni:days,modulo:'mezzi'});
     });
+  });
+  (assegnazioniDB||[]).forEach(a=>{
+    if(a.stato!=='attiva'||!a.fine)return;
+    const days=daysDiff(a.fine);if(days===null||days>0)return;
+    alerts.push({id:'assegnazione-'+a.id,tipo:'assegnazione',icona:'🔑',titolo:a.targa+' → '+a.nome,dettaglio:'Assegnazione scaduta il '+new Date(a.fine).toLocaleDateString('it-IT')+' — richiede rientro o proroga',giorni:days,modulo:'mezzi',assegnazioneId:a.id});
   });
   (materialiDB||[]).forEach(m=>{
     const g=parseFloat(m.giacenza),s=parseFloat(m.scortaMin)||0;
@@ -2206,28 +2272,85 @@ function renderAlertCenter(){
   const dismissed=getDismissedAlerts();
   const attivi=getAllAlerts().filter(a=>!dismissed.has(a.id));
   if(!attivi.length){el.innerHTML='<div class="empty-state"><div class="icon">✅</div><p>Nessun alert attivo al momento</p></div>';return;}
-  el.innerHTML=attivi.map(a=>'<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">'+
+  el.innerHTML=attivi.map(a=>{
+    const azioniSpecifiche=a.tipo==='assegnazione'?
+      '<button onclick="rientraMezzo('+a.assegnazioneId+')" style="background:none;border:1px solid var(--border2);color:var(--green);cursor:pointer;font-size:12px;padding:4px 10px;border-radius:4px;white-space:nowrap">🅿️ Rientro</button>'+
+      '<button onclick="prorogaMezzo('+a.assegnazioneId+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:4px 10px;border-radius:4px;white-space:nowrap">📅 Proroga</button>'
+      :'<button onclick="vaiAlModuloAlert(\''+a.modulo+'\')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:4px 12px;border-radius:4px;white-space:nowrap">Vai →</button>';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">'+
     '<span style="font-size:18px">'+a.icona+'</span>'+
     '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;color:var(--text)">'+a.titolo+'</div><div style="font-size:12px;color:'+(a.giorni<0?'var(--red)':'var(--text2)')+'">'+a.dettaglio+'</div></div>'+
-    '<button onclick="vaiAlModuloAlert(\''+a.modulo+'\')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:4px 12px;border-radius:4px;white-space:nowrap">Vai →</button>'+
+    azioniSpecifiche+
     '<button onclick="dismissAlert(\''+a.id+'\')" title="Ignora" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:4px 10px;border-radius:4px">✕</button>'+
-    '</div>').join('');
+    '</div>';
+  }).join('');
 }
 // ============ END CENTRO ALERT ============
 
+let editingAssegnazioneId=null;
 function addAssegnazione(){
   const targa=document.getElementById('ass-targa').value.trim(),nome=document.getElementById('ass-nome').value.trim();
-  if(!targa||!nome){showToast('Compila almeno targa e nome');return;}
-  assegnazioniDB.push({id:Date.now(),targa,nome,tipo:document.getElementById('ass-tipo').value,inizio:document.getElementById('ass-inizio').value,fine:document.getElementById('ass-fine').value,km:document.getElementById('ass-km').value,note:document.getElementById('ass-note').value});
-  saveAssegnazioniDB();renderAssegnazioni();
+  if(!targa||!nome){showToast('Compila almeno mezzo e nome');return;}
+  const d={targa,nome,tipo:document.getElementById('ass-tipo').value,inizio:document.getElementById('ass-inizio').value,fine:document.getElementById('ass-fine').value,km:document.getElementById('ass-km').value,note:document.getElementById('ass-note').value};
+  if(editingAssegnazioneId){
+    const i=assegnazioniDB.findIndex(x=>x.id===editingAssegnazioneId);
+    if(i!==-1){
+      const era=assegnazioniDB[i];
+      assegnazioniDB[i]={...era,...d};
+      showToast('Assegnazione aggiornata — nuova scadenza confermata');
+    }
+    editingAssegnazioneId=null;document.getElementById('btn-salva-ass').textContent='Registra assegnazione';
+  }else{
+    d.id=Date.now();d.stato='attiva';assegnazioniDB.push(d);showToast('Assegnazione registrata');
+  }
+  saveAssegnazioniCloud();renderAssegnazioni();
+  clearAssegnazioneForm();
+}
+function editAssegnazione(id){
+  const a=assegnazioniDB.find(x=>x.id===id);if(!a)return;
+  editingAssegnazioneId=id;
+  document.getElementById('ass-targa').value=a.targa||'';
+  document.getElementById('ass-nome').value=a.nome||'';
+  document.getElementById('ass-tipo').value=a.tipo||'In dotazione fissa';
+  document.getElementById('ass-inizio').value=a.inizio||'';
+  document.getElementById('ass-fine').value=a.fine||'';
+  document.getElementById('ass-km').value=a.km||'';
+  document.getElementById('ass-note').value=a.note||'';
+  document.getElementById('btn-salva-ass').textContent='Salva modifiche';
+  document.getElementById('btn-salva-ass').scrollIntoView({behavior:'smooth'});
+}
+function clearAssegnazioneForm(){
+  editingAssegnazioneId=null;
+  document.getElementById('btn-salva-ass').textContent='Registra assegnazione';
   ['ass-targa','ass-nome','ass-inizio','ass-fine','ass-km','ass-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  showToast('Assegnazione registrata');
+}
+function deleteAssegnazione(id){if(!confirm('Eliminare questa assegnazione?'))return;assegnazioniDB=assegnazioniDB.filter(a=>a.id!==id);saveAssegnazioniCloud();renderAssegnazioni();showToast('Assegnazione rimossa');}
+
+function rientraMezzo(id){
+  const a=assegnazioniDB.find(x=>x.id===id);if(!a)return;
+  if(!confirm('Confermi il rientro di "'+a.targa+'" al Parco DCE? Il mezzo torna disponibile.'))return;
+  a.stato='rientrata';a.rientroData=new Date().toISOString().slice(0,10);
+  saveAssegnazioniCloud();renderAssegnazioni();renderAlerts();updateAlertIndicators();
+  showToast('Mezzo rientrato al Parco DCE ✓');
+}
+function prorogaMezzo(id){
+  closeAlertCenter();
+  showModule('mezzi');
+  editAssegnazione(id);
+  showToast('Imposta la nuova data di fine e premi "Salva modifiche" per confermare la proroga');
 }
 
 function renderAssegnazioni(){
   const el=document.getElementById('assegnazioni-lista');
   if(!assegnazioniDB.length){el.innerHTML='<div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div>';return;}
-  el.innerHTML='<table class="data-table" style="margin-top:8px"><thead><tr><th>Mezzo</th><th>Assegnato a</th><th>Tipo</th><th>Dal</th><th>Al</th><th>Km</th><th>Note</th></tr></thead><tbody>'+[...assegnazioniDB].reverse().map(a=>'<tr><td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">'+a.targa+'</span></td><td style="font-weight:500;color:var(--text)">'+a.nome+'</td><td><span class="tag tag-blue" style="font-size:10px">'+a.tipo+'</span></td><td>'+(a.inizio?new Date(a.inizio).toLocaleDateString('it-IT'):'—')+'</td><td>'+(a.fine?new Date(a.fine).toLocaleDateString('it-IT'):'<span style="color:var(--green)">in corso</span>')+'</td><td>'+(a.km?a.km+' km':'—')+'</td><td style="color:var(--text3)">'+(a.note||'—')+'</td></tr>').join('')+'</tbody></table>';
+  el.innerHTML='<table class="data-table" style="margin-top:8px"><thead><tr><th>Mezzo</th><th>Assegnato a</th><th>Tipo</th><th>Dal</th><th>Al</th><th>Stato</th><th>Km</th><th>Note</th><th></th></tr></thead><tbody>'+[...assegnazioniDB].reverse().map(a=>{
+    const scaduta=a.stato==='attiva'&&a.fine&&daysDiff(a.fine)<=0;
+    const statoTag=a.stato==='rientrata'?'<span class="tag tag-gray">🅿️ Rientrata'+(a.rientroData?' ('+new Date(a.rientroData).toLocaleDateString('it-IT')+')':'')+'</span>':scaduta?'<span class="tag tag-red">⚠ Scaduta</span>':'<span class="tag tag-green">In corso</span>';
+    return '<tr><td><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">'+a.targa+'</span></td><td style="font-weight:500;color:var(--text)">'+a.nome+'</td><td><span class="tag tag-blue" style="font-size:10px">'+a.tipo+'</span></td><td>'+(a.inizio?new Date(a.inizio).toLocaleDateString('it-IT'):'—')+'</td><td>'+(a.fine?new Date(a.fine).toLocaleDateString('it-IT'):'<span style="color:var(--green)">indeterminato</span>')+'</td><td>'+statoTag+'</td><td>'+(a.km?a.km+' km':'—')+'</td><td style="color:var(--text3)">'+(a.note||'—')+'</td>'+
+    '<td>'+(scaduta?'<button onclick="rientraMezzo('+a.id+')" style="background:none;border:1px solid var(--border2);color:var(--green);cursor:pointer;font-size:11px;padding:2px 8px;border-radius:4px;margin-right:4px">🅿️ Rientro</button><button onclick="prorogaMezzo('+a.id+')" style="background:none;border:1px solid var(--border2);color:var(--accent);cursor:pointer;font-size:11px;padding:2px 8px;border-radius:4px">📅 Proroga</button>':'<button onclick="editAssegnazione('+a.id+')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px">Modifica</button> <button onclick="deleteAssegnazione('+a.id+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button>')+'</td>'+
+    '</tr>';
+  }).join('')+'</tbody></table>';
+  updateAlertIndicators();
 }
 
 async function saveMezziCloud(){
@@ -2258,11 +2381,11 @@ function stampaModuloAssegnazione(id){
     '.sign-box{width:45%}.sign-line{border-top:1px solid #333;margin-top:45px;padding-top:4px;font-size:11px;color:#555}'+
     'button{margin-top:26px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
     '</style></head><body>');
-  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2><div class="sub">Modulo di Assegnazione Mezzo / Attrezzatura — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
+  w.document.write('<h2>DCE S.r.l. — Carpenteria Metallica</h2><div class="sub">Modulo di Assegnazione Mezzo / Attrezzatura — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
   w.document.write('<table>'+riga('Tipo mezzo',m.tipo)+riga('Marca / Modello',m.modello)+riga('Targa / Matricola',m.targa)+riga('Anno immatricolazione',m.anno)+riga('Portata (kg)',m.portata)+riga('Stato generale',m.stato)+'</table>');
   w.document.write('<table>'+riga('Assegnato a (nome e cognome)','')+riga('Data consegna','')+riga('Km / ore contatore alla consegna','')+riga('Condizioni riscontrate alla consegna','')+riga('Note','')+'</table>');
   w.document.write('<div class="decl">Il sottoscritto dichiara di aver ricevuto in uso il mezzo/attrezzatura sopra indicato, di averlo trovato nelle condizioni riportate e si impegna a un utilizzo corretto e conforme alle norme di sicurezza vigenti, segnalando tempestivamente all\'azienda eventuali guasti, danni o anomalie riscontrate durante l\'utilizzo.</div>');
-  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma del consegnatario</div></div><div class="sign-box"><div class="sign-line">Firma per DCE Carpenteria Metallica S.r.l.</div></div></div>');
+  w.document.write('<div class="sign-row"><div class="sign-box"><div class="sign-line">Firma del consegnatario</div></div><div class="sign-box"><div class="sign-line">Firma per DCE S.r.l. — Carpenteria Metallica</div></div></div>');
   w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
   w.document.close();
 }
@@ -2502,7 +2625,7 @@ function stampaRegistroAttr(){
   const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=attrezzatureDB.map(a=>'<tr><td>'+(a.tipo||'')+'</td><td>'+(a.marca||'')+'</td><td>'+(a.modello||'')+'</td><td>'+(a.seriale||'')+'</td><td>'+(a.alim||'')+'</td><td>'+(a.stato||'')+'</td><td>'+(a.posizione||'')+(a.codpos?' ['+a.codpos+']':'')+'</td><td>'+(a.dotazione||'')+'</td><td>'+(a.prop||'')+'</td><td>'+(a.note||'')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Registro Attrezzature DCE</title><style>body{font-family:Arial,sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px 7px}th{background:#f0f0f0}tr:nth-child(even){background:#fafafa}button{margin-top:12px;padding:8px 16px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
-  w.document.write('<h2>Registro Attrezzature - DCE Carpenteria Metallica S.r.l.</h2>');
+  w.document.write('<h2>Registro Attrezzature - DCE S.r.l. — Carpenteria Metallica</h2>');
   w.document.write('<p style="color:#666;font-size:10px">Stampato il '+new Date().toLocaleDateString('it-IT')+' - Totale: '+attrezzatureDB.length+' attrezzature</p>');
   w.document.write('<table><thead><tr><th>Tipo</th><th>Marca</th><th>Modello</th><th>Seriale</th><th>Alim.</th><th>Stato</th><th>Posizione</th><th>Dotazione</th><th>Proprieta</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>');
   w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
@@ -2602,7 +2725,7 @@ function stampaRegistroFornitori(){
   const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
   const rows=fornitoriDB.map(f=>'<tr><td>'+(f.ragione||'')+'</td><td>'+(f.categoria||'')+'</td><td>'+(f.piva||'')+'</td><td>'+(f.referente||'')+'</td><td>'+(f.telefono||'')+'</td><td>'+(f.email||'')+'</td><td>'+(f.pagamento||'')+'</td></tr>').join('');
   w.document.write('<!DOCTYPE html><html><head><title>Registro Fornitori DCE</title><style>body{font-family:Arial,sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:5px 7px}th{background:#f0f0f0}tr:nth-child(even){background:#fafafa}button{margin-top:12px;padding:8px 16px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
-  w.document.write('<h2>Registro Fornitori - DCE Carpenteria Metallica S.r.l.</h2>');
+  w.document.write('<h2>Registro Fornitori - DCE S.r.l. — Carpenteria Metallica</h2>');
   w.document.write('<p style="color:#666;font-size:10px">Stampato il '+new Date().toLocaleDateString('it-IT')+' - Totale: '+fornitoriDB.length+' fornitori</p>');
   w.document.write('<table><thead><tr><th>Ragione sociale</th><th>Categoria</th><th>P.IVA</th><th>Referente</th><th>Telefono</th><th>Email</th><th>Pagamento</th></tr></thead><tbody>'+rows+'</tbody></table>');
   w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
@@ -3079,7 +3202,7 @@ function stampaReportCantiere(){
     'table{border-collapse:collapse;width:100%;margin-bottom:24px}th,td{border:1px solid #ccc;padding:6px 10px;text-align:left}th{background:#f0f0f0}'+
     '.tot{font-weight:bold;background:#fafafa}button{margin-top:10px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}'+
     '</style></head><body>');
-  w.document.write('<h2>DCE Carpenteria Metallica S.r.l.</h2>');
+  w.document.write('<h2>DCE S.r.l. — Carpenteria Metallica</h2>');
   w.document.write('<div class="sub">'+(cant?('Report Materiali — Cantiere: '+cant.nome+(cant.cliente?' ('+cant.cliente+')':'')+' — Stato: '+cant.stato+(cant.stato==='Chiuso'?' — REPORT FINALE':'')):'Report Materiali — Vista globale (tutti i cantieri)')+' — generato il '+new Date().toLocaleDateString('it-IT')+'</div>');
   w.document.write('<h3>Previsto / Effettivo per materiale</h3><table><thead><tr><th>Materiale</th><th>Previsto</th><th>Effettivo</th><th>Scostamento</th><th>Costo</th></tr></thead><tbody>'+(righeMat||'<tr><td colspan="5" style="color:#888">Nessun dato</td></tr>')+'<tr class="tot"><td colspan="4">Totale costo materiali</td><td>€ '+totCosto.toFixed(2)+'</td></tr></tbody></table>');
   w.document.write('<h3>Costo per squadra</h3><table><thead><tr><th>Squadra</th><th>Costo</th></tr></thead><tbody>'+(righeSq||'<tr><td colspan="2" style="color:#888">Nessun dato</td></tr>')+'</tbody></table>');
@@ -3117,6 +3240,7 @@ window.addEventListener('load',async()=>{
   }
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
+  updateDashAziendaLine();
   loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();
   renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();
   renderAttrezzature();
