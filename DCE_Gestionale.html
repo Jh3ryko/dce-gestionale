@@ -156,7 +156,7 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="co-name">DCE</div>
-    <div class="co-sub">Carpenteria Metallica S.r.l.</div>
+    <div class="co-sub">S.r.l.</div>
   </div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">Navigazione</div>
@@ -1086,7 +1086,7 @@
         <div id="assegnazioni-lista"><div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div></div>
         <div class="form-grid cols-3" style="margin-top:16px">
           <div class="form-group"><label>Mezzo</label><select id="ass-targa"><option value="">— seleziona mezzo —</option></select></div>
-          <div class="form-group"><label>Assegnato a</label><input type="text" id="ass-nome"></div>
+          <div class="form-group"><label>Assegnato a</label><select id="ass-nome"><option value="Parco DCE">🅿️ Parco DCE</option></select></div>
           <div class="form-group"><label>Tipo utilizzo</label><select id="ass-tipo"><option>In dotazione fissa</option><option>Uso temporaneo</option><option>Uso condiviso</option><option>Restituzione</option></select></div>
           <div class="form-group"><label>Data inizio</label><input type="date" id="ass-inizio"></div>
           <div class="form-group"><label>Data fine</label><input type="date" id="ass-fine"></div>
@@ -1538,6 +1538,7 @@ function updateSaldSelect(){
   if(sel)sel.innerHTML=opts;
   if(dotSel){const cur=dotSel.value;dotSel.innerHTML=opts;if(cur)dotSel.value=cur;}
   if(filt)filt.innerHTML='<option value="">Tutti i saldatori</option>'+saldatoriDB.map(s=>'<option>'+s.nome+'</option>').join('');
+  if(typeof updateMezzoTargaSelects==='function')updateMezzoTargaSelects();
 }
 
 // --- DOTAZIONE DPI/ATTREZZATURE SALDATORI ---
@@ -1808,6 +1809,7 @@ function updateSqSelect(){
     el.innerHTML=def+squadreDB.map(s=>'<option>'+s.nome+'</option>').join('');
   });
   if(typeof updateMaterialeSelects==='function')updateMaterialeSelects();
+  if(typeof updateMezzoTargaSelects==='function')updateMezzoTargaSelects();
 }
 
 // --- CONSUMI SQUADRE ---
@@ -2115,9 +2117,11 @@ function renderMezzi(){
     const scadenze=m.noleggio?[]:[scadenzaTag(m.assic,'Assicurazione'),scadenzaTag(m.bollo,'Bollo'),scadenzaTag(m.revisione,'Revisione'),scadenzaTag(m.inail,'INAIL'),scadenzaTag(m.tagliando,'Tagliando'),scadenzaTag(m.estintore,'Estintore'),scadenzaTag(m.altraScad,'Altra scad.')].filter(Boolean);
     const scadenzeHtml=scadenze.join(' ');
     const intM=interventiDB.filter(i=>i.targa===m.targa),aperti=intM.filter(i=>i.stato==='Aperto'||i.stato==='In corso').length;
+    const assAttiva=(assegnazioniDB||[]).filter(a=>a.targa===m.targa&&a.stato==='attiva').sort((x,y)=>(y.inizio||'').localeCompare(x.inizio||''))[0];
+    const assegnatarioBadge=assAttiva?('<span class="tag tag-blue">👤 '+assAttiva.nome+(assAttiva.fine?' (fino al '+new Date(assAttiva.fine).toLocaleDateString('it-IT')+')':'')+'</span>'):'<span class="tag tag-gray">🅿️ Parco DCE</span>';
     const kmM=kmLogDB.filter(k=>k.targa===m.targa).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
     const kmInfo=[m.assicImporto?'Premio: € '+m.assicImporto+(m.assicFreq?' ('+m.assicFreq+')':''):'',m.tagUltimoData?'Ultimo tagliando: '+new Date(m.tagUltimoData).toLocaleDateString('it-IT')+(m.tagUltimoKm?' a '+Number(m.tagUltimoKm).toLocaleString('it-IT')+' km':''):'',m.tagProssimoKm?'Prossimo previsto a '+Number(m.tagProssimoKm).toLocaleString('it-IT')+' km':''].filter(Boolean).join(' &nbsp;|&nbsp; ');
-    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+(m.assegnatario?'<span class="tag tag-blue">👤 '+m.assegnatario+'</span>':'')+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+assegnatarioBadge+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
   }).join('');
   updateMezzoTargaSelects();
 }
@@ -2194,6 +2198,15 @@ function deleteIntervento(id){if(!confirm('Eliminare questo intervento?'))return
 function updateMezzoTargaSelects(){
   const opts='<option value="">— seleziona mezzo —</option>'+mezziDB.map(m=>'<option value="'+m.targa+'">'+m.targa+(m.modello?' — '+m.modello:'')+'</option>').join('');
   ['int-targa','ass-targa'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;}});
+  const assNomeSel=document.getElementById('ass-nome');
+  if(assNomeSel){
+    const cur=assNomeSel.value;
+    let opts2='<option value="Parco DCE">🅿️ Parco DCE</option>';
+    if(saldatoriDB.length){opts2+='<optgroup label="Saldatori">'+saldatoriDB.map(s=>'<option value="'+s.nome+'">'+s.nome+'</option>').join('')+'</optgroup>';}
+    if(squadreDB.length){opts2+='<optgroup label="Squadre">'+squadreDB.map(s=>'<option value="'+s.nome+'">'+s.nome+(s.capo?' (c.p. '+s.capo+')':'')+'</option>').join('')+'</optgroup>';}
+    assNomeSel.innerHTML=opts2;
+    if(cur)assNomeSel.value=cur;
+  }
 }
 
 function renderInterventi(){
