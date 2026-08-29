@@ -148,6 +148,11 @@
     <div id="login-error" style="color:var(--red);font-size:12px;margin-bottom:12px;min-height:16px"></div>
     <button class="btn btn-primary" style="width:100%;padding:10px" onclick="doLogin()">Accedi</button>
     <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--text3)">Accesso riservato al personale autorizzato</div>
+    <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.6">
+      Kymera Software Solutions<br>
+      <span style="color:var(--text3)">by Danilo Iacovone</span><br>
+      <span style="opacity:0.7">© 2026 — Tutti i diritti riservati</span>
+    </div>
   </div>
 </div>
 
@@ -178,8 +183,14 @@
     <button class="nav-item" id="nav-mezzi" onclick="showModule('mezzi')"><span class="nav-dot" id="nav-dot-mezzi" style="background:#4a7eb5"></span>Automezzi e Muletti<span class="nav-badge tag-blue">attivo</span></button>
     <button class="nav-item" onclick="showModule('attrezzature')"><span class="nav-dot" style="background:#7a68b5"></span>Attrezzature<span class="nav-badge tag-purple">attivo</span></button>
     <button class="nav-item" id="nav-fornitori" style="display:none" onclick="showModule('fornitori')"><span class="nav-dot" style="background:#d4883a"></span>Fornitori<span class="nav-badge tag-orange">🔒</span></button>
+    <button class="nav-item" onclick="showModule('info')"><span class="nav-dot" style="background:#6b7280"></span>Info & Guida</button>
   </div>
   <div class="sidebar-footer">Danilo Iacovone<br>Resp. Magazzino e Logistica</div>
+  <div style="padding:10px 16px 14px;text-align:center;font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border)">
+    Kymera Software Solutions<br>
+    <span style="opacity:0.8">by Danilo Iacovone</span><br>
+    <span style="opacity:0.6">© 2026 — Tutti i diritti riservati</span>
+  </div>
 </aside>
 
 <main class="main">
@@ -1302,6 +1313,63 @@
         <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addAcquisto()">Registra acquisto</button></div>
       </div>
     </div>
+
+    <!-- INFO & GUIDA -->
+    <div class="module" id="mod-info">
+      <div class="section-header"><h1>ℹ️ Info & Guida</h1><p>Cosa fa il gestionale, modulo per modulo. Aggiornata a ogni nuova funzione.</p></div>
+
+      <div class="form-card">
+        <div class="form-card-title">📊 Dashboard</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Panoramica generale: intestazione azienda (dinamica, letta da Fase 0), stato di avanzamento di tutte le fasi del progetto con barre di completamento.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">📄 Project Charter + Fasi 0-6</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Documentazione strutturata del progetto di riorganizzazione magazzino: obiettivi, scope, budget (Charter); fotografia iniziale azienda con dati ATECO (Fase 0); riorganizzazione fisica (Fase 1); <b>Reparto Operativo</b> — saldatori, squadre, consumo dischi, dotazione DPI/attrezzature (Fase 2); <b>Flusso materiali e magazzino</b> — vedi sezione dedicata sotto (Fase 3); sicurezza (Fase 4); digitalizzazione (Fase 5); personale e procedure (Fase 6). Ogni fase ha una barra di completamento e salvataggio locale + cloud.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🏗️ Fase 3 — Il cuore del Magazzino</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">
+        <b>Catalogo Materiali:</b> anagrafica materiali di consumo (nome, categoria, unità di misura, prezzo, sconto, fornitore collegato, giacenza e scorta minima con alert automatico).<br><br>
+        <b>Cantieri:</b> apertura/chiusura commesse con date, squadra assegnata, stato. Possibilità di impostare un obiettivo "quantità prevista" per cantiere+materiale.<br><br>
+        <b>Consegne:</b> registrazione rapida di ogni consegna materiale a una squadra su un cantiere — si somma automaticamente al totale, scarica la giacenza in automatico. Storico raggruppato per cantiere+materiale con dettaglio a scomparsa.<br><br>
+        <b>Report:</b> previsto vs effettivo per materiale, costo per squadra, materiali sotto scorta, top scostamenti. Report stampabile per consegna a fine cantiere.
+        </p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🚛 Automezzi e Muletti</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Registro mezzi con scadenze (assicurazione con importo/frequenza rinnovo, bollo, revisione, INAIL, tagliando con km, estintore) e alert automatici entro 30 giorni. Flag "a noleggio" per escludere scadenze gestite dal noleggiatore. Storico km. Storico interventi/danni (modificabile). <b>Assegnazioni</b>: mezzo → persona (saldatore, squadra o Parco DCE) con data fine — alla scadenza scatta un alert con scelta diretta tra <b>Rientro</b> al Parco DCE o <b>Proroga</b> con nuova data. Modulo di assegnazione stampabile con firma.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🔧 Attrezzature</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Censimento utensili con stato, posizione, dotazione. Storico manutenzioni per numero seriale. Stampa registro.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">📦 Fornitori</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Anagrafica fornitori con <b>categorie merceologiche multiple</b> (un fornitore può coprire più categorie), referente, condizioni di pagamento. Registro acquisti collegato. Accesso riservato ad admin o utenti autorizzati dall'admin (pannello permessi dedicato).</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🔔 Centro Alert</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Raccoglie in un unico posto tutte le scadenze e criticità: mezzi in scadenza, materiali sotto scorta, assegnazioni mezzi scadute. Icona campanella in alto con contatore; nel menù laterale un triangolo ⚠ sostituisce il pallino sulle sezioni con alert attivi. Ogni alert può essere ignorato o ti porta direttamente alla sezione interessata.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🔐 Accesso e sicurezza</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Login con email/password, ruoli (admin/operatore/viewer), "Ricordami su questo dispositivo" con rinnovo automatico della sessione. Occhio 👁️ per mostrare/nascondere la password in fase di digitazione. Log di controllo (solo admin) per tracciare chi ha fatto cosa.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">📲 Altre funzionalità</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Installabile come app su desktop/telefono (icona propria, si apre senza barra del browser). Backup completo dei dati in un click. Tutti i registri con funzione di stampa dedicata (moduli di consegna/assegnazione con firma inclusa).</p>
+      </div>
+
+      <div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">Ultimo aggiornamento di questa pagina: da tenere sincronizzata a ogni nuova funzione aggiunta.</div>
+    </div>
   </div>
 </main>
 </div>
@@ -1333,8 +1401,8 @@
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg">Salvato</span></div>
 
 <script>
-const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali e magazzino',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori'};
+const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori','info'];
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali e magazzino',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori',info:'Info & Guida'};
 
 function showModule(id) {
   if(id==='fornitori'&&!hasFornitoriAccess()){showToast('Non hai i permessi per accedere ai Fornitori');return;}
