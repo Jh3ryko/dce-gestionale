@@ -154,9 +154,9 @@
 <!-- APP -->
 <div id="app" style="display:none;flex:1;width:100%;overflow:hidden">
 <aside class="sidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" style="display:flex;align-items:baseline;gap:6px">
     <div class="co-name">DCE</div>
-    <div class="co-sub">S.r.l.</div>
+    <div class="co-sub" style="margin-top:0">S.r.l.</div>
   </div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">Navigazione</div>
@@ -184,7 +184,7 @@
 
 <main class="main">
   <div class="topbar">
-    <div class="topbar-breadcrumb" id="breadcrumb"><span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">Dashboard</span></div>
+    <div class="topbar-breadcrumb" id="breadcrumb"><span style="color:#c9ccd1;font-weight:700">DCE Gestionale</span><span>›</span><span style="color:var(--text)">Dashboard</span></div>
     <div class="topbar-actions">
       <span id="topbar-user" style="font-size:12px;color:var(--text3)"></span>
       <button class="btn btn-ghost" id="btn-install-app" onclick="installApp()" style="display:none">📲 Installa</button>
@@ -1342,7 +1342,7 @@ function showModule(id) {
   document.getElementById('mod-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(btn=>{if(btn.getAttribute('onclick')&&btn.getAttribute('onclick').includes("'"+id+"'"))btn.classList.add('active');});
-  document.getElementById('breadcrumb').innerHTML='<span>DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
+  document.getElementById('breadcrumb').innerHTML='<span style="color:#c9ccd1;font-weight:700">DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
   if(id==='fase2'){updateMaterialeSelects();}
@@ -2136,7 +2136,7 @@ function renderMezzi(){
     const scadenzeHtml=scadenze.join(' ');
     const intM=interventiDB.filter(i=>i.targa===m.targa),aperti=intM.filter(i=>i.stato==='Aperto'||i.stato==='In corso').length;
     const assAttiva=(assegnazioniDB||[]).filter(a=>a.targa===m.targa&&a.stato==='attiva').sort((x,y)=>(y.inizio||'').localeCompare(x.inizio||''))[0];
-    const assegnatarioBadge=assAttiva?('<span class="tag tag-blue">👤 '+assAttiva.nome+(assAttiva.fine?' (fino al '+new Date(assAttiva.fine).toLocaleDateString('it-IT')+')':'')+'</span>'):'<span class="tag tag-gray">🅿️ Parco DCE</span>';
+    const assegnatarioBadge=assAttiva?('<span class="tag tag-blue">👤 '+assAttiva.nome+(assAttiva.fine?' (fino al '+new Date(assAttiva.fine).toLocaleDateString('it-IT')+')':'')+'</span>'):(m.assegnatario&&m.assegnatario!=='Parco DCE'?('<span class="tag tag-blue">👤 '+m.assegnatario+'</span>'):'<span class="tag tag-gray">🅿️ Parco DCE</span>');
     const kmM=kmLogDB.filter(k=>k.targa===m.targa).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
     const kmInfo=[m.assicImporto?'Premio: € '+m.assicImporto+(m.assicFreq?' ('+m.assicFreq+')':''):'',m.tagUltimoData?'Ultimo tagliando: '+new Date(m.tagUltimoData).toLocaleDateString('it-IT')+(m.tagUltimoKm?' a '+Number(m.tagUltimoKm).toLocaleString('it-IT')+' km':''):'',m.tagProssimoKm?'Prossimo previsto a '+Number(m.tagProssimoKm).toLocaleString('it-IT')+' km':''].filter(Boolean).join(' &nbsp;|&nbsp; ');
     return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+assegnatarioBadge+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
