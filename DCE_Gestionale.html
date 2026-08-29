@@ -472,7 +472,7 @@
             </div>
             <div class="form-group">
               <label>DPI / Attrezzatura</label>
-              <input type="text" id="dotsald-attr" placeholder="es. Maschera saldatura, guanti, tuta ignifuga">
+              <select id="dotsald-attr" onchange="if(this.value==='__nuovo__')apriArticoloModal('Attrezzi','dotsald-attr')"></select>
             </div>
             <div class="form-group">
               <label>N. Seriale / Inventario</label>
@@ -675,7 +675,7 @@
             </div>
             <div class="form-group">
               <label>Attrezzatura</label>
-              <input type="text" id="dot-sq-attr" placeholder="es. Flessibile Bosch GWS 22">
+              <select id="dot-sq-attr" onchange="if(this.value==='__nuovo__')apriArticoloModal('Attrezzi','dot-sq-attr')"></select>
             </div>
             <div class="form-group">
               <label>N. Seriale / Inventario</label>
@@ -777,12 +777,8 @@
           <div class="form-grid cols-3">
             <div class="form-group">
               <label>Materiale (rapido)</label>
-              <select id="mat-preset" onchange="if(this.value)document.getElementById('mat-nome').value=this.value">
+              <select id="mat-preset" onchange="if(this.value==='__nuovo__'){apriArticoloModal('Beni di consumo','mat-preset','mat-nome');}else if(this.value)document.getElementById('mat-nome').value=this.value">
                 <option value="">— scegli o scrivi sotto —</option>
-                <option>Disco Lamellare (L)</option><option>Disco Piano/Sbavatura (P)</option><option>Disco da Taglio (T)</option>
-                <option>Silicone / Sigillante</option><option>Bulloneria (viti/bulloni)</option><option>Bulloneria (dadi/rondelle)</option>
-                <option>Filo/Elettrodo saldatura</option><option>Gas saldatura</option><option>Vernice / Primer</option>
-                <option>Nastro / Guaina</option><option>Guanti / DPI monouso</option>
               </select>
             </div>
             <div class="form-group"><label>Nome materiale *</label><input type="text" id="mat-nome" placeholder="es. Silicone / Sigillante"></div>
@@ -1329,6 +1325,11 @@
       </div>
 
       <div class="form-card">
+        <div class="form-card-title">🗂️ Catalogo Articoli condiviso</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Anagrafica unica di oggetti divisa in tre categorie — <b>Attrezzi</b> (trapani, avvitatori, laser, martelli, metri...), <b>Attrezzatura</b> (caschetti, imbragature, aspirapolveri...), <b>Beni di consumo</b> (dischi, silicone, chimico bicomponente, punte...). Alimenta le tendine di Materiali (Fase 3) e delle Dotazioni Squadre/Saldatori (Fase 2). Opzione <b>"+ Nuovo articolo..."</b> in ogni tendina collegata: scegli categoria e nome, si registra una volta sola e resta disponibile ovunque da quel momento in poi. Il modulo Attrezzature ha il suo menu esteso dedicato; se scegli "Altro" con un nome nuovo, entra automaticamente anche nel catalogo condiviso.</p>
+      </div>
+
+      <div class="form-card">
         <div class="form-card-title">🏗️ Fase 3 — Il cuore del Magazzino</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7">
         <b>Catalogo Materiali:</b> anagrafica materiali di consumo (nome, categoria, unità di misura, prezzo, sconto, fornitore collegato, giacenza e scorta minima con alert automatico).<br><br>
@@ -1374,6 +1375,29 @@
 </main>
 </div>
 
+<!-- NUOVO ARTICOLO MODAL -->
+<div id="articolo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:420px;padding:20px">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">+ Nuovo articolo</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Categoria</label>
+      <select id="art-nuovo-categoria">
+        <option value="Attrezzi">Attrezzi</option>
+        <option value="Attrezzatura">Attrezzatura</option>
+        <option value="Beni di consumo">Beni di consumo</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Nome oggetto</label>
+      <input type="text" id="art-nuovo-nome" placeholder="es. Trapano a percussione">
+    </div>
+    <div class="actions-bar" style="border:none;padding:0;margin:0">
+      <button class="btn btn-primary" onclick="confermaNuovoArticolo()">Registra articolo</button>
+      <button class="btn btn-ghost" onclick="chiudiArticoloModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
 <!-- ALERT CENTER MODAL -->
 <div id="alert-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:700px;max-height:80vh;display:flex;flex-direction:column">
@@ -1413,8 +1437,8 @@ function showModule(id) {
   document.getElementById('breadcrumb').innerHTML='<span style="color:#c9ccd1;font-weight:700">DCE Gestionale</span><span>›</span><span style="color:var(--text)">'+BREADCRUMBS[id]+'</span>';
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
-  if(id==='fase2'){updateMaterialeSelects();}
-  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();}
+  if(id==='fase2'){updateMaterialeSelects();refreshArticoliSelects();}
+  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();}
 }
 
 function toggleCheck(id) {
@@ -2633,8 +2657,9 @@ async function loadAllFromCloud(){
     if(fornDati){fornitoriDB=fornDati.fornitori||[];acquistiDB=fornDati.acquisti||[];saveFornitoriDB();}
     applyFornitoriVisibility();
     const matDati=await loadFromCloud('materiali-registro');
-    if(matDati){materialiDB=matDati.materiali||[];cantieriDB=matDati.cantieri||[];previstoDB=matDati.previsto||[];consegneDB=matDati.consegne||[];saveMaterialiDB();}
-    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();updateDashboardStats();},100);
+    if(matDati){materialiDB=matDati.materiali||[];cantieriDB=matDati.cantieri||[];previstoDB=matDati.previsto||[];consegneDB=matDati.consegne||[];if(matDati.articoli&&matDati.articoli.length)articoliDB=matDati.articoli;saveMaterialiDB();saveArticoliDB();}
+    seedArticoliIniziali();
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();updateDashboardStats();},100);
   }catch(e){console.warn(e);}
 }
 
@@ -2658,6 +2683,8 @@ function getTipo(){const s=document.getElementById('at-tipo').value,c=document.g
 function getMarca(){const s=document.getElementById('at-marca').value,c=document.getElementById('at-marca-custom').value.trim();return(s==='Altra marca'&&c)?c:s;}
 function addAttrezzo(){
   const tipo=getTipo();if(!tipo){showToast('Seleziona almeno il tipo');return;}
+  const isCustom=document.getElementById('at-tipo').value==='Altro (specifica nelle note)'&&document.getElementById('at-tipo-custom').value.trim();
+  if(isCustom)registraArticolo('Attrezzi',tipo);
   let seriale=document.getElementById('at-seriale').value.trim();if(!seriale)seriale='ATT-'+Date.now().toString().slice(-5);
   const d={id:editingAttrId||Date.now(),tipo,marca:getMarca(),modello:document.getElementById('at-modello').value.trim(),seriale,
     alim:document.getElementById('at-alim').value,anno:document.getElementById('at-anno').value,prop:document.getElementById('at-prop').value,
@@ -2870,6 +2897,89 @@ async function saveFornitoriPermessi(){
   applyFornitoriVisibility();
 }
 // ============ END FORNITORI ============
+
+// ============ CATALOGO ARTICOLI CONDIVISO ============
+let articoliDB=[];
+let articoloModalContext={targetSelectId:null,extraTargetId:null};
+
+function seedArticoliIniziali(){
+  if(articoliDB.length)return;
+  const seed=[
+    ['Attrezzi','Trapano a percussione'],['Attrezzi','Trapano combinato (tassellatore)'],['Attrezzi','Trapano a colonna'],
+    ['Attrezzi','Avvitatore a batteria'],['Attrezzi','Avvitatore a impulsi'],['Attrezzi','Livella laser'],['Attrezzi','Laser di misura (distanziometro)'],
+    ['Attrezzi','Valigetta multiuso'],['Attrezzi','Martello'],['Attrezzi','Metro 5mt'],['Attrezzi','Metro 10mt'],
+    ['Attrezzatura','Caschetto da cantiere'],['Attrezzatura','Imbragatura'],['Attrezzatura','Aspirapolvere'],
+    ['Beni di consumo','Disco Lamellare (L)'],['Beni di consumo','Disco Piano/Sbavatura (P)'],['Beni di consumo','Disco da Taglio (T)'],
+    ['Beni di consumo','Silicone / Sigillante'],['Beni di consumo','Chimico bicomponente'],
+    ['Beni di consumo','Punta trapano'],['Beni di consumo','Punta trapano a colonna'],
+    ['Beni di consumo','Bulloneria (viti/bulloni)'],['Beni di consumo','Bulloneria (dadi/rondelle)'],
+    ['Beni di consumo','Filo/Elettrodo saldatura'],['Beni di consumo','Gas saldatura'],['Beni di consumo','Vernice / Primer'],
+    ['Beni di consumo','Nastro / Guaina'],['Beni di consumo','Guanti / DPI monouso']
+  ];
+  seed.forEach(([categoria,nome])=>articoliDB.push({id:Date.now()+Math.floor(Math.random()*100000),categoria,nome}));
+  saveArticoliDB();
+}
+function saveArticoliDB(){try{localStorage.setItem('dce-articoli',JSON.stringify(articoliDB));}catch(e){}}
+function loadArticoliDB(){try{articoliDB=JSON.parse(localStorage.getItem('dce-articoli')||'[]');}catch(e){articoliDB=[];}}
+
+function registraArticolo(categoria,nome){
+  nome=nome.trim();if(!nome)return null;
+  const esiste=articoliDB.find(a=>a.nome.toLowerCase()===nome.toLowerCase()&&a.categoria===categoria);
+  if(esiste)return esiste.nome;
+  articoliDB.push({id:Date.now(),categoria,nome});
+  saveArticoliDB();refreshArticoliSelects();
+  return nome;
+}
+
+function apriArticoloModal(categoriaDefault,targetSelectId,extraTargetId){
+  articoloModalContext={targetSelectId,extraTargetId};
+  document.getElementById('art-nuovo-categoria').value=categoriaDefault||'Attrezzi';
+  document.getElementById('art-nuovo-nome').value='';
+  document.getElementById('articolo-modal').style.display='flex';
+  document.getElementById('art-nuovo-nome').focus();
+}
+function chiudiArticoloModal(){
+  document.getElementById('articolo-modal').style.display='none';
+  const sel=document.getElementById(articoloModalContext.targetSelectId);
+  if(sel&&sel.value==='__nuovo__')sel.value='';
+}
+function confermaNuovoArticolo(){
+  const categoria=document.getElementById('art-nuovo-categoria').value;
+  const nome=document.getElementById('art-nuovo-nome').value.trim();
+  if(!nome){showToast('Inserisci il nome dell\'oggetto');return;}
+  registraArticolo(categoria,nome);
+  const {targetSelectId,extraTargetId}=articoloModalContext;
+  const sel=document.getElementById(targetSelectId);
+  if(sel){sel.value=nome;}
+  if(extraTargetId){const ex=document.getElementById(extraTargetId);if(ex)ex.value=nome;}
+  document.getElementById('articolo-modal').style.display='none';
+  showToast('Articolo registrato ✓ — disponibile ovunque da ora');
+}
+
+function refreshArticoliSelects(){
+  const buildOpts=(categorie,placeholder)=>{
+    let o='<option value="">'+placeholder+'</option>';
+    categorie.forEach(cat=>{
+      const items=articoliDB.filter(a=>a.categoria===cat);
+      if(items.length)o+='<optgroup label="'+cat+'">'+items.map(a=>'<option>'+a.nome+'</option>').join('')+'</optgroup>';
+    });
+    o+='<option value="__nuovo__">+ Nuovo articolo...</option>';
+    return o;
+  };
+  const matSel=document.getElementById('mat-preset');
+  if(matSel){matSel.innerHTML=buildOpts(['Beni di consumo'],'— scegli o scrivi sotto —');}
+  ['dot-sq-attr','dotsald-attr'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML=buildOpts(['Attrezzi','Attrezzatura'],'— seleziona attrezzo/DPI —');
+    if(cur&&cur!=='__nuovo__'){
+      const exists=[...sel.options].some(o=>o.value===cur);
+      if(!exists){const opt=document.createElement('option');opt.value=cur;opt.textContent=cur+' (non a catalogo)';sel.appendChild(opt);}
+      sel.value=cur;
+    }
+  });
+}
+// ============ END CATALOGO ARTICOLI ============
 
 // ============ MATERIALI (Catalogo + Cantieri + Consegne + Report) ============
 let materialiDB=[], cantieriDB=[], previstoDB=[], consegneDB=[];
@@ -3262,9 +3372,9 @@ function renderReportMateriali(){
 }
 
 async function saveMateriali(){
-  saveMaterialiDB();
+  saveMaterialiDB();saveArticoliDB();
   if(typeof saveToCloud==='function'&&currentUser){
-    const ok=await saveToCloud('materiali-registro',{materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB});
+    const ok=await saveToCloud('materiali-registro',{materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB});
     showToast(ok?'Materiali salvati ✓ (locale + cloud)':'Materiali salvati solo in locale');
   }else{showToast('Materiali salvati (solo locale)');}
 }
@@ -3349,13 +3459,13 @@ window.addEventListener('load',async()=>{
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
   updateDashAziendaLine();
-  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();
+  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();loadArticoliDB();seedArticoliIniziali();
   renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();
   renderAttrezzature();
   renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
   renderConsumiOfficina();renderConsumiSquadre();
   renderFornitori();updateAcquistoFornitoreSelect();applyFornitoriVisibility();
-  renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();
+  renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();
   updateDashboardStats();
 });
 
