@@ -118,6 +118,7 @@
   .actions-bar { display:flex; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
   #app { display:none; flex:1; overflow:hidden; }
   @media print { .sidebar,.topbar,.btn,.actions-bar,.toast,#login-screen { display:none !important; } .main { overflow:visible; } .module { display:block !important; } body { height:auto; overflow:visible; } }
+  @keyframes ticker-scroll { 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
 </style>
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -716,7 +717,50 @@
 
     <!-- FASE 3 — FLUSSO MATERIALI -->
     <div class="module" id="mod-fase3">
-      <div class="section-header"><h1>Fase 3 — Flusso materiali e magazzino</h1><p>Ricezione, movimentazione, spedizioni, catalogo materiali, cantieri e consumi — il magazzino come punto focale della fase.</p></div>
+      <div class="section-header"><h1>Fase 3 — Flusso materiali e magazzino</h1><p>Il Magazzino: centro di comando dinamico. Gestione: catalogo, cantieri, consegne, report.</p></div>
+
+      <!-- TAB ESTERNA -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
+        <button id="tab-f3-outer-magazzino" onclick="switchF3OuterTab('magazzino')" style="flex:1;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:var(--accent);color:#fff;font-family:var(--font)">🏭 Il Magazzino</button>
+        <button id="tab-f3-outer-gestione" onclick="switchF3OuterTab('gestione')" style="flex:1;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:var(--text2);font-family:var(--font)">⚙️ Gestione</button>
+      </div>
+
+      <!-- ============ IL MAGAZZINO (centro di comando) ============ -->
+      <div id="f3-outer-magazzino">
+
+        <!-- PANNELLO 1: QUADRO GENERALE -->
+        <div class="form-card">
+          <div class="form-card-title">📡 Quadro generale</div>
+          <div id="mag-quadro-generale" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
+        </div>
+
+        <!-- PANNELLO 2: RICERCA + AGENDA + DETTAGLIO -->
+        <div class="form-card">
+          <div class="form-card-title">🔎 Il Magazzino — ricerca e agenda</div>
+          <div style="display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;align-items:start" id="mag-tre-colonne">
+            <!-- COLONNA SINISTRA: ricerca -->
+            <div>
+              <input type="text" id="mag-search" placeholder="🔍 Cerca attrezzo, attrezzatura, materiale..." oninput="ricercaMagazzino()" style="width:100%;box-sizing:border-box;margin-bottom:10px">
+              <div id="mag-search-risultati" style="max-height:420px;overflow-y:auto"></div>
+            </div>
+            <!-- COLONNA CENTRALE: data + agenda -->
+            <div>
+              <div id="mag-data-corrente" style="text-align:center;padding:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px"></div>
+              <div id="mag-agenda-settimana" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px"></div>
+              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap">
+                <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
+              </div>
+            </div>
+            <!-- COLONNA DESTRA: dettaglio -->
+            <div id="mag-dettaglio" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;min-height:300px">
+              <div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ GESTIONE (contenuto esistente) ============ -->
+      <div id="f3-outer-gestione" style="display:none">
 
       <!-- TAB NAVIGATION -->
       <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border);flex-wrap:wrap">
@@ -897,6 +941,7 @@
         </div>
 
       </div>
+      </div><!-- /f3-outer-gestione -->
     </div>
 
     <!-- FASE 4 — SICUREZZA -->
@@ -1214,6 +1259,11 @@
           <div class="form-group"><label>In dotazione a</label><input type="text" id="at-dotazione" placeholder="es. Mario Rossi / uso comune"></div>
           <div class="form-group"><label>Data dotazione</label><input type="date" id="at-data-dot"></div>
           <div class="form-group span-2"><label>Note</label><textarea id="at-note" placeholder="Condizioni, accessori, anomalie..." style="min-height:60px"></textarea></div>
+          <div class="form-group span-3">
+            <label>Foto (opzionale)</label>
+            <input type="file" id="at-foto" accept="image/*" onchange="caricaFotoAttrezzo(event)">
+            <div id="at-foto-preview" style="margin-top:8px"></div>
+          </div>
         </div>
         <div class="actions-bar" style="border:none;padding:12px 0 0;margin:0">
           <button class="btn btn-primary" id="btn-salva-attr" onclick="addAttrezzo()">Aggiungi attrezzatura</button>
@@ -1375,6 +1425,29 @@
 </main>
 </div>
 
+<!-- AGENDA MODAL -->
+<div id="agenda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:380px;padding:20px">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">Nuova voce agenda</div>
+    <input type="hidden" id="agenda-modal-data">
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Tipo</label>
+      <select id="agenda-modal-tipo">
+        <option value="nota">📝 Nota</option>
+        <option value="promemoria">📌 Promemoria</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Testo</label>
+      <textarea id="agenda-modal-testo" style="min-height:70px" placeholder="es. Ordinare dischi lamellari"></textarea>
+    </div>
+    <div class="actions-bar" style="border:none;padding:0;margin:0">
+      <button class="btn btn-primary" onclick="confermaVoceAgenda()">Aggiungi</button>
+      <button class="btn btn-ghost" onclick="chiudiAgendaModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
 <!-- NUOVO ARTICOLO MODAL -->
 <div id="articolo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:420px;padding:20px">
@@ -1438,7 +1511,7 @@ function showModule(id) {
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
   if(id==='fase2'){updateMaterialeSelects();refreshArticoliSelects();}
-  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();}
+  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderMagazzino();}
 }
 
 function toggleCheck(id) {
@@ -2681,6 +2754,25 @@ function saveAttrDB(){try{localStorage.setItem('dce-attrezzature',JSON.stringify
 function loadAttrDB(){try{attrezzatureDB=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');manutenzioniDB=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){attrezzatureDB=[];manutenzioniDB=[];}}
 function getTipo(){const s=document.getElementById('at-tipo').value,c=document.getElementById('at-tipo-custom').value.trim();return(s==='Altro (specifica nelle note)'&&c)?c:s;}
 function getMarca(){const s=document.getElementById('at-marca').value,c=document.getElementById('at-marca-custom').value.trim();return(s==='Altra marca'&&c)?c:s;}
+let attrFotoTemp=null;
+function caricaFotoAttrezzo(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const maxW=320;const scale=Math.min(1,maxW/img.width);
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width*scale;canvas.height=img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      attrFotoTemp=canvas.toDataURL('image/jpeg',0.7);
+      document.getElementById('at-foto-preview').innerHTML='<img src="'+attrFotoTemp+'" style="max-width:120px;border-radius:6px;border:1px solid var(--border2)">';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function addAttrezzo(){
   const tipo=getTipo();if(!tipo){showToast('Seleziona almeno il tipo');return;}
   const isCustom=document.getElementById('at-tipo').value==='Altro (specifica nelle note)'&&document.getElementById('at-tipo-custom').value.trim();
@@ -2690,7 +2782,8 @@ function addAttrezzo(){
     alim:document.getElementById('at-alim').value,anno:document.getElementById('at-anno').value,prop:document.getElementById('at-prop').value,
     stato:document.getElementById('at-stato').value,posizione:document.getElementById('at-posizione').value,
     codpos:document.getElementById('at-codpos').value.trim(),dotazione:document.getElementById('at-dotazione').value.trim(),
-    dataDot:document.getElementById('at-data-dot').value,note:document.getElementById('at-note').value};
+    dataDot:document.getElementById('at-data-dot').value,note:document.getElementById('at-note').value,
+    foto:attrFotoTemp||(editingAttrId?(attrezzatureDB.find(a=>a.id===editingAttrId)||{}).foto:null)||null};
   if(editingAttrId){const i=attrezzatureDB.findIndex(a=>a.id===editingAttrId);if(i!==-1){attrezzatureDB[i]=d;showToast('Aggiornata');}editingAttrId=null;document.getElementById('btn-salva-attr').textContent='Aggiungi attrezzatura';document.getElementById('attr-form-title').textContent='Aggiungi / Modifica attrezzatura';}
   else{attrezzatureDB.push(d);showToast('Aggiunta');}
   saveAttrDB();renderAttrezzature();clearAttrezzoForm();
@@ -2704,6 +2797,9 @@ function editAttrezzo(id){
   ['modello','seriale','anno','codpos','dotazione','note'].forEach(k=>{const el=document.getElementById('at-'+k);if(el)el.value=a[k]||'';});
   document.getElementById('at-alim').value=a.alim||'';document.getElementById('at-prop').value=a.prop||'Proprieta aziendale';
   document.getElementById('at-stato').value=a.stato||'';document.getElementById('at-posizione').value=a.posizione||'';document.getElementById('at-data-dot').value=a.dataDot||'';
+  attrFotoTemp=a.foto||null;
+  document.getElementById('at-foto-preview').innerHTML=a.foto?'<img src="'+a.foto+'" style="max-width:120px;border-radius:6px;border:1px solid var(--border2)">':'';
+  document.getElementById('at-foto').value='';
   document.getElementById('btn-salva-attr').textContent='Salva modifiche';document.getElementById('attr-form-title').textContent='Modifica: '+a.tipo;
   document.getElementById('attr-form-card').scrollIntoView({behavior:'smooth'});showToast('Modifica in corso');
 }
@@ -2712,6 +2808,7 @@ function clearAttrezzoForm(){
   editingAttrId=null;document.getElementById('btn-salva-attr').textContent='Aggiungi attrezzatura';document.getElementById('attr-form-title').textContent='Aggiungi / Modifica attrezzatura';
   ['at-tipo','at-tipo-custom','at-marca','at-marca-custom','at-modello','at-seriale','at-alim','at-anno','at-posizione','at-codpos','at-dotazione','at-data-dot','at-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('at-prop').value='Proprieta aziendale';document.getElementById('at-stato').value='';
+  attrFotoTemp=null;document.getElementById('at-foto-preview').innerHTML='';document.getElementById('at-foto').value='';
 }
 function attrStatoColor(s){return{'Ottimo':'tag-green','Buono':'tag-green','Usato - funzionante':'tag-orange','Da riparare':'tag-red','In riparazione':'tag-red','Fuori uso':'tag-red','Dismesso':'tag-gray'}[s]||'tag-gray';}
 function renderAttrezzature(){
@@ -2897,6 +2994,158 @@ async function saveFornitoriPermessi(){
   applyFornitoriVisibility();
 }
 // ============ END FORNITORI ============
+
+// ============ IL MAGAZZINO (centro di comando) ============
+function switchF3OuterTab(tab){
+  document.getElementById('f3-outer-magazzino').style.display=(tab==='magazzino')?'':'none';
+  document.getElementById('f3-outer-gestione').style.display=(tab==='gestione')?'':'none';
+  document.getElementById('tab-f3-outer-magazzino').style.background=(tab==='magazzino')?'var(--accent)':'transparent';
+  document.getElementById('tab-f3-outer-magazzino').style.color=(tab==='magazzino')?'#fff':'var(--text2)';
+  document.getElementById('tab-f3-outer-gestione').style.background=(tab==='gestione')?'var(--accent)':'transparent';
+  document.getElementById('tab-f3-outer-gestione').style.color=(tab==='gestione')?'#fff':'var(--text2)';
+  if(tab==='magazzino')renderMagazzino();
+}
+
+function renderMagazzino(){
+  renderQuadroGenerale();
+  renderMagazzinoData();
+  renderAgendaSettimana();
+  renderTickerPromemoria();
+  document.getElementById('mag-search').value='';
+  document.getElementById('mag-search-risultati').innerHTML='';
+  document.getElementById('mag-dettaglio').innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>';
+}
+
+// --- PANNELLO 1: QUADRO GENERALE ---
+function vaiA(modulo,tab2,subtab){
+  showModule(modulo);
+  if(modulo==='fase3'&&tab2)switchF3OuterTab(tab2);
+  if(modulo==='fase3'&&subtab)switchF3Tab(subtab);
+  if(modulo==='fase2'&&subtab)switchF2Tab(subtab);
+}
+function renderQuadroGenerale(){
+  const el=document.getElementById('mag-quadro-generale');if(!el)return;
+  const cantAperti=cantieriDB.filter(c=>c.stato==='Aperto');
+  const cantChiusi=cantieriDB.filter(c=>c.stato==='Chiuso');
+  const cardCantieri='<div onclick="vaiA(\'fase3\',\'gestione\',\'cantieri\')" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px">'+
+    '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🏗️ Cantieri</div>'+
+    (cantAperti.length?cantAperti.map(c=>'<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><b style="color:var(--text)">'+c.nome+'</b>'+(c.cliente?' — '+c.cliente:'')+'</div>').join(''):'<div style="font-size:12px;color:var(--text3)">Nessun cantiere aperto</div>')+
+    '<div style="font-size:11px;color:var(--text3);margin-top:6px">'+cantAperti.length+' aperti · '+cantChiusi.length+' chiusi</div></div>';
+
+  const cardSquadre='<div onclick="vaiA(\'fase2\',null,\'squadre\')" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px">'+
+    '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">👷 Squadre</div>'+
+    (squadreDB.length?squadreDB.map(s=>'<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><b style="color:var(--text)">'+s.nome+'</b> — c.p. '+(s.capo||'—')+(s.cantiere?' <span style="color:var(--accent)">→ '+s.cantiere+'</span>':'')+'</div>').join(''):'<div style="font-size:12px;color:var(--text3)">Nessuna squadra censita</div>')+
+    '</div>';
+
+  const cardSaldatori='<div onclick="vaiA(\'fase2\',null,\'officina\')" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px">'+
+    '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🔧 Saldatori</div>'+
+    (saldatoriDB.length?saldatoriDB.map(s=>{
+      const ultimo=consumiOfficDB.filter(c=>c.saldatore===s.nome&&c.cantiereId).sort((a,b)=>(b.data||'').localeCompare(a.data||''))[0];
+      const cant=ultimo?cantieriDB.find(c=>String(c.id)===String(ultimo.cantiereId)):null;
+      return '<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><b style="color:var(--text)">'+s.nome+'</b>'+(cant?' <span style="color:var(--accent)">→ '+cant.nome+'</span>':' <span style="color:var(--text3)">— nessuna commessa recente</span>')+'</div>';
+    }).join(''):'<div style="font-size:12px;color:var(--text3)">Nessun saldatore censito</div>')+
+    '</div>';
+
+  el.innerHTML=cardCantieri+cardSquadre+cardSaldatori;
+}
+
+// --- PANNELLO 2: RICERCA ---
+function ricercaMagazzino(){
+  const q=document.getElementById('mag-search').value.trim().toLowerCase();
+  const el=document.getElementById('mag-search-risultati');
+  if(!q){el.innerHTML='';return;}
+  const risultati=[];
+  articoliDB.forEach(a=>{if(a.nome.toLowerCase().includes(q))risultati.push({tipo:'articolo',icona:a.categoria==='Attrezzi'?'🔧':a.categoria==='Attrezzatura'?'🦺':'🧴',nome:a.nome,sotto:a.categoria,ref:a});});
+  materialiDB.forEach(m=>{if(m.nome.toLowerCase().includes(q))risultati.push({tipo:'materiale',icona:'🧴',nome:m.nome,sotto:'Materiale — giacenza: '+(m.giacenza||'0')+' '+(m.um||''),ref:m});});
+  attrezzatureDB.forEach(a=>{if((a.tipo+' '+(a.marca||'')+' '+(a.modello||'')+' '+(a.seriale||'')).toLowerCase().includes(q))risultati.push({tipo:'attrezzatura',icona:'🔧',nome:a.tipo+(a.modello?' — '+a.modello:''),sotto:'Attrezzatura — '+(a.stato||'')+' — '+(a.seriale||''),ref:a});});
+  if(!risultati.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">Nessun risultato</div>';return;}
+  el.innerHTML=risultati.slice(0,40).map((r,i)=>'<div onclick="mostraDettaglioMagazzino('+i+')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border)"><span style="font-size:16px">'+r.icona+'</span><div><div style="font-size:12px;font-weight:500;color:var(--text)">'+r.nome+'</div><div style="font-size:11px;color:var(--text3)">'+r.sotto+'</div></div></div>').join('');
+  window._magRisultati=risultati;
+}
+function mostraDettaglioMagazzino(i){
+  const r=window._magRisultati[i];if(!r)return;
+  const el=document.getElementById('mag-dettaglio');
+  let html='<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">'+r.icona+' '+r.nome+'</div>';
+  if(r.tipo==='attrezzatura'){
+    const a=r.ref;
+    if(a.foto)html+='<img src="'+a.foto+'" style="width:100%;max-width:200px;border-radius:8px;margin:10px 0;border:1px solid var(--border2)">';
+    html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Marca: '+(a.marca||'—')+'<br>Modello: '+(a.modello||'—')+'<br>Seriale: '+(a.seriale||'—')+'<br>Stato: '+(a.stato||'—')+'<br>Posizione: '+(a.posizione||'—')+'<br>Dotazione a: '+(a.dotazione||'—')+(a.note?'<br>Note: '+a.note:'')+'</div>';
+    html+='<button onclick="showModule(\'attrezzature\');editAttrezzo('+a.id+')" style="margin-top:12px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:6px 14px;border-radius:4px">Apri in Attrezzature →</button>';
+  }else if(r.tipo==='materiale'){
+    const m=r.ref;
+    html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria: '+(m.categoria||'—')+'<br>Giacenza: '+(m.giacenza||'0')+' '+(m.um||'')+'<br>Scorta minima: '+(m.scortaMin||'0')+'<br>Prezzo: '+(m.prezzo?'€ '+m.prezzo:'—')+(m.note?'<br>Note: '+m.note:'')+'</div>';
+    html+='<button onclick="showModule(\'fase3\');switchF3OuterTab(\'gestione\');switchF3Tab(\'catalogo\');editMateriale('+m.id+')" style="margin-top:12px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:6px 14px;border-radius:4px">Apri in Catalogo →</button>';
+  }else{
+    html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria catalogo: '+r.ref.categoria+'<br><span style="color:var(--text3)">Articolo generico — non ha una scheda propria, è usato come voce nelle tendine di Materiali/Dotazioni.</span></div>';
+  }
+  el.innerHTML=html;
+}
+
+// --- PANNELLO 2: DATA E AGENDA ---
+function renderMagazzinoData(){
+  const el=document.getElementById('mag-data-corrente');if(!el)return;
+  const oggi=new Date();
+  const giorni=['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+  const mesi=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  el.innerHTML='<div style="font-size:26px;font-weight:700;color:var(--accent)">'+oggi.getDate()+'</div><div style="font-size:13px;font-weight:600;color:var(--text)">'+giorni[oggi.getDay()]+'</div><div style="font-size:11px;color:var(--text3)">'+mesi[oggi.getMonth()]+' '+oggi.getFullYear()+'</div>';
+}
+
+let agendaDB=[];
+function saveAgendaDB(){try{localStorage.setItem('dce-agenda',JSON.stringify(agendaDB));}catch(e){}}
+function loadAgendaDB(){try{agendaDB=JSON.parse(localStorage.getItem('dce-agenda')||'[]');}catch(e){agendaDB=[];}}
+
+function getSettimanaCorrente(){
+  const oggi=new Date();const giorno=oggi.getDay()===0?7:oggi.getDay();
+  const lunedi=new Date(oggi);lunedi.setDate(oggi.getDate()-giorno+1);
+  const settimana=[];
+  for(let i=0;i<7;i++){const d=new Date(lunedi);d.setDate(lunedi.getDate()+i);settimana.push(d.toISOString().slice(0,10));}
+  return settimana;
+}
+function renderAgendaSettimana(){
+  const el=document.getElementById('mag-agenda-settimana');if(!el)return;
+  const giorniAbbr=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+  const settimana=getSettimanaCorrente();
+  const oggiStr=new Date().toISOString().slice(0,10);
+  el.innerHTML=settimana.map((data,i)=>{
+    const voci=agendaDB.filter(a=>a.data===data);
+    const isOggi=data===oggiStr;
+    return '<div style="background:'+(isOggi?'var(--accent-bg)':'var(--bg2)')+';border:1px solid '+(isOggi?'var(--accent-border)':'var(--border)')+';border-radius:var(--radius);padding:6px;min-height:90px;display:flex;flex-direction:column">'+
+      '<div style="font-size:10px;font-weight:600;color:'+(isOggi?'var(--accent)':'var(--text3)')+';text-align:center;margin-bottom:4px">'+giorniAbbr[i]+' '+parseInt(data.slice(8,10))+'</div>'+
+      '<div style="flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto;max-height:70px">'+
+      voci.map(v=>'<div onclick="rimuoviVoceAgenda('+v.id+')" title="Clicca per rimuovere" style="cursor:pointer;font-size:9px;padding:2px 4px;border-radius:3px;background:'+(v.tipo==='promemoria'?'rgba(212,136,58,0.25)':'rgba(255,255,255,0.08)')+';color:'+(v.tipo==='promemoria'?'var(--accent)':'var(--text2)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.testo+'</div>').join('')+
+      '</div>'+
+      '<button onclick="apriAgendaModal(\''+data+'\')" style="margin-top:4px;background:none;border:1px dashed var(--border2);color:var(--text3);cursor:pointer;font-size:11px;border-radius:3px;padding:2px">+</button>'+
+      '</div>';
+  }).join('');
+}
+function apriAgendaModal(data){
+  document.getElementById('agenda-modal-data').value=data;
+  document.getElementById('agenda-modal-testo').value='';
+  document.getElementById('agenda-modal-tipo').value='nota';
+  document.getElementById('agenda-modal').style.display='flex';
+}
+function chiudiAgendaModal(){document.getElementById('agenda-modal').style.display='none';}
+function confermaVoceAgenda(){
+  const testo=document.getElementById('agenda-modal-testo').value.trim();
+  if(!testo){showToast('Scrivi qualcosa');return;}
+  agendaDB.push({id:Date.now(),data:document.getElementById('agenda-modal-data').value,tipo:document.getElementById('agenda-modal-tipo').value,testo});
+  saveAgendaDB();renderAgendaSettimana();renderTickerPromemoria();chiudiAgendaModal();
+  showToast('Aggiunto ✓');
+}
+function rimuoviVoceAgenda(id){
+  if(!confirm('Rimuovere questa voce?'))return;
+  agendaDB=agendaDB.filter(a=>a.id!==id);
+  saveAgendaDB();renderAgendaSettimana();renderTickerPromemoria();
+}
+function renderTickerPromemoria(){
+  const el=document.getElementById('mag-ticker');if(!el)return;
+  const oggiStr=new Date().toISOString().slice(0,10);
+  const promemoria=agendaDB.filter(a=>a.tipo==='promemoria'&&a.data>=oggiStr).sort((a,b)=>a.data.localeCompare(b.data));
+  if(!promemoria.length){el.textContent='Nessun promemoria attivo';el.style.animation='none';return;}
+  el.innerHTML=promemoria.map(p=>'<span style="color:var(--accent);font-weight:600">📌 '+new Date(p.data).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})+'</span> — '+p.testo).join('&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;');
+  el.style.animation='ticker-scroll 25s linear infinite';
+}
+// ============ END IL MAGAZZINO ============
 
 // ============ CATALOGO ARTICOLI CONDIVISO ============
 let articoliDB=[];
@@ -3459,7 +3708,7 @@ window.addEventListener('load',async()=>{
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
   updateDashAziendaLine();
-  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();loadArticoliDB();seedArticoliIniziali();
+  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();loadArticoliDB();seedArticoliIniziali();loadAgendaDB();
   renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();
   renderAttrezzature();
   renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
