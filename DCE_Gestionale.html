@@ -151,7 +151,6 @@
     <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--text3)">Accesso riservato al personale autorizzato</div>
     <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.6">
       Kymera Software Solutions<br>
-      <span style="color:var(--text3)">by Danilo Iacovone</span><br>
       <span style="opacity:0.7">© 2026 — Tutti i diritti riservati</span>
     </div>
   </div>
@@ -172,9 +171,9 @@
   <div class="sidebar-section">
     <div class="sidebar-section-label">Fasi del progetto</div>
     <button class="nav-item" onclick="showModule('fase0')"><span class="nav-dot" style="background:#9a9890"></span>Fase 0 — Fotografia iniziale<span class="nav-badge tag-orange">attiva</span></button>
-    <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 1 — Magazzino<span class="nav-badge tag-orange">attiva</span></button>
+    <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" id="nav-dot-fase1" style="background:#4a9e6a"></span>Fase 1 — Il Magazzino<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Reparto Operativo<span class="nav-badge tag-orange">attiva</span></button>
-    <button class="nav-item" id="nav-fase3" onclick="showModule('fase3')"><span class="nav-dot" id="nav-dot-fase3" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-orange">attivo</span></button>
+    <button class="nav-item" id="nav-fase3" onclick="showModule('fase3')"><span class="nav-dot" style="background:#b5943a"></span>Fase 3 — Flusso materiali<span class="nav-badge tag-orange">attivo</span></button>
     <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 4 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase5')"><span class="nav-dot" style="background:#b55a4a"></span>Fase 5 — Digitalizzazione<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase6')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 6 — Personale & SOP<span class="nav-badge tag-gray">prossima</span></button>
@@ -189,7 +188,6 @@
   <div class="sidebar-footer">Danilo Iacovone<br>Resp. Magazzino e Logistica</div>
   <div style="padding:10px 16px 14px;text-align:center;font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border)">
     Kymera Software Solutions<br>
-    <span style="opacity:0.8">by Danilo Iacovone</span><br>
     <span style="opacity:0.6">© 2026 — Tutti i diritti riservati</span>
   </div>
 </aside>
@@ -221,7 +219,7 @@
       <h2>Stato fasi</h2>
       <div class="phases-grid">
         <div class="phase-card in-progress" onclick="showModule('fase0')"><div class="phase-num" style="color:var(--text3)">Fase 0</div><div class="phase-title">Fotografia iniziale</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase0" style="width:0%;background:var(--text3)"></div></div></div>
-        <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Riorganizzazione magazzino</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase1" style="width:0%;background:var(--green)"></div></div></div>
+        <div class="phase-card in-progress" onclick="showModule('fase1')"><div class="phase-num" style="color:var(--green)">Fase 1</div><div class="phase-title">Il Magazzino</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase1" style="width:0%;background:var(--green)"></div></div></div>
         <div class="phase-card in-progress" onclick="showModule('fase2')"><div class="phase-num" style="color:var(--purple)">Fase 2</div><div class="phase-title">Reparto Operativo</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase2" style="width:0%;background:var(--purple)"></div></div></div>
         <div class="phase-card" onclick="showModule('fase3')"><div class="phase-num" style="color:var(--accent)">Fase 3</div><div class="phase-title">Flusso materiali</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase3" style="width:0%;background:var(--accent)"></div></div></div>
         <div class="phase-card in-progress" onclick="showModule('fase4')"><div class="phase-num" style="color:var(--blue)">Fase 4</div><div class="phase-title">Sicurezza e conformità</div><div class="phase-bar"><div class="phase-bar-fill" id="bar-fase4" style="width:0%;background:var(--blue)"></div></div></div>
@@ -365,8 +363,207 @@
     </div>
 
     <!-- FASE 1 — MAGAZZINO -->
-    <div class="module" id="mod-fase1">
-      <div class="section-header"><h1>Fase 1 — Riorganizzazione fisica del magazzino</h1><p>Layout, sistemi di stoccaggio, classificazione materiali, etichettatura e zone funzionali.</p></div>
+        <div class="module" id="mod-fase1">
+      <div class="section-header"><h1>Fase 1 — Magazzino</h1><p>Il Magazzino: centro di comando dinamico. Gestione: catalogo, cantieri, consegne, report. Riorganizzazione fisica: layout e classificazione.</p></div>
+
+      <!-- TAB ESTERNA -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border);flex-wrap:wrap">
+        <button id="tab-f1-outer-magazzino" onclick="switchF1OuterTab('magazzino')" style="flex:1;min-width:140px;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:var(--accent);color:#fff;font-family:var(--font)">🏭 Il Magazzino</button>
+        <button id="tab-f1-outer-gestione" onclick="switchF1OuterTab('gestione')" style="flex:1;min-width:140px;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:var(--text2);font-family:var(--font)">⚙️ Gestione</button>
+        <button id="tab-f1-outer-riorg" onclick="switchF1OuterTab('riorg')" style="flex:1;min-width:140px;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:var(--text2);font-family:var(--font)">🗂️ Riorganizzazione fisica</button>
+      </div>
+
+<!-- ============ IL MAGAZZINO (centro di comando) ============ -->
+      <div id="f1-outer-magazzino">
+
+        <!-- PANNELLO 1: QUADRO GENERALE -->
+        <div class="form-card">
+          <div class="form-card-title">📡 Quadro generale</div>
+          <div id="mag-quadro-generale" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
+        </div>
+
+        <!-- PANNELLO 2: RICERCA + AGENDA + DETTAGLIO -->
+        <div class="form-card">
+          <div class="form-card-title">🔎 Il Magazzino — ricerca e agenda</div>
+          <div style="display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;align-items:start" id="mag-tre-colonne">
+            <!-- COLONNA SINISTRA: ricerca -->
+            <div>
+              <input type="text" id="mag-search" placeholder="🔍 Cerca attrezzo, attrezzatura, materiale..." oninput="ricercaMagazzino()" style="width:100%;box-sizing:border-box;margin-bottom:10px">
+              <div id="mag-search-risultati" style="max-height:420px;overflow-y:auto"></div>
+            </div>
+            <!-- COLONNA CENTRALE: data + agenda -->
+            <div>
+              <div style="display:flex;gap:4px;margin-bottom:10px;background:var(--bg2);padding:3px;border-radius:var(--radius);border:1px solid var(--border)">
+                <button id="mag-view-settimana" onclick="cambiaVistaAgenda('settimana')" style="flex:1;padding:5px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:var(--accent);color:#fff">Settimana</button>
+                <button id="mag-view-mese" onclick="cambiaVistaAgenda('mese')" style="flex:1;padding:5px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:transparent;color:var(--text2)">Mese</button>
+                <button id="mag-view-anno" onclick="cambiaVistaAgenda('anno')" style="flex:1;padding:5px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:transparent;color:var(--text2)">Anno</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <button onclick="navigaAgenda(-1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:14px;padding:4px 10px;border-radius:4px">◀</button>
+                <div id="mag-data-corrente" onclick="apriSelettoreMeseAnno()" style="flex:1;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);cursor:pointer" title="Clicca per saltare a un mese/anno specifico"></div>
+                <button onclick="navigaAgenda(1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:14px;padding:4px 10px;border-radius:4px">▶</button>
+              </div>
+              <div id="mag-agenda-settimana" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px"></div>
+              <div id="mag-agenda-mese" style="display:none;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px"></div>
+              <div id="mag-agenda-anno" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px"></div>
+              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap">
+                <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
+              </div>
+            </div>
+            <!-- COLONNA DESTRA: dettaglio -->
+            <div id="mag-dettaglio" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;min-height:300px">
+              <div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="f1-outer-gestione" style="display:none">
+
+      <!-- TAB NAVIGATION GESTIONE -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border);flex-wrap:wrap">
+        <button id="tab-f1-catalogo" onclick="switchF1Tab('catalogo')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Catalogo</button>
+        <button id="tab-f1-cantieri" onclick="switchF1Tab('cantieri')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Cantieri</button>
+        <button id="tab-f1-consegne" onclick="switchF1Tab('consegne')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consegne</button>
+        <button id="tab-f1-report" onclick="switchF1Tab('report')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Report</button>
+      </div>
+
+<!-- TAB CATALOGO -->
+      <div id="f1-tab-catalogo">
+        <div class="form-card">
+          <div class="form-card-title">Materiali censiti (<span id="mat-count">0</span>)</div>
+          <div id="mat-lista"><div class="empty-state"><div class="icon">🧰</div><p>Nessun materiale censito</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title" id="mat-form-title">Aggiungi / Modifica materiale</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label>Materiale (rapido)</label>
+              <select id="mat-preset" onchange="if(this.value==='__nuovo__'){apriArticoloModal('Beni di consumo','mat-preset','mat-nome');}else if(this.value)document.getElementById('mat-nome').value=this.value">
+                <option value="">— scegli o scrivi sotto —</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Nome materiale *</label><input type="text" id="mat-nome" placeholder="es. Silicone / Sigillante"></div>
+            <div class="form-group"><label>Categoria</label>
+              <select id="mat-categoria">
+                <option value="">— seleziona —</option>
+                <option>Dischi</option><option>Sigillanti/Adesivi</option><option>Bulloneria e Fissaggi</option>
+                <option>Saldatura</option><option>Vernici e Trattamenti</option><option>DPI monouso</option><option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Unità di misura</label>
+              <select id="mat-um"><option>pz</option><option>kg</option><option>lt</option><option>mt</option><option>scatola</option><option>tubo</option><option>rotolo</option><option>confezione</option></select>
+            </div>
+            <div class="form-group"><label>Prezzo unitario (€)</label><input type="number" id="mat-prezzo" placeholder="es. 4.50"></div>
+            <div class="form-group"><label>Sconto (%)</label><input type="number" id="mat-sconto" placeholder="es. 10"></div>
+            <div class="form-group"><label>Fornitore</label><select id="mat-fornitore"><option value="">— seleziona fornitore —</option></select></div>
+            <div class="form-group"><label>Giacenza attuale</label><input type="number" id="mat-giacenza" placeholder="es. 200"></div>
+            <div class="form-group"><label>Scorta minima (alert)</label><input type="number" id="mat-scorta-min" placeholder="es. 20"></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-mat" onclick="addMateriale()">Aggiungi materiale</button>
+            <button class="btn btn-ghost" onclick="clearMaterialeForm()">Annulla</button>
+          </div>
+        </div>
+      </div>
+
+
+<!-- TAB CANTIERI -->
+      <div id="f1-tab-cantieri" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
+          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
+            <div class="form-group"><label>Cliente</label><input type="text" id="cant-cliente" placeholder="es. Zincheria De Lucchi"></div>
+            <div class="form-group"><label>Squadra assegnata</label><select id="cant-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Data apertura</label><input type="date" id="cant-apertura"></div>
+            <div class="form-group"><label>Data chiusura</label><input type="date" id="cant-chiusura"></div>
+            <div class="form-group"><label>Stato</label><select id="cant-stato"><option>Aperto</option><option>Chiuso</option></select></div>
+            <div class="form-group span-3"><label>Note</label><input type="text" id="cant-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-cant" onclick="addCantiere()">Apri cantiere</button>
+            <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="prev-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Quantità prevista</label><input type="number" id="prev-quantita" placeholder="es. 50"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
+        </div>
+      </div>
+
+
+<!-- TAB CONSEGNE -->
+      <div id="f1-tab-consegne" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Storico consegne</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="cs-filter-cantiere" onchange="renderConsegne()"><option value="">Tutti i cantieri</option></select>
+            <select id="cs-filter-materiale" onchange="renderConsegne()"><option value="">Tutti i materiali</option></select>
+          </div>
+          <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Registra consegna materiale</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
+            <div class="form-group"><label>Materiale</label><select id="cs-materiale"><option value="">— seleziona materiale —</option></select></div>
+            <div class="form-group"><label>Squadra</label><select id="cs-squadra"><option value="">— seleziona squadra —</option></select></div>
+            <div class="form-group"><label>Quantità consegnata *</label><input type="number" id="cs-quantita" placeholder="es. 50"></div>
+            <div class="form-group"><label>Data</label><input type="date" id="cs-data"></div>
+            <div class="form-group span-2"><label>Note</label><input type="text" id="cs-note" placeholder="note libere"></div>
+          </div>
+          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+            <button class="btn btn-primary" id="btn-salva-cs" onclick="addConsegna()">Registra consegna</button>
+            <button class="btn btn-ghost" onclick="clearConsegnaForm()">Annulla</button>
+          </div>
+        </div>
+      </div>
+
+
+<!-- TAB REPORT -->
+      <div id="f1-tab-report" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">Seleziona cantiere</div>
+          <select id="rep-cantiere" onchange="renderReportMateriali()" style="max-width:400px"><option value="">— tutti i cantieri (vista globale) —</option></select>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">📊 Previsto / Effettivo per materiale <span id="rep-titolo-cantiere" style="font-weight:400;color:var(--text3);font-size:12px"></span></div>
+          <div id="mat-report-materiali"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">👷 Costo totale consegnato per squadra</div>
+          <div id="mat-report-squadre"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">⚠ Materiali sotto scorta minima</div>
+          <div id="mat-report-scorta"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
+          <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:0;margin:0">
+          <button class="btn btn-ghost" onclick="stampaReportCantiere()">🖨 Stampa report</button>
+          <button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button>
+        </div>
+
+      </div>
+      </div><!-- /f1-outer-gestione -->
+
+    
+      <div id="f1-outer-riorg" style="display:none">
       <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f1-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f1-fill" style="width:0%"></div></div></div>
       <div class="form-card">
         <div class="form-card-title">1.1 · Layout e scaffalature</div>
@@ -409,9 +606,11 @@
         <button class="btn btn-ghost" onclick="showModule('fase0')">← Fase 0</button>
         <button class="btn btn-ghost" onclick="showModule('fase2')">Fase 2 →</button>
       </div>
+      </div>
+
     </div>
 
-    <!-- FASE 2 — SCORTE -->
+<!-- FASE 2 — SCORTE -->
     <div class="module" id="mod-fase2">
       <div class="section-header">
         <h1>Fase 2 — Reparto Operativo</h1>
@@ -716,62 +915,8 @@
 
 
     <!-- FASE 3 — FLUSSO MATERIALI -->
-    <div class="module" id="mod-fase3">
-      <div class="section-header"><h1>Fase 3 — Flusso materiali e magazzino</h1><p>Il Magazzino: centro di comando dinamico. Gestione: catalogo, cantieri, consegne, report.</p></div>
-
-      <!-- TAB ESTERNA -->
-      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border)">
-        <button id="tab-f3-outer-magazzino" onclick="switchF3OuterTab('magazzino')" style="flex:1;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:var(--accent);color:#fff;font-family:var(--font)">🏭 Il Magazzino</button>
-        <button id="tab-f3-outer-gestione" onclick="switchF3OuterTab('gestione')" style="flex:1;padding:10px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:var(--text2);font-family:var(--font)">⚙️ Gestione</button>
-      </div>
-
-      <!-- ============ IL MAGAZZINO (centro di comando) ============ -->
-      <div id="f3-outer-magazzino">
-
-        <!-- PANNELLO 1: QUADRO GENERALE -->
-        <div class="form-card">
-          <div class="form-card-title">📡 Quadro generale</div>
-          <div id="mag-quadro-generale" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
-        </div>
-
-        <!-- PANNELLO 2: RICERCA + AGENDA + DETTAGLIO -->
-        <div class="form-card">
-          <div class="form-card-title">🔎 Il Magazzino — ricerca e agenda</div>
-          <div style="display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;align-items:start" id="mag-tre-colonne">
-            <!-- COLONNA SINISTRA: ricerca -->
-            <div>
-              <input type="text" id="mag-search" placeholder="🔍 Cerca attrezzo, attrezzatura, materiale..." oninput="ricercaMagazzino()" style="width:100%;box-sizing:border-box;margin-bottom:10px">
-              <div id="mag-search-risultati" style="max-height:420px;overflow-y:auto"></div>
-            </div>
-            <!-- COLONNA CENTRALE: data + agenda -->
-            <div>
-              <div id="mag-data-corrente" style="text-align:center;padding:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px"></div>
-              <div id="mag-agenda-settimana" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px"></div>
-              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap">
-                <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
-              </div>
-            </div>
-            <!-- COLONNA DESTRA: dettaglio -->
-            <div id="mag-dettaglio" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;min-height:300px">
-              <div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============ GESTIONE (contenuto esistente) ============ -->
-      <div id="f3-outer-gestione" style="display:none">
-
-      <!-- TAB NAVIGATION -->
-      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius-lg);border:1px solid var(--border);flex-wrap:wrap">
-        <button id="tab-f3-panoramica" onclick="switchF3Tab('panoramica')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--accent);color:#fff;font-family:var(--font)">Panoramica</button>
-        <button id="tab-f3-catalogo" onclick="switchF3Tab('catalogo')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Catalogo</button>
-        <button id="tab-f3-cantieri" onclick="switchF3Tab('cantieri')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Cantieri</button>
-        <button id="tab-f3-consegne" onclick="switchF3Tab('consegne')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Consegne</button>
-        <button id="tab-f3-report" onclick="switchF3Tab('report')" style="flex:1;min-width:110px;padding:8px 12px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);font-family:var(--font)">Report</button>
-      </div>
-
-      <div id="f3-tab-panoramica">
+        <div class="module" id="mod-fase3">
+      <div class="section-header"><h1>Fase 3 — Flusso materiali in entrata e uscita</h1><p>Ricezione merci, movimentazione interna, spedizioni, gestione fornitori.</p></div>
       <div class="progress-wrap"><div class="progress-label"><span>Completamento sezione</span><span id="f3-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="f3-fill" style="width:0%"></div></div></div>
       <div class="form-card">
         <div class="form-card-title">3.1 · Ricezione merci</div>
@@ -808,143 +953,9 @@
         <button class="btn btn-ghost" onclick="showModule('fase2')">← Fase 2</button>
         <button class="btn btn-ghost" onclick="showModule('fase4')">Fase 4 →</button>
       </div>
-      </div>
-
-<!-- TAB CATALOGO -->
-      <div id="f3-tab-catalogo" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Materiali censiti (<span id="mat-count">0</span>)</div>
-          <div id="mat-lista"><div class="empty-state"><div class="icon">🧰</div><p>Nessun materiale censito</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title" id="mat-form-title">Aggiungi / Modifica materiale</div>
-          <div class="form-grid cols-3">
-            <div class="form-group">
-              <label>Materiale (rapido)</label>
-              <select id="mat-preset" onchange="if(this.value==='__nuovo__'){apriArticoloModal('Beni di consumo','mat-preset','mat-nome');}else if(this.value)document.getElementById('mat-nome').value=this.value">
-                <option value="">— scegli o scrivi sotto —</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Nome materiale *</label><input type="text" id="mat-nome" placeholder="es. Silicone / Sigillante"></div>
-            <div class="form-group"><label>Categoria</label>
-              <select id="mat-categoria">
-                <option value="">— seleziona —</option>
-                <option>Dischi</option><option>Sigillanti/Adesivi</option><option>Bulloneria e Fissaggi</option>
-                <option>Saldatura</option><option>Vernici e Trattamenti</option><option>DPI monouso</option><option>Altro</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Unità di misura</label>
-              <select id="mat-um"><option>pz</option><option>kg</option><option>lt</option><option>mt</option><option>scatola</option><option>tubo</option><option>rotolo</option><option>confezione</option></select>
-            </div>
-            <div class="form-group"><label>Prezzo unitario (€)</label><input type="number" id="mat-prezzo" placeholder="es. 4.50"></div>
-            <div class="form-group"><label>Sconto (%)</label><input type="number" id="mat-sconto" placeholder="es. 10"></div>
-            <div class="form-group"><label>Fornitore</label><select id="mat-fornitore"><option value="">— seleziona fornitore —</option></select></div>
-            <div class="form-group"><label>Giacenza attuale</label><input type="number" id="mat-giacenza" placeholder="es. 200"></div>
-            <div class="form-group"><label>Scorta minima (alert)</label><input type="number" id="mat-scorta-min" placeholder="es. 20"></div>
-            <div class="form-group span-3"><label>Note</label><input type="text" id="mat-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-mat" onclick="addMateriale()">Aggiungi materiale</button>
-            <button class="btn btn-ghost" onclick="clearMaterialeForm()">Annulla</button>
-          </div>
-        </div>
-      </div>
-
-
-<!-- TAB CANTIERI -->
-      <div id="f3-tab-cantieri" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
-          <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
-            <div class="form-group"><label>Cliente</label><input type="text" id="cant-cliente" placeholder="es. Zincheria De Lucchi"></div>
-            <div class="form-group"><label>Squadra assegnata</label><select id="cant-squadra"><option value="">— seleziona squadra —</option></select></div>
-            <div class="form-group"><label>Data apertura</label><input type="date" id="cant-apertura"></div>
-            <div class="form-group"><label>Data chiusura</label><input type="date" id="cant-chiusura"></div>
-            <div class="form-group"><label>Stato</label><select id="cant-stato"><option>Aperto</option><option>Chiuso</option></select></div>
-            <div class="form-group span-3"><label>Note</label><input type="text" id="cant-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-cant" onclick="addCantiere()">Apri cantiere</button>
-            <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
-          </div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
-            <div class="form-group"><label>Materiale</label><select id="prev-materiale"><option value="">— seleziona materiale —</option></select></div>
-            <div class="form-group"><label>Quantità prevista</label><input type="number" id="prev-quantita" placeholder="es. 50"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addPrevisto()">Imposta obiettivo</button></div>
-        </div>
-      </div>
-
-
-<!-- TAB CONSEGNE -->
-      <div id="f3-tab-consegne" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Storico consegne</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select id="cs-filter-cantiere" onchange="renderConsegne()"><option value="">Tutti i cantieri</option></select>
-            <select id="cs-filter-materiale" onchange="renderConsegne()"><option value="">Tutti i materiali</option></select>
-          </div>
-          <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">Registra consegna materiale</div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
-            <div class="form-group"><label>Materiale</label><select id="cs-materiale"><option value="">— seleziona materiale —</option></select></div>
-            <div class="form-group"><label>Squadra</label><select id="cs-squadra"><option value="">— seleziona squadra —</option></select></div>
-            <div class="form-group"><label>Quantità consegnata *</label><input type="number" id="cs-quantita" placeholder="es. 50"></div>
-            <div class="form-group"><label>Data</label><input type="date" id="cs-data"></div>
-            <div class="form-group span-2"><label>Note</label><input type="text" id="cs-note" placeholder="note libere"></div>
-          </div>
-          <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-            <button class="btn btn-primary" id="btn-salva-cs" onclick="addConsegna()">Registra consegna</button>
-            <button class="btn btn-ghost" onclick="clearConsegnaForm()">Annulla</button>
-          </div>
-        </div>
-      </div>
-
-
-<!-- TAB REPORT -->
-      <div id="f3-tab-report" style="display:none">
-        <div class="form-card">
-          <div class="form-card-title">Seleziona cantiere</div>
-          <select id="rep-cantiere" onchange="renderReportMateriali()" style="max-width:400px"><option value="">— tutti i cantieri (vista globale) —</option></select>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">📊 Previsto / Effettivo per materiale <span id="rep-titolo-cantiere" style="font-weight:400;color:var(--text3);font-size:12px"></span></div>
-          <div id="mat-report-materiali"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">👷 Costo totale consegnato per squadra</div>
-          <div id="mat-report-squadre"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">⚠ Materiali sotto scorta minima</div>
-          <div id="mat-report-scorta"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="form-card">
-          <div class="form-card-title">🔺 Materiali con maggiore scostamento</div>
-          <div id="mat-report-top"><div class="empty-state"><p>Nessun dato ancora disponibile</p></div></div>
-        </div>
-        <div class="actions-bar" style="border:none;padding:0;margin:0">
-          <button class="btn btn-ghost" onclick="stampaReportCantiere()">🖨 Stampa report</button>
-          <button class="btn btn-primary" onclick="saveMateriali()">Salva Materiali</button>
-        </div>
-
-      </div>
-      </div><!-- /f3-outer-gestione -->
     </div>
 
-    <!-- FASE 4 — SICUREZZA -->
+<!-- FASE 4 — SICUREZZA -->
     <div class="module" id="mod-fase4">
       <div class="section-header"><h1>Fase 4 — Sicurezza e conformità normativa</h1><p>Gestione rifiuti speciali, segnaletica, DPI e interfaccia con RSPP.</p></div>
       <div class="info-box">Hai già prodotto il <strong>Report Sicurezza Rifiuti DCE</strong> — carica qui i dati per tenerli tracciati nel gestionale.</div>
@@ -1067,10 +1078,32 @@
     <div class="module" id="mod-mezzi">
       <div class="section-header"><h1>Automezzi e Muletti — Registro operativo</h1><p>Censimento, stato, scadenze, storico danni e interventi per ogni mezzo aziendale.</p></div>
       <div id="mezzi-alerts"></div>
+
       <div class="form-card">
         <div class="form-card-title">Parco mezzi censito</div>
         <div id="mezzi-lista"><div class="empty-state"><div class="icon">🚛</div><p>Nessun mezzo censito</p></div></div>
         <div class="actions-bar" style="border:none;padding:12px 0 0;margin:0"><button class="btn btn-primary" onclick="saveMezziCloud()">Salva Mezzi e Interventi</button></div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">Storico assegnazioni</div>
+        <div id="assegnazioni-lista"><div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div></div>
+        <div class="form-grid cols-3" style="margin-top:16px">
+          <div class="form-group"><label>Mezzo</label><select id="ass-targa"><option value="">— seleziona mezzo —</option></select></div>
+          <div class="form-group"><label>Assegnato a</label><select id="ass-nome"><option value="Parco DCE">🅿️ Parco DCE</option></select></div>
+          <div class="form-group"><label>Tipo utilizzo</label><select id="ass-tipo"><option>In dotazione fissa</option><option>Uso temporaneo</option><option>Uso condiviso</option><option>Restituzione</option></select></div>
+          <div class="form-group"><label>Data inizio</label><input type="date" id="ass-inizio"></div>
+          <div class="form-group"><label>Data fine</label><input type="date" id="ass-fine"></div>
+          <div class="form-group"><label>Km alla consegna</label><input type="number" id="ass-km"></div>
+          <div class="form-group span-2"><label>Note</label><input type="text" id="ass-note"></div>
+        </div>
+        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
+          <button class="btn btn-primary" id="btn-salva-ass" onclick="addAssegnazione()">Registra assegnazione</button>
+          <button class="btn btn-ghost" onclick="clearAssegnazioneForm()">Annulla</button>
+          <button class="btn btn-ghost" onclick="saveAssegnazioniCloud()" style="margin-left:auto">Salva Assegnazioni</button>
+        </div>
+      </div>
+
       <div class="form-card" id="mezzi-form-card">
         <div class="form-card-title" id="mezzi-form-title">Aggiungi / Modifica mezzo</div>
         <div class="form-grid cols-3">
@@ -1116,6 +1149,7 @@
           <button class="btn btn-ghost" onclick="importaMezziDaExcel()" style="margin-left:auto">📥 Importa dati riepilogo scadenze</button>
         </div>
       </div>
+
       <div class="form-card">
         <div class="form-card-title">Registra lettura Km</div>
         <div class="form-grid cols-3">
@@ -1125,7 +1159,7 @@
         </div>
         <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" onclick="addKmLog()">Registra lettura</button></div>
       </div>
-      </div>
+
       <div class="form-card">
         <div class="form-card-title">Registro interventi</div>
         <div id="interventi-lista"><div class="empty-state"><div class="icon">🔧</div><p>Nessun intervento registrato</p></div></div>
@@ -1140,27 +1174,8 @@
         </div>
         <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0"><button class="btn btn-primary" id="btn-salva-int" onclick="addIntervento()">Registra intervento</button></div>
       </div>
-      <div class="form-card">
-        <div class="form-card-title">Storico assegnazioni</div>
-        <div id="assegnazioni-lista"><div class="empty-state"><div class="icon">👤</div><p>Nessuna assegnazione registrata</p></div></div>
-        <div class="form-grid cols-3" style="margin-top:16px">
-          <div class="form-group"><label>Mezzo</label><select id="ass-targa"><option value="">— seleziona mezzo —</option></select></div>
-          <div class="form-group"><label>Assegnato a</label><select id="ass-nome"><option value="Parco DCE">🅿️ Parco DCE</option></select></div>
-          <div class="form-group"><label>Tipo utilizzo</label><select id="ass-tipo"><option>In dotazione fissa</option><option>Uso temporaneo</option><option>Uso condiviso</option><option>Restituzione</option></select></div>
-          <div class="form-group"><label>Data inizio</label><input type="date" id="ass-inizio"></div>
-          <div class="form-group"><label>Data fine</label><input type="date" id="ass-fine"></div>
-          <div class="form-group"><label>Km alla consegna</label><input type="number" id="ass-km"></div>
-          <div class="form-group span-2"><label>Note</label><input type="text" id="ass-note"></div>
-        </div>
-        <div class="actions-bar" style="border:none;padding:8px 0 0;margin:0">
-          <button class="btn btn-primary" id="btn-salva-ass" onclick="addAssegnazione()">Registra assegnazione</button>
-          <button class="btn btn-ghost" onclick="clearAssegnazioneForm()">Annulla</button>
-          <button class="btn btn-ghost" onclick="saveAssegnazioniCloud()" style="margin-left:auto">Salva Assegnazioni</button>
-        </div>
-      </div>
     </div>
 
-  
     <!-- ATTREZZATURE -->
     <div class="module" id="mod-attrezzature">
       <div class="section-header"><h1>Registro Attrezzature</h1><p>Censimento utensili aziendali — stato, posizione, dotazione, storico manutenzioni.</p></div>
@@ -1371,27 +1386,34 @@
 
       <div class="form-card">
         <div class="form-card-title">📄 Project Charter + Fasi 0-6</div>
-        <p style="font-size:13px;color:var(--text2);line-height:1.7">Documentazione strutturata del progetto di riorganizzazione magazzino: obiettivi, scope, budget (Charter); fotografia iniziale azienda con dati ATECO (Fase 0); riorganizzazione fisica (Fase 1); <b>Reparto Operativo</b> — saldatori, squadre, consumo dischi, dotazione DPI/attrezzature (Fase 2); <b>Flusso materiali e magazzino</b> — vedi sezione dedicata sotto (Fase 3); sicurezza (Fase 4); digitalizzazione (Fase 5); personale e procedure (Fase 6). Ogni fase ha una barra di completamento e salvataggio locale + cloud.</p>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Documentazione strutturata del progetto di riorganizzazione magazzino: obiettivi, scope, budget (Charter); fotografia iniziale azienda con dati ATECO (Fase 0); <b>Il Magazzino</b> — vedi sezione dedicata sotto (Fase 1); <b>Reparto Operativo</b> — saldatori, squadre, consumo dischi, dotazione DPI/attrezzature (Fase 2); flusso materiali in entrata/uscita, ricezione, movimentazione, spedizioni (Fase 3); sicurezza (Fase 4); digitalizzazione (Fase 5); personale e procedure (Fase 6). Ogni fase ha una barra di completamento e salvataggio locale + cloud.</p>
       </div>
 
       <div class="form-card">
         <div class="form-card-title">🗂️ Catalogo Articoli condiviso</div>
-        <p style="font-size:13px;color:var(--text2);line-height:1.7">Anagrafica unica di oggetti divisa in tre categorie — <b>Attrezzi</b> (trapani, avvitatori, laser, martelli, metri...), <b>Attrezzatura</b> (caschetti, imbragature, aspirapolveri...), <b>Beni di consumo</b> (dischi, silicone, chimico bicomponente, punte...). Alimenta le tendine di Materiali (Fase 3) e delle Dotazioni Squadre/Saldatori (Fase 2). Opzione <b>"+ Nuovo articolo..."</b> in ogni tendina collegata: scegli categoria e nome, si registra una volta sola e resta disponibile ovunque da quel momento in poi. Il modulo Attrezzature ha il suo menu esteso dedicato; se scegli "Altro" con un nome nuovo, entra automaticamente anche nel catalogo condiviso.</p>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Anagrafica unica di oggetti divisa in tre categorie — <b>Attrezzi</b> (trapani, avvitatori, laser, martelli, metri...), <b>Attrezzatura</b> (caschetti, imbragature, aspirapolveri...), <b>Beni di consumo</b> (dischi, silicone, chimico bicomponente, punte...). Alimenta le tendine di Materiali (Fase 1) e delle Dotazioni Squadre/Saldatori (Fase 2). Opzione <b>"+ Nuovo articolo..."</b> in ogni tendina collegata: scegli categoria e nome, si registra una volta sola e resta disponibile ovunque da quel momento in poi. Il modulo Attrezzature ha il suo menu esteso dedicato; se scegli "Altro" con un nome nuovo, entra automaticamente anche nel catalogo condiviso.</p>
       </div>
 
       <div class="form-card">
-        <div class="form-card-title">🏗️ Fase 3 — Il cuore del Magazzino</div>
+        <div class="form-card-title">🏭 Fase 1 — Il Magazzino (il cuore del gestionale)</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7">
-        <b>Catalogo Materiali:</b> anagrafica materiali di consumo (nome, categoria, unità di misura, prezzo, sconto, fornitore collegato, giacenza e scorta minima con alert automatico).<br><br>
-        <b>Cantieri:</b> apertura/chiusura commesse con date, squadra assegnata, stato. Possibilità di impostare un obiettivo "quantità prevista" per cantiere+materiale.<br><br>
-        <b>Consegne:</b> registrazione rapida di ogni consegna materiale a una squadra su un cantiere — si somma automaticamente al totale, scarica la giacenza in automatico. Storico raggruppato per cantiere+materiale con dettaglio a scomparsa.<br><br>
-        <b>Report:</b> previsto vs effettivo per materiale, costo per squadra, materiali sotto scorta, top scostamenti. Report stampabile per consegna a fine cantiere.
+        Tre schede: <b>🏭 Il Magazzino</b> (centro di comando), <b>⚙️ Gestione</b> (catalogo/cantieri/consegne/report), <b>🗂️ Riorganizzazione fisica</b> (layout, scaffalature, classificazione — contenuto originale di Fase 1).<br><br>
+        <b>Il Magazzino</b> — Quadro generale in alto: cantieri (aperti/chiusi, cliente), squadre (con cantiere attuale), saldatori (con ultima commessa dedotta dai consumi) — tutto cliccabile, porta dritto alla sezione. Sotto: ricerca in tempo reale su tutto il magazzino (articoli, materiali, attrezzature), con dettaglio a destra (foto per le Attrezzature, icona per categoria altrimenti). Al centro: agenda con tre viste navigabili — <b>Settimana</b>, <b>Mese</b> (calendario completo) e <b>Anno</b> (12 mesi cliccabili) — frecce ◀▶ per scorrere, click sulla data per saltare a un mese/anno specifico. Note (grigie) e Promemoria (arancioni, con nastro scorrevole dei prossimi in alto).<br><br>
+        <b>Gestione → Catalogo Materiali:</b> anagrafica materiali di consumo (nome, categoria, unità di misura, prezzo, sconto, fornitore collegato, giacenza e scorta minima con alert automatico).<br><br>
+        <b>Gestione → Cantieri:</b> apertura/chiusura commesse con date, squadra assegnata, stato. Obiettivo "quantità prevista" per cantiere+materiale.<br><br>
+        <b>Gestione → Consegne:</b> registrazione rapida di ogni consegna materiale a una squadra su un cantiere — si somma automaticamente al totale, scarica la giacenza in automatico. Storico raggruppato per cantiere+materiale con dettaglio a scomparsa.<br><br>
+        <b>Gestione → Report:</b> previsto vs effettivo per materiale, costo per squadra, materiali sotto scorta, top scostamenti. Report stampabile per consegna a fine cantiere.
         </p>
       </div>
 
       <div class="form-card">
         <div class="form-card-title">🚛 Automezzi e Muletti</div>
-        <p style="font-size:13px;color:var(--text2);line-height:1.7">Registro mezzi con scadenze (assicurazione con importo/frequenza rinnovo, bollo, revisione, INAIL, tagliando con km, estintore) e alert automatici entro 30 giorni. Flag "a noleggio" per escludere scadenze gestite dal noleggiatore. Storico km. Storico interventi/danni (modificabile). <b>Assegnazioni</b>: mezzo → persona (saldatore, squadra o Parco DCE) con data fine — alla scadenza scatta un alert con scelta diretta tra <b>Rientro</b> al Parco DCE o <b>Proroga</b> con nuova data. Modulo di assegnazione stampabile con firma.</p>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Ordine pagina: Parco mezzi censito → Storico assegnazioni (subito accessibile per assegnare velocemente) → form completo Aggiungi/Modifica mezzo → Registra lettura Km → Registro interventi. Ogni mezzo censito ha un pulsante <b>📋 Assegna</b> che porta dritto al form di assegnazione con il mezzo già selezionato. Registro con scadenze (assicurazione con importo/frequenza rinnovo, bollo, revisione, INAIL, tagliando con km, estintore) e alert automatici entro 30 giorni. Flag "a noleggio" per escludere scadenze gestite dal noleggiatore. Storico km. Storico interventi/danni (modificabile). <b>Assegnazioni</b>: mezzo → persona (saldatore, squadra o Parco DCE) con data fine — alla scadenza scatta un alert con scelta diretta tra <b>Rientro</b> al Parco DCE o <b>Proroga</b> con nuova data. Modulo di assegnazione stampabile con firma.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-title">🏗️ Fase 3 — Flusso materiali</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">Ricezione merci, movimentazione interna, spedizioni, fornitori chiave — panoramica testuale semplice della fase, con la sua barra di completamento.</p>
       </div>
 
       <div class="form-card">
@@ -1423,6 +1445,29 @@
     </div>
   </div>
 </main>
+</div>
+
+<!-- SELETTORE MESE/ANNO MODAL -->
+<div id="meseanno-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:320px;padding:20px">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">Vai a...</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Mese</label>
+      <select id="meseanno-modal-mese">
+        <option value="0">Gennaio</option><option value="1">Febbraio</option><option value="2">Marzo</option><option value="3">Aprile</option>
+        <option value="4">Maggio</option><option value="5">Giugno</option><option value="6">Luglio</option><option value="7">Agosto</option>
+        <option value="8">Settembre</option><option value="9">Ottobre</option><option value="10">Novembre</option><option value="11">Dicembre</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Anno</label>
+      <input type="number" id="meseanno-modal-anno" style="width:100%">
+    </div>
+    <div class="actions-bar" style="border:none;padding:0;margin:0">
+      <button class="btn btn-primary" onclick="confermaSelettoreMeseAnno()">Vai</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('meseanno-modal').style.display='none'">Annulla</button>
+    </div>
+  </div>
 </div>
 
 <!-- AGENDA MODAL -->
@@ -1499,7 +1544,7 @@
 
 <script>
 const MODULES=['dashboard','charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6','mezzi','attrezzature','fornitori','info'];
-const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali e magazzino',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori',info:'Info & Guida'};
+const BREADCRUMBS={dashboard:'Dashboard',charter:'Project Charter',fase0:'Fase 0 — Fotografia iniziale',fase1:'Fase 1 — Il Magazzino',fase2:'Fase 2 — Reparto Operativo',fase3:'Fase 3 — Flusso materiali',fase4:'Fase 4 — Sicurezza',fase5:'Fase 5 — Digitalizzazione',fase6:'Fase 6 — Personale & SOP',mezzi:'Automezzi e Muletti',attrezzature:'Registro Attrezzature',fornitori:'Fornitori',info:'Info & Guida'};
 
 function showModule(id) {
   if(id==='fornitori'&&!hasFornitoriAccess()){showToast('Non hai i permessi per accedere ai Fornitori');return;}
@@ -1511,7 +1556,7 @@ function showModule(id) {
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
   if(id==='fase2'){updateMaterialeSelects();refreshArticoliSelects();}
-  if(id==='fase3'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderMagazzino();}
+  if(id==='fase1'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderMagazzino();}
 }
 
 function toggleCheck(id) {
@@ -2304,7 +2349,7 @@ function renderMezzi(){
     const assegnatarioBadge=assAttiva?('<span class="tag tag-blue">👤 '+assAttiva.nome+(assAttiva.fine?' (fino al '+new Date(assAttiva.fine).toLocaleDateString('it-IT')+')':'')+'</span>'):(m.assegnatario&&m.assegnatario!=='Parco DCE'?('<span class="tag tag-blue">👤 '+m.assegnatario+'</span>'):'<span class="tag tag-gray">🅿️ Parco DCE</span>');
     const kmM=kmLogDB.filter(k=>k.targa===m.targa).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
     const kmInfo=[m.assicImporto?'Premio: € '+m.assicImporto+(m.assicFreq?' ('+m.assicFreq+')':''):'',m.tagUltimoData?'Ultimo tagliando: '+new Date(m.tagUltimoData).toLocaleDateString('it-IT')+(m.tagUltimoKm?' a '+Number(m.tagUltimoKm).toLocaleString('it-IT')+' km':''):'',m.tagProssimoKm?'Prossimo previsto a '+Number(m.tagProssimoKm).toLocaleString('it-IT')+' km':''].filter(Boolean).join(' &nbsp;|&nbsp; ');
-    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+assegnatarioBadge+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
+    return '<div style="border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;background:var(--bg3)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--text)">'+m.tipo+'</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:3px">'+m.targa+'</span>'+(m.modello?'<span style="font-size:12px;color:var(--text2)">'+m.modello+'</span>':'')+(m.anno?'<span class="tag tag-gray">'+m.anno+'</span>':'')+(m.stato?'<span class="tag '+statoColor(m.stato)+'">'+m.stato+'</span>':'')+(m.noleggio?'<span class="tag tag-blue">🔑 A noleggio</span>':'')+(aperti>0?'<span class="tag tag-red">🔧 '+aperti+' intervento/i aperti</span>':'')+(m.portata?'<span class="tag tag-gray">⬆ '+m.portata+' kg</span>':'')+assegnatarioBadge+'<div style="margin-left:auto;display:flex;gap:6px"><button onclick="assegnaMezzoRapido('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--green);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">📋 Assegna</button><button onclick="stampaModuloAssegnazione('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🖨 Modulo</button><button onclick="editMezzo('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button><button onclick="deleteMezzo('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button></div></div>'+(m.noleggio?'<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Scadenze incluse e gestite dal contratto di noleggio</div>':(scadenzeHtml?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+scadenzeHtml+'</div>':''))+(kmInfo?'<div style="font-size:11px;color:var(--text2);margin-bottom:4px">'+kmInfo+'</div>':'')+(m.note?'<div style="font-size:12px;color:var(--text3);margin-top:4px">'+m.note+'</div>':'')+(kmM.length?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico km ('+kmM.length+')</div>'+kmM.slice(-6).reverse().map(k=>'<div style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(k.data?new Date(k.data).toLocaleDateString('it-IT'):'—')+'</span><span style="color:var(--text2)">'+Number(k.km).toLocaleString('it-IT')+' km</span><button onclick="deleteKmLog('+k.id+')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕</button></div>').join('')+'</div>':'')+(intM.length>0?'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Storico interventi</div>'+intM.slice().reverse().map(i=>'<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text3);white-space:nowrap">'+(i.data||'—')+'</span><span class="tag '+(i.stato==='Risolto'?'tag-green':i.stato==='In corso'?'tag-orange':'tag-red')+'" style="font-size:10px">'+i.stato+'</span><span style="color:var(--text2);font-weight:500">'+i.tipo+'</span><span style="color:var(--text3)">'+i.desc+'</span>'+(i.costo?'<span style="color:var(--accent);margin-left:auto;white-space:nowrap">€ '+i.costo+'</span>':'')+'</div>').join('')+'</div>':'')+'</div>';
   }).join('');
   updateMezzoTargaSelects();
 }
@@ -2440,7 +2485,7 @@ function getAllAlerts(){
   (materialiDB||[]).forEach(m=>{
     const g=parseFloat(m.giacenza),s=parseFloat(m.scortaMin)||0;
     if(isNaN(g)||g>s)return;
-    alerts.push({id:'materiale-'+m.id+'-scorta',tipo:'materiale',icona:'🧰',titolo:m.nome,dettaglio:'Sotto scorta minima — giacenza '+g+' '+(m.um||'')+' (minimo: '+s+')',giorni:-999,modulo:'fase3'});
+    alerts.push({id:'materiale-'+m.id+'-scorta',tipo:'materiale',icona:'🧰',titolo:m.nome,dettaglio:'Sotto scorta minima — giacenza '+g+' '+(m.um||'')+' (minimo: '+s+')',giorni:-999,modulo:'fase1'});
   });
   return alerts.sort((a,b)=>a.giorni-b.giorni);
 }
@@ -2451,8 +2496,8 @@ function updateAlertIndicators(){
   const badge=document.getElementById('alert-badge');
   if(badge){if(attivi.length){badge.style.display='';badge.textContent=attivi.length>99?'99+':attivi.length;}else{badge.style.display='none';}}
 
-  const perModulo={mezzi:attivi.filter(a=>a.modulo==='mezzi'),fase3:attivi.filter(a=>a.modulo==='fase3')};
-  [['nav-dot-mezzi','#4a7eb5',perModulo.mezzi],['nav-dot-fase3','#b5943a',perModulo.fase3]].forEach(([dotId,colore,lista])=>{
+  const perModulo={mezzi:attivi.filter(a=>a.modulo==='mezzi'),fase1:attivi.filter(a=>a.modulo==='fase1')};
+  [['nav-dot-mezzi','#4a7eb5',perModulo.mezzi],['nav-dot-fase1','#4a9e6a',perModulo.fase1]].forEach(([dotId,colore,lista])=>{
     const dot=document.getElementById(dotId);if(!dot)return;
     const navItem=dot.closest('.nav-item');
     if(lista.length){
@@ -2470,7 +2515,7 @@ function closeAlertCenter(){document.getElementById('alert-modal').style.display
 function vaiAlModuloAlert(modulo){
   closeAlertCenter();
   showModule(modulo);
-  if(modulo==='fase3')switchF3Tab('catalogo');
+  if(modulo==='fase1'){switchF1OuterTab('gestione');switchF1Tab('catalogo');}
 }
 function renderAlertCenter(){
   const el=document.getElementById('alert-center-list');if(!el)return;
@@ -2573,6 +2618,14 @@ async function saveAssegnazioniCloud(){
   }else{showToast('Salvate (solo locale)');}
 }
 
+function assegnaMezzoRapido(id){
+  const m=mezziDB.find(x=>x.id===id);if(!m)return;
+  clearAssegnazioneForm();
+  document.getElementById('ass-targa').value=m.targa;
+  document.getElementById('ass-inizio').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ass-targa').scrollIntoView({behavior:'smooth',block:'center'});
+  showToast('Compila assegnatario e date, poi "Registra assegnazione"');
+}
 function stampaModuloAssegnazione(id){
   const m=mezziDB.find(x=>x.id===id);if(!m)return;
   const w=window.open('','_blank');if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
@@ -2996,21 +3049,18 @@ async function saveFornitoriPermessi(){
 // ============ END FORNITORI ============
 
 // ============ IL MAGAZZINO (centro di comando) ============
-function switchF3OuterTab(tab){
-  document.getElementById('f3-outer-magazzino').style.display=(tab==='magazzino')?'':'none';
-  document.getElementById('f3-outer-gestione').style.display=(tab==='gestione')?'':'none';
-  document.getElementById('tab-f3-outer-magazzino').style.background=(tab==='magazzino')?'var(--accent)':'transparent';
-  document.getElementById('tab-f3-outer-magazzino').style.color=(tab==='magazzino')?'#fff':'var(--text2)';
-  document.getElementById('tab-f3-outer-gestione').style.background=(tab==='gestione')?'var(--accent)':'transparent';
-  document.getElementById('tab-f3-outer-gestione').style.color=(tab==='gestione')?'#fff':'var(--text2)';
+function switchF1OuterTab(tab){
+  ['magazzino','gestione','riorg'].forEach(t=>{
+    document.getElementById('f1-outer-'+t).style.display=(t===tab)?'':'none';
+    document.getElementById('tab-f1-outer-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
+    document.getElementById('tab-f1-outer-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
+  });
   if(tab==='magazzino')renderMagazzino();
 }
 
 function renderMagazzino(){
   renderQuadroGenerale();
-  renderMagazzinoData();
-  renderAgendaSettimana();
-  renderTickerPromemoria();
+  renderAgenda();
   document.getElementById('mag-search').value='';
   document.getElementById('mag-search-risultati').innerHTML='';
   document.getElementById('mag-dettaglio').innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>';
@@ -3019,15 +3069,15 @@ function renderMagazzino(){
 // --- PANNELLO 1: QUADRO GENERALE ---
 function vaiA(modulo,tab2,subtab){
   showModule(modulo);
-  if(modulo==='fase3'&&tab2)switchF3OuterTab(tab2);
-  if(modulo==='fase3'&&subtab)switchF3Tab(subtab);
+  if(modulo==='fase1'&&tab2)switchF1OuterTab(tab2);
+  if(modulo==='fase1'&&subtab)switchF1Tab(subtab);
   if(modulo==='fase2'&&subtab)switchF2Tab(subtab);
 }
 function renderQuadroGenerale(){
   const el=document.getElementById('mag-quadro-generale');if(!el)return;
   const cantAperti=cantieriDB.filter(c=>c.stato==='Aperto');
   const cantChiusi=cantieriDB.filter(c=>c.stato==='Chiuso');
-  const cardCantieri='<div onclick="vaiA(\'fase3\',\'gestione\',\'cantieri\')" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px">'+
+  const cardCantieri='<div onclick="vaiA(\'fase1\',\'gestione\',\'cantieri\')" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px">'+
     '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🏗️ Cantieri</div>'+
     (cantAperti.length?cantAperti.map(c=>'<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><b style="color:var(--text)">'+c.nome+'</b>'+(c.cliente?' — '+c.cliente:'')+'</div>').join(''):'<div style="font-size:12px;color:var(--text3)">Nessun cantiere aperto</div>')+
     '<div style="font-size:11px;color:var(--text3);margin-top:6px">'+cantAperti.length+' aperti · '+cantChiusi.length+' chiusi</div></div>';
@@ -3074,7 +3124,7 @@ function mostraDettaglioMagazzino(i){
   }else if(r.tipo==='materiale'){
     const m=r.ref;
     html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria: '+(m.categoria||'—')+'<br>Giacenza: '+(m.giacenza||'0')+' '+(m.um||'')+'<br>Scorta minima: '+(m.scortaMin||'0')+'<br>Prezzo: '+(m.prezzo?'€ '+m.prezzo:'—')+(m.note?'<br>Note: '+m.note:'')+'</div>';
-    html+='<button onclick="showModule(\'fase3\');switchF3OuterTab(\'gestione\');switchF3Tab(\'catalogo\');editMateriale('+m.id+')" style="margin-top:12px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:6px 14px;border-radius:4px">Apri in Catalogo →</button>';
+    html+='<button onclick="showModule(\'fase1\');switchF1OuterTab(\'gestione\');switchF1Tab(\'catalogo\');editMateriale('+m.id+')" style="margin-top:12px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:6px 14px;border-radius:4px">Apri in Catalogo →</button>';
   }else{
     html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria catalogo: '+r.ref.categoria+'<br><span style="color:var(--text3)">Articolo generico — non ha una scheda propria, è usato come voce nelle tendine di Materiali/Dotazioni.</span></div>';
   }
@@ -3082,39 +3132,123 @@ function mostraDettaglioMagazzino(i){
 }
 
 // --- PANNELLO 2: DATA E AGENDA ---
-function renderMagazzinoData(){
-  const el=document.getElementById('mag-data-corrente');if(!el)return;
-  const oggi=new Date();
-  const giorni=['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
-  const mesi=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-  el.innerHTML='<div style="font-size:26px;font-weight:700;color:var(--accent)">'+oggi.getDate()+'</div><div style="font-size:13px;font-weight:600;color:var(--text)">'+giorni[oggi.getDay()]+'</div><div style="font-size:11px;color:var(--text3)">'+mesi[oggi.getMonth()]+' '+oggi.getFullYear()+'</div>';
-}
-
 let agendaDB=[];
+let agendaViewMode='settimana';
+let agendaViewDate=new Date();
 function saveAgendaDB(){try{localStorage.setItem('dce-agenda',JSON.stringify(agendaDB));}catch(e){}}
 function loadAgendaDB(){try{agendaDB=JSON.parse(localStorage.getItem('dce-agenda')||'[]');}catch(e){agendaDB=[];}}
 
-function getSettimanaCorrente(){
-  const oggi=new Date();const giorno=oggi.getDay()===0?7:oggi.getDay();
-  const lunedi=new Date(oggi);lunedi.setDate(oggi.getDate()-giorno+1);
+const MESI_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const GIORNI_IT=['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+const GIORNI_ABBR=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+
+function cambiaVistaAgenda(mode){
+  agendaViewMode=mode;
+  ['settimana','mese','anno'].forEach(m=>{
+    document.getElementById('mag-view-'+m).style.background=(m===mode)?'var(--accent)':'transparent';
+    document.getElementById('mag-view-'+m).style.color=(m===mode)?'#fff':'var(--text2)';
+  });
+  document.getElementById('mag-agenda-settimana').style.display=(mode==='settimana')?'grid':'none';
+  document.getElementById('mag-agenda-mese').style.display=(mode==='mese')?'grid':'none';
+  document.getElementById('mag-agenda-anno').style.display=(mode==='anno')?'grid':'none';
+  renderAgenda();
+}
+function navigaAgenda(dir){
+  const d=new Date(agendaViewDate);
+  if(agendaViewMode==='settimana')d.setDate(d.getDate()+7*dir);
+  else if(agendaViewMode==='mese')d.setMonth(d.getMonth()+dir);
+  else d.setFullYear(d.getFullYear()+dir);
+  agendaViewDate=d;
+  renderAgenda();
+}
+function apriSelettoreMeseAnno(){
+  document.getElementById('meseanno-modal-mese').value=agendaViewDate.getMonth();
+  document.getElementById('meseanno-modal-anno').value=agendaViewDate.getFullYear();
+  document.getElementById('meseanno-modal').style.display='flex';
+}
+function confermaSelettoreMeseAnno(){
+  const mese=parseInt(document.getElementById('meseanno-modal-mese').value);
+  const anno=parseInt(document.getElementById('meseanno-modal-anno').value);
+  agendaViewDate=new Date(anno,mese,1);
+  document.getElementById('meseanno-modal').style.display='none';
+  cambiaVistaAgenda('mese');
+}
+function renderAgenda(){
+  renderAgendaHeader();
+  if(agendaViewMode==='settimana')renderAgendaSettimana();
+  else if(agendaViewMode==='mese')renderAgendaMese();
+  else renderAgendaAnno();
+  renderTickerPromemoria();
+}
+function renderAgendaHeader(){
+  const el=document.getElementById('mag-data-corrente');if(!el)return;
+  const oggi=new Date();
+  if(agendaViewMode==='settimana'){
+    const sett=getSettimanaDi(agendaViewDate);
+    const d0=new Date(sett[0]),d6=new Date(sett[6]);
+    el.innerHTML='<div style="font-size:15px;font-weight:700;color:var(--text)">'+d0.getDate()+' - '+d6.getDate()+' '+MESI_IT[d6.getMonth()]+' '+d6.getFullYear()+'</div><div style="font-size:11px;color:var(--text3)">Oggi: '+oggi.getDate()+' '+MESI_IT[oggi.getMonth()]+' '+oggi.getFullYear()+'</div>';
+  }else if(agendaViewMode==='mese'){
+    el.innerHTML='<div style="font-size:17px;font-weight:700;color:var(--text)">'+MESI_IT[agendaViewDate.getMonth()]+' '+agendaViewDate.getFullYear()+'</div><div style="font-size:11px;color:var(--text3)">Clicca per saltare a un mese specifico</div>';
+  }else{
+    el.innerHTML='<div style="font-size:20px;font-weight:700;color:var(--text)">'+agendaViewDate.getFullYear()+'</div><div style="font-size:11px;color:var(--text3)">Clicca per saltare a un anno specifico</div>';
+  }
+}
+function getSettimanaDi(dataRif){
+  const giorno=dataRif.getDay()===0?7:dataRif.getDay();
+  const lunedi=new Date(dataRif);lunedi.setDate(dataRif.getDate()-giorno+1);
   const settimana=[];
   for(let i=0;i<7;i++){const d=new Date(lunedi);d.setDate(lunedi.getDate()+i);settimana.push(d.toISOString().slice(0,10));}
   return settimana;
 }
 function renderAgendaSettimana(){
   const el=document.getElementById('mag-agenda-settimana');if(!el)return;
-  const giorniAbbr=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
-  const settimana=getSettimanaCorrente();
+  const settimana=getSettimanaDi(agendaViewDate);
   const oggiStr=new Date().toISOString().slice(0,10);
   el.innerHTML=settimana.map((data,i)=>{
     const voci=agendaDB.filter(a=>a.data===data);
     const isOggi=data===oggiStr;
     return '<div style="background:'+(isOggi?'var(--accent-bg)':'var(--bg2)')+';border:1px solid '+(isOggi?'var(--accent-border)':'var(--border)')+';border-radius:var(--radius);padding:6px;min-height:90px;display:flex;flex-direction:column">'+
-      '<div style="font-size:10px;font-weight:600;color:'+(isOggi?'var(--accent)':'var(--text3)')+';text-align:center;margin-bottom:4px">'+giorniAbbr[i]+' '+parseInt(data.slice(8,10))+'</div>'+
+      '<div style="font-size:10px;font-weight:600;color:'+(isOggi?'var(--accent)':'var(--text3)')+';text-align:center;margin-bottom:4px">'+GIORNI_ABBR[i]+' '+parseInt(data.slice(8,10))+'</div>'+
       '<div style="flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto;max-height:70px">'+
       voci.map(v=>'<div onclick="rimuoviVoceAgenda('+v.id+')" title="Clicca per rimuovere" style="cursor:pointer;font-size:9px;padding:2px 4px;border-radius:3px;background:'+(v.tipo==='promemoria'?'rgba(212,136,58,0.25)':'rgba(255,255,255,0.08)')+';color:'+(v.tipo==='promemoria'?'var(--accent)':'var(--text2)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.testo+'</div>').join('')+
       '</div>'+
       '<button onclick="apriAgendaModal(\''+data+'\')" style="margin-top:4px;background:none;border:1px dashed var(--border2);color:var(--text3);cursor:pointer;font-size:11px;border-radius:3px;padding:2px">+</button>'+
+      '</div>';
+  }).join('');
+}
+function renderAgendaMese(){
+  const el=document.getElementById('mag-agenda-mese');if(!el)return;
+  const anno=agendaViewDate.getFullYear(),mese=agendaViewDate.getMonth();
+  const primoGiorno=new Date(anno,mese,1);
+  const ultimoGiorno=new Date(anno,mese+1,0);
+  const inizioGriglia=new Date(primoGiorno);
+  const offset=primoGiorno.getDay()===0?6:primoGiorno.getDay()-1;
+  inizioGriglia.setDate(primoGiorno.getDate()-offset);
+  const oggiStr=new Date().toISOString().slice(0,10);
+  let html=GIORNI_ABBR.map(g=>'<div style="font-size:9px;font-weight:600;color:var(--text3);text-align:center">'+g+'</div>').join('');
+  const cursore=new Date(inizioGriglia);
+  for(let i=0;i<42;i++){
+    const dataStr=cursore.toISOString().slice(0,10);
+    const inMese=cursore.getMonth()===mese;
+    const isOggi=dataStr===oggiStr;
+    const voci=agendaDB.filter(a=>a.data===dataStr);
+    html+='<div onclick="apriAgendaModal(\''+dataStr+'\')" style="cursor:pointer;min-height:38px;padding:3px;border-radius:4px;background:'+(isOggi?'var(--accent-bg)':'var(--bg2)')+';border:1px solid '+(isOggi?'var(--accent-border)':'var(--border)')+';opacity:'+(inMese?'1':'0.35')+'">'+
+      '<div style="font-size:9px;color:'+(isOggi?'var(--accent)':'var(--text3)')+';font-weight:'+(isOggi?'700':'400')+'">'+cursore.getDate()+'</div>'+
+      (voci.length?'<div style="display:flex;gap:2px;flex-wrap:wrap;margin-top:2px">'+voci.slice(0,4).map(v=>'<span style="width:5px;height:5px;border-radius:50%;background:'+(v.tipo==='promemoria'?'var(--accent)':'var(--text3)')+'"></span>').join('')+'</div>':'')+
+      '</div>';
+    cursore.setDate(cursore.getDate()+1);
+    if(cursore>ultimoGiorno&&cursore.getDay()===1&&i>27)break;
+  }
+  el.innerHTML=html;
+}
+function renderAgendaAnno(){
+  const el=document.getElementById('mag-agenda-anno');if(!el)return;
+  const anno=agendaViewDate.getFullYear();
+  el.innerHTML=MESI_IT.map((nome,i)=>{
+    const count=agendaDB.filter(a=>{const d=new Date(a.data);return d.getFullYear()===anno&&d.getMonth()===i;}).length;
+    return '<div onclick="agendaViewDate=new Date('+anno+','+i+',1);cambiaVistaAgenda(\'mese\')" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">'+
+      '<div style="font-size:12px;font-weight:600;color:var(--text)">'+nome+'</div>'+
+      (count?'<div style="font-size:10px;color:var(--accent);margin-top:4px">'+count+' voc'+(count===1?'e':'i')+'</div>':'<div style="font-size:10px;color:var(--text3);margin-top:4px">—</div>')+
       '</div>';
   }).join('');
 }
@@ -3129,13 +3263,13 @@ function confermaVoceAgenda(){
   const testo=document.getElementById('agenda-modal-testo').value.trim();
   if(!testo){showToast('Scrivi qualcosa');return;}
   agendaDB.push({id:Date.now(),data:document.getElementById('agenda-modal-data').value,tipo:document.getElementById('agenda-modal-tipo').value,testo});
-  saveAgendaDB();renderAgendaSettimana();renderTickerPromemoria();chiudiAgendaModal();
+  saveAgendaDB();renderAgenda();chiudiAgendaModal();
   showToast('Aggiunto ✓');
 }
 function rimuoviVoceAgenda(id){
   if(!confirm('Rimuovere questa voce?'))return;
   agendaDB=agendaDB.filter(a=>a.id!==id);
-  saveAgendaDB();renderAgendaSettimana();renderTickerPromemoria();
+  saveAgendaDB();renderAgenda();
 }
 function renderTickerPromemoria(){
   const el=document.getElementById('mag-ticker');if(!el)return;
@@ -3234,11 +3368,11 @@ function refreshArticoliSelects(){
 let materialiDB=[], cantieriDB=[], previstoDB=[], consegneDB=[];
 let editingMaterialeId=null, editingCantiereId=null, editingConsegnaId=null;
 
-function switchF3Tab(tab){
-  ['panoramica','catalogo','cantieri','consegne','report'].forEach(t=>{
-    document.getElementById('f3-tab-'+t).style.display=(t===tab)?'':'none';
-    document.getElementById('tab-f3-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
-    document.getElementById('tab-f3-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
+function switchF1Tab(tab){
+  ['catalogo','cantieri','consegne','report'].forEach(t=>{
+    document.getElementById('f1-tab-'+t).style.display=(t===tab)?'':'none';
+    document.getElementById('tab-f1-'+t).style.background=(t===tab)?'var(--accent)':'transparent';
+    document.getElementById('tab-f1-'+t).style.color=(t===tab)?'#fff':'var(--text2)';
   });
   if(tab==='report')renderReportMateriali();
 }
@@ -3443,8 +3577,9 @@ function renderCantieri(){
   }).join('');
 }
 function vaiReportCantiere(cantiereId){
-  showModule('fase3');
-  switchF3Tab('report');
+  showModule('fase1');
+  switchF1OuterTab('gestione');
+  switchF1Tab('report');
   document.getElementById('rep-cantiere').value=cantiereId;
   renderReportMateriali();
 }
