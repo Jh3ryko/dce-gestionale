@@ -382,17 +382,25 @@
           <div id="mag-quadro-generale" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
         </div>
 
-        <!-- PANNELLO 2: RICERCA + AGENDA + DETTAGLIO -->
+        <!-- PANNELLO 2: RICERCA + AGENDA + GESTIONE NOTE -->
         <div class="form-card">
           <div class="form-card-title">🔎 Il Magazzino — ricerca e agenda</div>
-          <div style="display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;align-items:start" id="mag-tre-colonne">
-            <!-- COLONNA SINISTRA: ricerca -->
+          <div style="display:grid;grid-template-columns:0.9fr 1.4fr 0.9fr;gap:16px;align-items:start" id="mag-tre-colonne">
+            <!-- COLONNA SINISTRA: ricerca + dettaglio compatto -->
             <div>
               <input type="text" id="mag-search" placeholder="🔍 Cerca attrezzo, attrezzatura, materiale..." oninput="ricercaMagazzino()" style="width:100%;box-sizing:border-box;margin-bottom:10px">
-              <div id="mag-search-risultati" style="max-height:420px;overflow-y:auto"></div>
+              <div id="mag-search-risultati" style="max-height:180px;overflow-y:auto;margin-bottom:12px"></div>
+              <div id="mag-dettaglio" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px;min-height:160px">
+                <div class="empty-state"><div class="icon">📦</div><p style="font-size:12px">Cerca e clicca un elemento per i dettagli</p></div>
+              </div>
             </div>
-            <!-- COLONNA CENTRALE: data + agenda -->
+            <!-- COLONNA CENTRALE: data/ora + agenda potenziata -->
             <div>
+              <button id="btn-pin-agenda" onclick="impostaPinAgenda()" style="display:none;margin-bottom:8px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:11px;padding:4px 10px;border-radius:4px">🔑 Imposta PIN Agenda</button>
+              <div style="display:flex;gap:8px;margin-bottom:10px">
+                <div id="mag-data-corrente" onclick="apriSelettoreMeseAnno()" style="flex:2;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);cursor:pointer" title="Clicca per saltare a un mese/anno specifico"></div>
+                <div id="mag-ora-corrente" style="flex:1;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg)"></div>
+              </div>
               <div style="display:flex;gap:4px;margin-bottom:10px;background:var(--bg2);padding:3px;border-radius:var(--radius);border:1px solid var(--border)">
                 <button id="mag-view-settimana" onclick="cambiaVistaAgenda('settimana')" style="flex:1;padding:5px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:var(--accent);color:#fff">Settimana</button>
                 <button id="mag-view-mese" onclick="cambiaVistaAgenda('mese')" style="flex:1;padding:5px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:transparent;color:var(--text2)">Mese</button>
@@ -400,19 +408,24 @@
               </div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                 <button onclick="navigaAgenda(-1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:14px;padding:4px 10px;border-radius:4px">◀</button>
-                <div id="mag-data-corrente" onclick="apriSelettoreMeseAnno()" style="flex:1;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);cursor:pointer" title="Clicca per saltare a un mese/anno specifico"></div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--text3)">Naviga periodo</div>
                 <button onclick="navigaAgenda(1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:14px;padding:4px 10px;border-radius:4px">▶</button>
               </div>
-              <div id="mag-agenda-settimana" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px"></div>
+              <div id="mag-agenda-settimana" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px"></div>
               <div id="mag-agenda-mese" style="display:none;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px"></div>
               <div id="mag-agenda-anno" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px"></div>
-              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap">
+            </div>
+            <!-- COLONNA DESTRA: gestione Note/Promemoria -->
+            <div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                <button onclick="apriGestioneAgendaItems('nota')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-size:13px;font-weight:500;padding:10px;border-radius:var(--radius);text-align:left">📝 Gestisci Note</button>
+                <button onclick="apriGestioneAgendaItems('promemoria')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:13px;font-weight:500;padding:10px;border-radius:var(--radius);text-align:left">📌 Gestisci Promemoria</button>
+              </div>
+              <div class="form-card-title" style="margin-bottom:8px">Prossimi promemoria</div>
+              <div id="mag-promemoria-lista" style="max-height:260px;overflow-y:auto"></div>
+              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap;margin-top:12px">
                 <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
               </div>
-            </div>
-            <!-- COLONNA DESTRA: dettaglio -->
-            <div id="mag-dettaglio" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;min-height:300px">
-              <div class="empty-state"><div class="icon">📦</div><p>Cerca e clicca un elemento per vederne i dettagli</p></div>
             </div>
           </div>
         </div>
@@ -436,7 +449,7 @@
           <div class="form-card-title">Materiali censiti (<span id="mat-count">0</span>)</div>
           <div id="mat-lista"><div class="empty-state"><div class="icon">🧰</div><p>Nessun materiale censito</p></div></div>
         </div>
-        <div class="form-card">
+        <div class="form-card" id="mat-form-card-wrap">
           <div class="form-card-title" id="mat-form-title">Aggiungi / Modifica materiale</div>
           <div class="form-grid cols-3">
             <div class="form-group">
@@ -477,7 +490,7 @@
           <div class="form-card-title">Cantieri (<span id="cant-count">0</span>)</div>
           <div id="cant-lista"><div class="empty-state"><div class="icon">🏗️</div><p>Nessun cantiere aperto</p></div></div>
         </div>
-        <div class="form-card">
+        <div class="form-card" id="cant-form-card-wrap">
           <div class="form-card-title" id="cant-form-title">Apri nuovo cantiere</div>
           <div class="form-grid cols-3">
             <div class="form-group"><label>Nome cantiere *</label><input type="text" id="cant-nome" placeholder="es. Cantiere Milano - Via Rossi"></div>
@@ -493,7 +506,7 @@
             <button class="btn btn-ghost" onclick="clearCantiereForm()">Annulla</button>
           </div>
         </div>
-        <div class="form-card">
+        <div class="form-card" id="prev-form-card-wrap">
           <div class="form-card-title">🎯 Imposta obiettivo previsto (per cantiere + materiale)</div>
           <div class="form-grid cols-3">
             <div class="form-group"><label>Cantiere</label><select id="prev-cantiere"><option value="">— seleziona cantiere —</option></select></div>
@@ -515,7 +528,7 @@
           </div>
           <div id="cs-lista"><div class="empty-state"><div class="icon">📋</div><p>Nessuna consegna registrata</p></div></div>
         </div>
-        <div class="form-card">
+        <div class="form-card" id="cs-form-card-wrap">
           <div class="form-card-title">Registra consegna materiale</div>
           <div class="form-grid cols-3">
             <div class="form-group"><label>Cantiere</label><select id="cs-cantiere"><option value="">— seleziona cantiere —</option></select></div>
@@ -567,7 +580,7 @@
           <div class="form-card-title">Clienti censiti (<span id="cli-count">0</span>)</div>
           <div id="cli-lista"><div class="empty-state"><div class="icon">🧑‍💼</div><p>Nessun cliente registrato</p></div></div>
         </div>
-        <div class="form-card">
+        <div class="form-card" id="cli-form-card-wrap">
           <div class="form-card-title" id="cli-form-title">Aggiungi / Modifica cliente</div>
           <div class="form-grid cols-3">
             <div class="form-group"><label>Nome cliente *</label><input type="text" id="cli-nome" placeholder="es. Zincheria De Lucchi"></div>
@@ -1431,12 +1444,19 @@
       <div class="form-card">
         <div class="form-card-title">🏭 Fase 1 — Il Magazzino (il cuore del gestionale)</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7">
-        Tre schede: <b>🏭 Il Magazzino</b> (centro di comando), <b>⚙️ Gestione</b> (catalogo/cantieri/consegne/report), <b>🗂️ Riorganizzazione fisica</b> (layout, scaffalature, classificazione — contenuto originale di Fase 1).<br><br>
-        <b>Il Magazzino</b> — Quadro generale in alto: cantieri (aperti/chiusi, cliente), squadre (con cantiere attuale), saldatori (con ultima commessa dedotta dai consumi) — tutto cliccabile, porta dritto alla sezione. Sotto: ricerca in tempo reale su tutto il magazzino (articoli, materiali, attrezzature), con dettaglio a destra (foto per le Attrezzature, icona per categoria altrimenti). Al centro: agenda con tre viste navigabili — <b>Settimana</b>, <b>Mese</b> (calendario completo) e <b>Anno</b> (12 mesi cliccabili) — frecce ◀▶ per scorrere, click sulla data per saltare a un mese/anno specifico. Note (grigie) e Promemoria (arancioni, con nastro scorrevole dei prossimi in alto).<br><br>
+        Tre schede: <b>🏭 Il Magazzino</b> (centro di comando), <b>⚙️ Gestione</b> (catalogo/cantieri/consegne/report/clienti), <b>🗂️ Riorganizzazione fisica</b> (layout, scaffalature, classificazione — contenuto originale di Fase 1).<br><br>
+        <b>Il Magazzino</b> — Quadro generale in alto: cantieri (aperti/chiusi, cliente), squadre (con cantiere attuale), saldatori (con ultima commessa dedotta dai consumi) — tutto cliccabile, porta dritto alla sezione.<br><br>
+        <b>Colonna sinistra:</b> ricerca in tempo reale su tutto il magazzino (articoli, materiali, attrezzature), con un riquadro dettaglio compatto sotto (foto per le Attrezzature, icona per categoria altrimenti).<br><br>
+        <b>Colonna centrale — Agenda potenziata:</b> data e <b>orario corrente</b> in alto, tre viste navigabili con frecce ◀▶ — <b>Settimana</b> (giorni grandi, divisi in fasce Mattino/Pomeriggio, cliccabili per creare direttamente una voce in quel momento della giornata), <b>Mese</b> (calendario completo) e <b>Anno</b> (12 mesi cliccabili). Click sulla data per saltare a un mese/anno specifico. Ogni Nota o Promemoria può avere data, ora, fascia, destinatario e autore.<br><br>
+        <b>Colonna destra — Gestione Note/Promemoria:</b> due pulsanti dedicati aprono una vista elenco completa (rispettivamente per Note e per Promemoria) con azioni per ciascuna voce: <b>✉️ invia via email</b> a un utente registrato (apre il client di posta), <b>✎ modifica</b>, <b>🖨 stampa</b>, <b>✕ elimina</b>. Sotto ai due pulsanti, un riquadro mostra i prossimi promemoria in ordine cronologico, e più giù il nastro scorrevole.<br><br>
+        <b>🔒 Protezione Agenda:</b> l'admin può impostare un PIN separato dal login (pulsante "🔑 Imposta PIN Agenda", visibile solo all'admin) per proteggere note e promemoria da occhi indiscreti — sblocco valido per la sessione del browser.<br><br>
+        <b>🔐 Modifica dati riservata all'admin:</b> in Gestione (Catalogo, Cantieri, Consegne, Clienti, Obiettivi previsti) solo l'utente con ruolo admin vede i form di aggiunta e i pulsanti Modifica/Elimina — gli altri utenti possono consultare ma non alterare i dati.<br><br>
         <b>Gestione → Catalogo Materiali:</b> anagrafica materiali di consumo (nome, categoria, unità di misura, prezzo, sconto, fornitore collegato, giacenza e scorta minima con alert automatico).<br><br>
-        <b>Gestione → Cantieri:</b> apertura/chiusura commesse con date, squadra assegnata, stato. Obiettivo "quantità prevista" per cantiere+materiale.<br><br>
+        <b>Gestione → Cantieri:</b> apertura/chiusura commesse con date, <b>Cliente collegato</b> (non più testo libero), squadra assegnata, stato. Obiettivo "quantità prevista" per cantiere+materiale.<br><br>
+        <b>Gestione → Clienti:</b> anagrafica clienti (referente, telefono, email, note). I cantieri creati in passato con cliente scritto a mano vengono convertiti automaticamente in Clienti veri al primo avvio.<br><br>
         <b>Gestione → Consegne:</b> registrazione rapida di ogni consegna materiale a una squadra su un cantiere — si somma automaticamente al totale, scarica la giacenza in automatico. Storico raggruppato per cantiere+materiale con dettaglio a scomparsa.<br><br>
-        <b>Gestione → Report:</b> previsto vs effettivo per materiale, costo per squadra, materiali sotto scorta, top scostamenti. Report stampabile per consegna a fine cantiere.
+        <b>Gestione → Report:</b> previsto vs effettivo per materiale, costo per squadra, materiali sotto scorta, top scostamenti. Report stampabile per consegna a fine cantiere.<br><br>
+        <b>Consumo Cliente/Cantiere in Fase 2:</b> registrando un consumo dischi (Officina o Squadre) si sceglie prima il <b>Cliente</b>, poi — a cascata — solo i <b>Cantieri di quel cliente</b> (o "nessun cantiere" per lavoro generico). Ogni scheda saldatore/squadra ha un pulsante <b>🧾 Registra consumo</b> che apre il form già selezionato, precompilato con l'ultimo cliente/cantiere usato.
         </p>
       </div>
 
@@ -1506,9 +1526,20 @@
 
 <!-- AGENDA MODAL -->
 <div id="agenda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:380px;padding:20px">
-    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">Nuova voce agenda</div>
-    <input type="hidden" id="agenda-modal-data">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:420px;padding:20px">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px" id="agenda-modal-titolo">Nuova voce agenda</div>
+    <input type="hidden" id="agenda-modal-id">
+    <div class="form-grid cols-3" style="margin-bottom:12px">
+      <div class="form-group"><label>Data</label><input type="date" id="agenda-modal-data"></div>
+      <div class="form-group"><label>Ora</label><input type="time" id="agenda-modal-ora"></div>
+      <div class="form-group"><label>Fascia</label>
+        <select id="agenda-modal-fascia">
+          <option value="">—</option>
+          <option value="mattina">Mattina</option>
+          <option value="pomeriggio">Pomeriggio</option>
+        </select>
+      </div>
+    </div>
     <div class="form-group" style="margin-bottom:12px">
       <label>Tipo</label>
       <select id="agenda-modal-tipo">
@@ -1516,13 +1547,43 @@
         <option value="promemoria">📌 Promemoria</option>
       </select>
     </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Per chi (facoltativo)</label>
+      <input type="text" id="agenda-modal-destinatario" placeholder="es. Gabriele, o lascia vuoto">
+    </div>
     <div class="form-group" style="margin-bottom:16px">
       <label>Testo</label>
       <textarea id="agenda-modal-testo" style="min-height:70px" placeholder="es. Ordinare dischi lamellari"></textarea>
     </div>
     <div class="actions-bar" style="border:none;padding:0;margin:0">
-      <button class="btn btn-primary" onclick="confermaVoceAgenda()">Aggiungi</button>
+      <button class="btn btn-primary" onclick="confermaVoceAgenda()">Salva</button>
       <button class="btn btn-ghost" onclick="chiudiAgendaModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- GESTIONE NOTE/PROMEMORIA MODAL -->
+<div id="gestione-agenda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:92vw;max-width:750px;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
+      <span style="font-size:15px;font-weight:600;color:var(--text)" id="gestione-agenda-titolo">Gestisci</span>
+      <button onclick="document.getElementById('gestione-agenda-modal').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div id="gestione-agenda-lista" style="overflow-y:auto;padding:16px 20px"></div>
+  </div>
+</div>
+
+<!-- INVIA EMAIL MODAL -->
+<div id="email-agenda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:90vw;max-width:380px;padding:20px">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">Invia via email</div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Destinatario</label>
+      <select id="email-agenda-utente"></select>
+    </div>
+    <div class="actions-bar" style="border:none;padding:0;margin:0">
+      <button class="btn btn-primary" onclick="confermaInvioEmail()">Apri email</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('email-agenda-modal').style.display='none'">Annulla</button>
     </div>
   </div>
 </div>
@@ -1590,7 +1651,7 @@ function showModule(id) {
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
   if(id==='fase2'){updateMaterialeSelects();refreshArticoliSelects();aggiornaSelectClienti();}
-  if(id==='fase1'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderClienti();aggiornaSelectClienti();renderMagazzino();}
+  if(id==='fase1'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderClienti();aggiornaSelectClienti();applyMagazzinoPermessi();renderMagazzino();}
 }
 
 function toggleCheck(id) {
@@ -2338,6 +2399,13 @@ function loadMezziDB(){try{mezziDB=JSON.parse(localStorage.getItem('dce-mezzi')|
 function saveAssegnazioniDB(){try{localStorage.setItem('dce-assegnazioni',JSON.stringify(assegnazioniDB));}catch(e){}}
 function loadAssegnazioniDB(){try{assegnazioniDB=JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]');}catch(e){assegnazioniDB=[];}}
 function daysDiff(d){if(!d)return null;const dt=new Date(d),now=new Date();now.setHours(0,0,0,0);return Math.ceil((dt-now)/(864e5));}
+function isAdmin(){return !!(currentUser&&currentUser.ruolo==='admin');}
+function applyMagazzinoPermessi(){
+  const ammin=isAdmin();
+  ['mat-form-card-wrap','cant-form-card-wrap','cli-form-card-wrap','prev-form-card-wrap','cs-form-card-wrap'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display=ammin?'':'none';
+  });
+}
 function scadenzaTag(d,label){if(!d)return '';const days=daysDiff(d),fmt=new Date(d).toLocaleDateString('it-IT');if(days<0)return'<span class="tag tag-red">⚠ '+label+': SCADUTA ('+fmt+')</span>';if(days<=30)return'<span class="tag tag-red">🔴 '+label+': '+fmt+' ('+days+'gg)</span>';if(days<=90)return'<span class="tag tag-orange">🟠 '+label+': '+fmt+' ('+days+'gg)</span>';return'<span class="tag tag-green">✓ '+label+': '+fmt+'</span>';}
 function statoColor(s){return{Ottimo:'tag-green',Buono:'tag-green',Accettabile:'tag-orange','Da revisionare':'tag-red','Fuori servizio':'tag-red'}[s]||'tag-gray';}
 
@@ -3122,8 +3190,9 @@ function switchF1OuterTab(tab){
   if(tab==='magazzino')renderMagazzino();
 }
 
-function renderMagazzino(){
+async function renderMagazzino(){
   renderQuadroGenerale();
+  await caricaPinAgenda();
   renderAgenda();
   document.getElementById('mag-search').value='';
   document.getElementById('mag-search-risultati').innerHTML='';
@@ -3238,11 +3307,14 @@ function confermaSelettoreMeseAnno(){
   cambiaVistaAgenda('mese');
 }
 function renderAgenda(){
+  if(agendaPin&&!agendaUnlocked){renderAgendaBloccata();return;}
   renderAgendaHeader();
+  renderOraCorrente();
   if(agendaViewMode==='settimana')renderAgendaSettimana();
   else if(agendaViewMode==='mese')renderAgendaMese();
   else renderAgendaAnno();
   renderTickerPromemoria();
+  renderPromemoriaLista();
 }
 function renderAgendaHeader(){
   const el=document.getElementById('mag-data-corrente');if(!el)return;
@@ -3264,19 +3336,63 @@ function getSettimanaDi(dataRif){
   for(let i=0;i<7;i++){const d=new Date(lunedi);d.setDate(lunedi.getDate()+i);settimana.push(d.toISOString().slice(0,10));}
   return settimana;
 }
+// --- PROTEZIONE AGENDA (PIN separato dal login) ---
+let agendaPin=null, agendaUnlocked=false, agendaPinCaricato=false;
+async function caricaPinAgenda(){
+  if(agendaPinCaricato)return;
+  agendaPinCaricato=true;
+  try{
+    const d=await loadFromCloud('agenda-config');
+    agendaPin=(d&&d.pin)?d.pin:null;
+  }catch(e){agendaPin=null;}
+  const btn=document.getElementById('btn-pin-agenda');
+  if(btn)btn.style.display=isAdmin()?'':'none';
+}
+async function impostaPinAgenda(){
+  const nuovo=prompt(agendaPin?'Cambia PIN Agenda (lascia vuoto per rimuovere la protezione):':'Imposta un PIN per proteggere l\'Agenda (solo numeri, lascia vuoto per nessuna protezione):', agendaPin||'');
+  if(nuovo===null)return;
+  agendaPin=nuovo.trim()||null;
+  if(typeof saveToCloud==='function'&&currentUser){
+    await saveToCloud('agenda-config',{pin:agendaPin});
+  }
+  agendaUnlocked=true;
+  showToast(agendaPin?'PIN Agenda impostato ✓':'Protezione Agenda rimossa');
+  renderAgenda();
+}
+function renderAgendaBloccata(){
+  const box='<div style="grid-column:1/-1;text-align:center;padding:30px 10px"><div style="font-size:28px;margin-bottom:8px">🔒</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">Agenda protetta da PIN</div><input type="password" id="agenda-pin-input" placeholder="PIN" style="max-width:140px;text-align:center;margin-bottom:8px" onkeydown="if(event.key===\'Enter\')sbloccaAgenda()"><br><button class="btn btn-primary" onclick="sbloccaAgenda()">Sblocca</button></div>';
+  document.getElementById('mag-agenda-settimana').innerHTML=box;
+  document.getElementById('mag-agenda-mese').innerHTML='';
+  document.getElementById('mag-agenda-anno').innerHTML='';
+  document.getElementById('mag-promemoria-lista').innerHTML='<div style="font-size:12px;color:var(--text3)">🔒 Sblocca l\'agenda per vedere i promemoria</div>';
+  const ticker=document.getElementById('mag-ticker');if(ticker){ticker.textContent='';ticker.style.animation='none';}
+}
+function sbloccaAgenda(){
+  const val=(document.getElementById('agenda-pin-input')?.value||'').trim();
+  if(val===agendaPin){agendaUnlocked=true;renderAgenda();showToast('Agenda sbloccata ✓');}
+  else showToast('PIN errato');
+}
+
 function renderAgendaSettimana(){
   const el=document.getElementById('mag-agenda-settimana');if(!el)return;
   const settimana=getSettimanaDi(agendaViewDate);
   const oggiStr=new Date().toISOString().slice(0,10);
+  const vociFascia=(data,fascia)=>agendaDB.filter(a=>a.data===data&&(a.fascia||'')===fascia);
+  const rigaFascia=(data,fascia,label)=>{
+    const voci=vociFascia(data,fascia);
+    return '<div style="border-top:1px solid var(--border);padding-top:4px;margin-top:4px">'+
+      '<div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--text3);text-transform:uppercase">'+label+'</span>'+
+      '<button onclick="apriAgendaModal(\''+data+'\',\''+fascia+'\')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 4px">+</button></div>'+
+      voci.map(v=>'<div onclick="modificaVoceAgenda('+v.id+')" title="Clicca per modificare" style="cursor:pointer;font-size:9px;padding:2px 4px;margin-top:2px;border-radius:3px;background:'+(v.tipo==='promemoria'?'rgba(212,136,58,0.25)':'rgba(255,255,255,0.08)')+';color:'+(v.tipo==='promemoria'?'var(--accent)':'var(--text2)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(v.ora?v.ora+' ':'')+v.testo+'</div>').join('')+
+      '</div>';
+  };
   el.innerHTML=settimana.map((data,i)=>{
-    const voci=agendaDB.filter(a=>a.data===data);
     const isOggi=data===oggiStr;
-    return '<div style="background:'+(isOggi?'var(--accent-bg)':'var(--bg2)')+';border:1px solid '+(isOggi?'var(--accent-border)':'var(--border)')+';border-radius:var(--radius);padding:6px;min-height:90px;display:flex;flex-direction:column">'+
-      '<div style="font-size:10px;font-weight:600;color:'+(isOggi?'var(--accent)':'var(--text3)')+';text-align:center;margin-bottom:4px">'+GIORNI_ABBR[i]+' '+parseInt(data.slice(8,10))+'</div>'+
-      '<div style="flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto;max-height:70px">'+
-      voci.map(v=>'<div onclick="rimuoviVoceAgenda('+v.id+')" title="Clicca per rimuovere" style="cursor:pointer;font-size:9px;padding:2px 4px;border-radius:3px;background:'+(v.tipo==='promemoria'?'rgba(212,136,58,0.25)':'rgba(255,255,255,0.08)')+';color:'+(v.tipo==='promemoria'?'var(--accent)':'var(--text2)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.testo+'</div>').join('')+
-      '</div>'+
-      '<button onclick="apriAgendaModal(\''+data+'\')" style="margin-top:4px;background:none;border:1px dashed var(--border2);color:var(--text3);cursor:pointer;font-size:11px;border-radius:3px;padding:2px">+</button>'+
+    return '<div style="background:'+(isOggi?'var(--accent-bg)':'var(--bg2)')+';border:1px solid '+(isOggi?'var(--accent-border)':'var(--border)')+';border-radius:var(--radius);padding:8px;min-height:170px;display:flex;flex-direction:column">'+
+      '<div style="font-size:13px;font-weight:700;color:'+(isOggi?'var(--accent)':'var(--text)')+';text-align:center;margin-bottom:2px">'+GIORNI_ABBR[i]+'</div>'+
+      '<div style="font-size:16px;font-weight:700;color:'+(isOggi?'var(--accent)':'var(--text2)')+';text-align:center;margin-bottom:4px">'+parseInt(data.slice(8,10))+'</div>'+
+      rigaFascia(data,'mattina','Mattino')+
+      rigaFascia(data,'pomeriggio','Pomeriggio')+
       '</div>';
   }).join('');
 }
@@ -3316,24 +3432,58 @@ function renderAgendaAnno(){
       '</div>';
   }).join('');
 }
-function apriAgendaModal(data){
+function renderOraCorrente(){
+  const el=document.getElementById('mag-ora-corrente');if(!el)return;
+  const now=new Date();
+  el.innerHTML='<div style="font-size:17px;font-weight:700;color:var(--text)">'+now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'</div><div style="font-size:10px;color:var(--text3)">ora attuale</div>';
+}
+setInterval(()=>{if(document.getElementById('mag-ora-corrente'))renderOraCorrente();},30000);
+
+function apriAgendaModal(data,fascia){
+  if(agendaPin&&!agendaUnlocked){showToast('Sblocca prima l\'agenda con il PIN');return;}
+  document.getElementById('agenda-modal-id').value='';
+  document.getElementById('agenda-modal-titolo').textContent='Nuova voce agenda';
   document.getElementById('agenda-modal-data').value=data;
+  document.getElementById('agenda-modal-ora').value='';
+  document.getElementById('agenda-modal-fascia').value=fascia||'';
+  document.getElementById('agenda-modal-destinatario').value='';
   document.getElementById('agenda-modal-testo').value='';
   document.getElementById('agenda-modal-tipo').value='nota';
+  document.getElementById('agenda-modal').style.display='flex';
+}
+function modificaVoceAgenda(id){
+  const v=agendaDB.find(x=>x.id===id);if(!v)return;
+  document.getElementById('agenda-modal-id').value=v.id;
+  document.getElementById('agenda-modal-titolo').textContent='Modifica voce agenda';
+  document.getElementById('agenda-modal-data').value=v.data;
+  document.getElementById('agenda-modal-ora').value=v.ora||'';
+  document.getElementById('agenda-modal-fascia').value=v.fascia||'';
+  document.getElementById('agenda-modal-destinatario').value=v.destinatario||'';
+  document.getElementById('agenda-modal-testo').value=v.testo;
+  document.getElementById('agenda-modal-tipo').value=v.tipo;
   document.getElementById('agenda-modal').style.display='flex';
 }
 function chiudiAgendaModal(){document.getElementById('agenda-modal').style.display='none';}
 function confermaVoceAgenda(){
   const testo=document.getElementById('agenda-modal-testo').value.trim();
   if(!testo){showToast('Scrivi qualcosa');return;}
-  agendaDB.push({id:Date.now(),data:document.getElementById('agenda-modal-data').value,tipo:document.getElementById('agenda-modal-tipo').value,testo});
+  const id=document.getElementById('agenda-modal-id').value;
+  const dati={data:document.getElementById('agenda-modal-data').value,ora:document.getElementById('agenda-modal-ora').value,fascia:document.getElementById('agenda-modal-fascia').value,tipo:document.getElementById('agenda-modal-tipo').value,destinatario:document.getElementById('agenda-modal-destinatario').value.trim(),testo,autore:currentUser?currentUser.nome:''};
+  if(id){
+    const i=agendaDB.findIndex(a=>String(a.id)===String(id));
+    if(i!==-1){agendaDB[i]={...agendaDB[i],...dati};}
+    showToast('Modificato ✓');
+  }else{
+    dati.id=Date.now();agendaDB.push(dati);
+    showToast('Aggiunto ✓');
+  }
   saveAgendaDB();renderAgenda();chiudiAgendaModal();
-  showToast('Aggiunto ✓');
 }
 function rimuoviVoceAgenda(id){
   if(!confirm('Rimuovere questa voce?'))return;
   agendaDB=agendaDB.filter(a=>a.id!==id);
   saveAgendaDB();renderAgenda();
+  if(document.getElementById('gestione-agenda-modal').style.display==='flex')renderGestioneAgendaLista();
 }
 function renderTickerPromemoria(){
   const el=document.getElementById('mag-ticker');if(!el)return;
@@ -3342,6 +3492,78 @@ function renderTickerPromemoria(){
   if(!promemoria.length){el.textContent='Nessun promemoria attivo';el.style.animation='none';return;}
   el.innerHTML=promemoria.map(p=>'<span style="color:var(--accent);font-weight:600">📌 '+new Date(p.data).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})+'</span> — '+p.testo).join('&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;');
   el.style.animation='ticker-scroll 25s linear infinite';
+}
+function renderPromemoriaLista(){
+  const el=document.getElementById('mag-promemoria-lista');if(!el)return;
+  const oggiStr=new Date().toISOString().slice(0,10);
+  const lista=agendaDB.filter(a=>a.tipo==='promemoria'&&a.data>=oggiStr).sort((a,b)=>(a.data+((a.ora||'')||'')).localeCompare(b.data+((b.ora||'')||'')));
+  if(!lista.length){el.innerHTML='<div style="font-size:12px;color:var(--text3)">Nessun promemoria in arrivo</div>';return;}
+  el.innerHTML=lista.slice(0,10).map(p=>'<div onclick="modificaVoceAgenda('+p.id+')" style="cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">'+
+    '<div style="color:var(--accent);font-weight:600">'+new Date(p.data).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})+(p.ora?' · '+p.ora:'')+'</div>'+
+    '<div style="color:var(--text2)">'+p.testo+'</div>'+
+    (p.destinatario?'<div style="color:var(--text3)">per: '+p.destinatario+'</div>':'')+
+    '</div>').join('');
+}
+
+// --- GESTIONE NOTE / PROMEMORIA (tab dedicata) ---
+let gestioneAgendaTipo='nota';
+function apriGestioneAgendaItems(tipo){
+  if(agendaPin&&!agendaUnlocked){showToast('Sblocca prima l\'agenda con il PIN');return;}
+  gestioneAgendaTipo=tipo;
+  document.getElementById('gestione-agenda-titolo').textContent=tipo==='nota'?'📝 Gestisci Note':'📌 Gestisci Promemoria';
+  document.getElementById('gestione-agenda-modal').style.display='flex';
+  renderGestioneAgendaLista();
+}
+function renderGestioneAgendaLista(){
+  const el=document.getElementById('gestione-agenda-lista');if(!el)return;
+  const lista=agendaDB.filter(a=>a.tipo===gestioneAgendaTipo).sort((a,b)=>(b.data+(b.ora||'')).localeCompare(a.data+(a.ora||'')));
+  if(!lista.length){el.innerHTML='<div class="empty-state"><div class="icon">'+(gestioneAgendaTipo==='nota'?'📝':'📌')+'</div><p>Nessuna voce registrata</p></div>';return;}
+  el.innerHTML=lista.map(v=>'<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">'+
+    '<div style="flex:1;min-width:0">'+
+    '<div style="font-size:12px;color:var(--text3)">'+new Date(v.data).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+(v.ora?' · '+v.ora:'')+(v.fascia?' · '+v.fascia:'')+'</div>'+
+    '<div style="font-size:13px;color:var(--text);margin-top:2px">'+v.testo+'</div>'+
+    (v.destinatario?'<div style="font-size:11px;color:var(--text3);margin-top:2px">Per: '+v.destinatario+'</div>':'')+
+    (v.autore?'<div style="font-size:10px;color:var(--text3)">Creato da: '+v.autore+'</div>':'')+
+    '</div>'+
+    '<div style="display:flex;gap:6px;flex-shrink:0">'+
+    '<button onclick="apriEmailAgenda('+v.id+')" title="Invia via email" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:4px">✉️</button>'+
+    '<button onclick="modificaVoceAgenda('+v.id+')" title="Modifica" style="background:none;border:1px solid var(--border2);color:var(--accent);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:4px">✎</button>'+
+    '<button onclick="stampaVoceAgenda('+v.id+')" title="Stampa" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:4px">🖨</button>'+
+    '<button onclick="rimuoviVoceAgenda('+v.id+')" title="Elimina" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:4px">✕</button>'+
+    '</div></div>').join('');
+}
+function stampaVoceAgenda(id){
+  const v=agendaDB.find(x=>x.id===id);if(!v)return;
+  const w=window.open('','_blank');
+  if(!w){showToast('⚠ Popup bloccato dal browser — abilita i popup per questo sito e riprova');return;}
+  w.document.write('<!DOCTYPE html><html><head><title>'+(v.tipo==='nota'?'Nota':'Promemoria')+'</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#222}h2{margin-bottom:4px}.meta{color:#666;font-size:12px;margin-bottom:20px}.testo{font-size:14px;line-height:1.6;border:1px solid #ccc;padding:16px;border-radius:6px;background:#fafafa}button{margin-top:20px;padding:8px 18px;cursor:pointer}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h2>DCE S.r.l. — '+(v.tipo==='nota'?'Nota':'Promemoria')+'</h2>');
+  w.document.write('<div class="meta">Data: '+new Date(v.data).toLocaleDateString('it-IT')+(v.ora?' ore '+v.ora:'')+(v.destinatario?' — Per: '+v.destinatario:'')+(v.autore?' — Da: '+v.autore:'')+'</div>');
+  w.document.write('<div class="testo">'+v.testo+'</div>');
+  w.document.write('<button onclick="window.print()">Stampa</button></body></html>');
+  w.document.close();
+}
+let emailAgendaTargetId=null;
+async function apriEmailAgenda(id){
+  emailAgendaTargetId=id;
+  const sel=document.getElementById('email-agenda-utente');
+  sel.innerHTML='<option value="">Caricamento utenti...</option>';
+  document.getElementById('email-agenda-modal').style.display='flex';
+  try{
+    const users=await sbFetch('/rest/v1/profiles?select=id,nome,email');
+    const conEmail=users.filter(u=>u.email);
+    if(!conEmail.length){sel.innerHTML='<option value="">Nessuna email disponibile tra gli utenti</option>';return;}
+    sel.innerHTML=conEmail.map(u=>'<option value="'+u.email+'">'+u.nome+' ('+u.email+')</option>').join('');
+  }catch(e){sel.innerHTML='<option value="">Errore caricamento utenti</option>';}
+}
+function confermaInvioEmail(){
+  const email=document.getElementById('email-agenda-utente').value;
+  if(!email){showToast('Seleziona un destinatario');return;}
+  const v=agendaDB.find(x=>x.id===emailAgendaTargetId);if(!v)return;
+  const oggetto=encodeURIComponent('DCE Gestionale — '+(v.tipo==='nota'?'Nota':'Promemoria')+' del '+new Date(v.data).toLocaleDateString('it-IT'));
+  const corpo=encodeURIComponent((v.ora?'Ore: '+v.ora+'\n':'')+(v.destinatario?'Per: '+v.destinatario+'\n':'')+'\n'+v.testo+'\n\n— Inviato da DCE Gestionale');
+  window.location.href='mailto:'+email+'?subject='+oggetto+'&body='+corpo;
+  document.getElementById('email-agenda-modal').style.display='none';
 }
 // ============ END IL MAGAZZINO ============
 
@@ -3550,8 +3772,8 @@ function renderMateriali(){
       (forn?'<span style="font-size:11px;color:var(--text3)">🏭 '+forn.ragione+'</span>':'')+
       (m.note?'<span style="font-size:11px;color:var(--text3)">'+m.note+'</span>':'')+
       '<div style="margin-left:auto;display:flex;gap:6px">'+
-      '<button onclick="editMateriale('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
-      '<button onclick="deleteMateriale('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>'+
+      (isAdmin()?'<button onclick="editMateriale('+m.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
+      '<button onclick="deleteMateriale('+m.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>':'')+
       '</div></div>';
   }).join('');
   updateAlertIndicators();
@@ -3623,8 +3845,8 @@ function renderClienti(){
       (cl.referente?'<span style="font-size:11px;color:var(--text3)">Referente: '+cl.referente+'</span>':'')+
       (cl.telefono?'<span style="font-size:11px;color:var(--text3)">Tel: '+cl.telefono+'</span>':'')+
       '<div style="margin-left:auto;display:flex;gap:6px">'+
-      '<button onclick="editCliente('+cl.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
-      '<button onclick="deleteCliente('+cl.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>'+
+      (isAdmin()?'<button onclick="editCliente('+cl.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎ Modifica</button>'+
+      '<button onclick="deleteCliente('+cl.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕ Rimuovi</button>':'')+
       '</div></div>';
   }).join('');
 }
@@ -3731,10 +3953,10 @@ function renderCantieri(){
       (c.cliente?'<span class="tag tag-blue" style="font-size:10px">'+c.cliente+'</span>':'')+
       (sq?'<span class="tag tag-orange" style="font-size:10px">👷 '+sq.nome+'</span>':'')+
       '<div style="margin-left:auto;display:flex;gap:6px">'+
-      (c.stato==='Aperto'?'<button onclick="chiudiCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔒 Chiudi cantiere</button>':'<button onclick="riapriCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔓 Riapri</button>')+
+      (isAdmin()?(c.stato==='Aperto'?'<button onclick="chiudiCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔒 Chiudi cantiere</button>':'<button onclick="riapriCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">🔓 Riapri</button>'):'')+
       '<button onclick="vaiReportCantiere('+c.id+')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">📊 Report</button>'+
-      '<button onclick="editCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎</button>'+
-      '<button onclick="deleteCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕</button>'+
+      (isAdmin()?'<button onclick="editCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✎</button>'+
+      '<button onclick="deleteCantiere('+c.id+')" style="background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:12px;padding:3px 10px;border-radius:4px">✕</button>':'')+
       '</div></div>'+
       '<div style="font-size:12px;color:var(--text3);margin-top:6px">Aperto: '+(c.apertura?new Date(c.apertura).toLocaleDateString('it-IT'):'—')+(c.chiusura?' &nbsp;·&nbsp; Chiuso: '+new Date(c.chiusura).toLocaleDateString('it-IT'):'')+' &nbsp;·&nbsp; Consegne registrate: '+nConsegne+'</div>'+
       (c.note?'<div style="font-size:12px;color:var(--text3);margin-top:2px">'+c.note+'</div>':'')+
