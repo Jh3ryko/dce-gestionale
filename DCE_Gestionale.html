@@ -169,7 +169,8 @@
     <button class="nav-item" onclick="showModule('charter')"><span class="nav-dot" style="background:#d4883a"></span>Project Charter<span class="nav-badge tag-orange">⭐</span></button>
   </div>
   <div class="sidebar-section">
-    <div class="sidebar-section-label">Fasi del progetto</div>
+    <div class="sidebar-section-label" onclick="toggleSidebarSection('fasi-progetto')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">Fasi del progetto<span id="fasi-progetto-arrow" style="transition:transform 0.15s">▾</span></div>
+    <div id="fasi-progetto-body">
     <button class="nav-item" onclick="showModule('fase0')"><span class="nav-dot" style="background:#9a9890"></span>Fase 0 — Fotografia iniziale<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase1')"><span class="nav-dot" id="nav-dot-fase1" style="background:#4a9e6a"></span>Fase 1 — Il Magazzino<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase2')"><span class="nav-dot" style="background:#7a68b5"></span>Fase 2 — Reparto Operativo<span class="nav-badge tag-orange">attiva</span></button>
@@ -177,6 +178,7 @@
     <button class="nav-item" onclick="showModule('fase4')"><span class="nav-dot" style="background:#4a7eb5"></span>Fase 4 — Sicurezza<span class="nav-badge tag-orange">attiva</span></button>
     <button class="nav-item" onclick="showModule('fase5')"><span class="nav-dot" style="background:#b55a4a"></span>Fase 5 — Digitalizzazione<span class="nav-badge tag-gray">prossima</span></button>
     <button class="nav-item" onclick="showModule('fase6')"><span class="nav-dot" style="background:#4a9e6a"></span>Fase 6 — Personale & SOP<span class="nav-badge tag-gray">prossima</span></button>
+    </div>
   </div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">Registri operativi</div>
@@ -201,6 +203,8 @@
       <button class="btn btn-ghost" id="btn-alert-center" onclick="showAlertCenter()" title="Centro alert" style="position:relative">🔔<span id="alert-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;line-height:1.4;min-width:15px;text-align:center">0</span></button>
       <button class="btn btn-ghost" onclick="showAuditLog()" title="Solo admin">📋 Log</button>
       <button class="btn btn-ghost" onclick="exportData()" title="Backup tecnico completo — non stampabile">💾 Backup</button>
+      <button class="btn btn-ghost" onclick="apriImportaBackup()" title="Ripristina i dati da un file di backup">📂 Ripristina</button>
+      <input type="file" id="input-importa-backup" accept=".json,application/json" style="display:none" onchange="importaBackup(event)">
       <button class="btn btn-primary" onclick="saveAll()">Salva tutto</button>
       <button class="btn btn-ghost" onclick="doLogout()" style="color:var(--red)">Esci</button>
     </div>
@@ -396,7 +400,12 @@
             </div>
             <!-- COLONNA CENTRALE: data/ora + agenda potenziata -->
             <div>
-              <button id="btn-pin-agenda" onclick="impostaPinAgenda()" style="display:none;margin-bottom:8px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:11px;padding:4px 10px;border-radius:4px">🔑 Imposta PIN Agenda</button>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <button id="btn-pin-agenda" onclick="impostaPinAgenda()" style="display:none;flex-shrink:0;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:11px;padding:4px 10px;border-radius:4px">🔑 Imposta PIN Agenda</button>
+                <div style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:6px 0;overflow:hidden;white-space:nowrap">
+                  <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
+                </div>
+              </div>
               <div style="display:flex;gap:8px;margin-bottom:10px">
                 <div id="mag-data-corrente" onclick="apriSelettoreMeseAnno()" style="flex:2;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);cursor:pointer" title="Clicca per saltare a un mese/anno specifico"></div>
                 <div id="mag-ora-corrente" style="flex:1;text-align:center;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg)"></div>
@@ -423,9 +432,6 @@
               </div>
               <div class="form-card-title" style="margin-bottom:8px">Prossimi promemoria</div>
               <div id="mag-promemoria-lista" style="max-height:260px;overflow-y:auto"></div>
-              <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 0;overflow:hidden;white-space:nowrap;margin-top:12px">
-                <div id="mag-ticker" style="display:inline-block;padding-left:100%;font-size:12px"></div>
-              </div>
             </div>
           </div>
         </div>
@@ -2339,32 +2345,65 @@ function loadModule(name){
 
 function saveAll(){['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(saveModule);saveCharter();showToast('Tutto salvato ✓');}
 
+const DCE_BACKUP_KEYS={
+  fase0:'dce-fase0',fase1:'dce-fase1',fase2:'dce-fase2',fase3:'dce-fase3',fase4:'dce-fase4',fase5:'dce-fase5',fase6:'dce-fase6',charter:'dce-charter',
+  mezzi:'dce-mezzi',interventi:'dce-interventi',assegnazioni:'dce-assegnazioni',kmLog:'dce-kmlog',
+  attrezzature:'dce-attrezzature',manutenzioni:'dce-manutenzioni',
+  fornitori:'dce-fornitori',acquisti:'dce-acquisti',
+  saldatori:'dce-saldatori',consumiOfficina:'dce-consumioffic',squadre:'dce-squadre',consumiSquadre:'dce-consumisq',
+  dotazioniSquadre:'dce-dotazionisq',dotazioniSaldatori:'dce-dotazionisald',
+  materiali:'dce-materiali',cantieri:'dce-cantieri',previsto:'dce-previsto',consegne:'dce-consegne',
+  articoli:'dce-articoli',clienti:'dce-clienti',agenda:'dce-agenda'
+};
 function exportData(){
   const all={};
-  ['fase0','fase1','fase2','fase3','fase4','fase5','fase6','charter'].forEach(f=>{try{all[f]=JSON.parse(localStorage.getItem('dce-'+f)||'{}');}catch(e){}});
-  try{all.mezzi=JSON.parse(localStorage.getItem('dce-mezzi')||'[]');}catch(e){}
-  try{all.interventi=JSON.parse(localStorage.getItem('dce-interventi')||'[]');}catch(e){}
-  try{all.assegnazioni=JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]');}catch(e){}
-  try{all.kmLog=JSON.parse(localStorage.getItem('dce-kmlog')||'[]');}catch(e){}
-  try{all.attrezzature=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');}catch(e){}
-  try{all.manutenzioni=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){}
-  try{all.fornitori=JSON.parse(localStorage.getItem('dce-fornitori')||'[]');}catch(e){}
-  try{all.acquisti=JSON.parse(localStorage.getItem('dce-acquisti')||'[]');}catch(e){}
-  try{all.saldatori=JSON.parse(localStorage.getItem('dce-saldatori')||'[]');}catch(e){}
-  try{all.consumiOfficina=JSON.parse(localStorage.getItem('dce-consumioffic')||'[]');}catch(e){}
-  try{all.squadre=JSON.parse(localStorage.getItem('dce-squadre')||'[]');}catch(e){}
-  try{all.consumiSquadre=JSON.parse(localStorage.getItem('dce-consumisq')||'[]');}catch(e){}
-  try{all.dotazioniSquadre=JSON.parse(localStorage.getItem('dce-dotazionisq')||'[]');}catch(e){}
-  try{all.dotazioniSaldatori=JSON.parse(localStorage.getItem('dce-dotazionisald')||'[]');}catch(e){}
-  try{all.materiali=JSON.parse(localStorage.getItem('dce-materiali')||'[]');}catch(e){}
-  try{all.cantieri=JSON.parse(localStorage.getItem('dce-cantieri')||'[]');}catch(e){}
-  try{all.previsto=JSON.parse(localStorage.getItem('dce-previsto')||'[]');}catch(e){}
-  try{all.consegne=JSON.parse(localStorage.getItem('dce-consegne')||'[]');}catch(e){}
+  Object.entries(DCE_BACKUP_KEYS).forEach(([nome,chiave])=>{
+    try{all[nome]=JSON.parse(localStorage.getItem(chiave)||(chiave.startsWith('dce-fase')||chiave==='dce-charter'?'{}':'[]'));}catch(e){}
+  });
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='DCE_backup_dati_'+new Date().toISOString().split('T')[0]+'.json';a.click();
   showToast('Backup dati scaricato (file tecnico, non per la stampa)');
 }
+function apriImportaBackup(){document.getElementById('input-importa-backup').click();}
+function importaBackup(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let dati;
+    try{dati=JSON.parse(e.target.result);}catch(err){showToast('File non valido — non sembra un backup DCE');return;}
+    if(!confirm('Questo sovrascriverà i dati locali attuali con quelli del backup. Procedere?'))return;
+    let ripristinati=0;
+    Object.entries(DCE_BACKUP_KEYS).forEach(([nome,chiave])=>{
+      if(dati[nome]!==undefined){try{localStorage.setItem(chiave,JSON.stringify(dati[nome]));ripristinati++;}catch(err){}}
+    });
+    showToast('Backup importato ✓ ('+ripristinati+' sezioni) — ricarico la pagina...');
+    setTimeout(()=>location.reload(),1200);
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
 
+function toggleSidebarSection(id){
+  const body=document.getElementById(id+'-body');
+  const arrow=document.getElementById(id+'-arrow');
+  if(!body||!arrow)return;
+  const chiuso=body.style.display==='none';
+  body.style.display=chiuso?'':'none';
+  arrow.style.transform=chiuso?'':'rotate(-90deg)';
+  try{localStorage.setItem('dce-sidebar-'+id,chiuso?'aperto':'chiuso');}catch(e){}
+}
+function ripristinaStatoSidebar(){
+  ['fasi-progetto'].forEach(id=>{
+    let stato='aperto';
+    try{stato=localStorage.getItem('dce-sidebar-'+id)||'aperto';}catch(e){}
+    if(stato==='chiuso'){
+      const body=document.getElementById(id+'-body');
+      const arrow=document.getElementById(id+'-arrow');
+      if(body)body.style.display='none';
+      if(arrow)arrow.style.transform='rotate(-90deg)';
+    }
+  });
+}
 function showToast(msg){
   const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
@@ -4201,6 +4240,7 @@ function stampaReportCantiere(){
 // ============ END MATERIALI ============
 
 window.addEventListener('load',async()=>{
+  ripristinaStatoSidebar();
   // Ripristina sessione: prima localStorage (Ricordami), poi sessionStorage
   const remember=localStorage.getItem('dce-remember')==='1';
   const store=remember?localStorage:sessionStorage;
