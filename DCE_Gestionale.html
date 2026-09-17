@@ -1722,6 +1722,7 @@ function saveScorteDB(){
     localStorage.setItem('dce-dotazionisq',JSON.stringify(dotazioniSqDB));
     localStorage.setItem('dce-dotazionisald',JSON.stringify(dotazioniSaldDB));
   }catch(e){}
+  scheduleCloudSave('fase2-scorte',()=>({saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB,dotazioniSald:dotazioniSaldDB}));
 }
 
 function loadScorteDB(){
@@ -2433,9 +2434,9 @@ function loadCharter(){
 
 // MEZZI
 let mezziDB=[],interventiDB=[],assegnazioniDB=[],kmLogDB=[],editingMezzoId=null;
-function saveMezziDB(){try{localStorage.setItem('dce-mezzi',JSON.stringify(mezziDB));localStorage.setItem('dce-interventi',JSON.stringify(interventiDB));localStorage.setItem('dce-kmlog',JSON.stringify(kmLogDB));}catch(e){}}
+function saveMezziDB(){try{localStorage.setItem('dce-mezzi',JSON.stringify(mezziDB));localStorage.setItem('dce-interventi',JSON.stringify(interventiDB));localStorage.setItem('dce-kmlog',JSON.stringify(kmLogDB));}catch(e){}scheduleCloudSave('mezzi-registro',()=>({mezzi:mezziDB,interventi:interventiDB,kmLog:kmLogDB}));}
 function loadMezziDB(){try{mezziDB=JSON.parse(localStorage.getItem('dce-mezzi')||'[]');interventiDB=JSON.parse(localStorage.getItem('dce-interventi')||'[]');kmLogDB=JSON.parse(localStorage.getItem('dce-kmlog')||'[]');}catch(e){mezziDB=[];interventiDB=[];kmLogDB=[];}}
-function saveAssegnazioniDB(){try{localStorage.setItem('dce-assegnazioni',JSON.stringify(assegnazioniDB));}catch(e){}}
+function saveAssegnazioniDB(){try{localStorage.setItem('dce-assegnazioni',JSON.stringify(assegnazioniDB));}catch(e){}scheduleCloudSave('assegnazioni-registro',()=>({assegnazioni:assegnazioniDB}));}
 function loadAssegnazioniDB(){try{assegnazioniDB=JSON.parse(localStorage.getItem('dce-assegnazioni')||'[]');}catch(e){assegnazioniDB=[];}}
 function daysDiff(d){if(!d)return null;const dt=new Date(d),now=new Date();now.setHours(0,0,0,0);return Math.ceil((dt-now)/(864e5));}
 function isAdmin(){return !!(currentUser&&currentUser.ruolo==='admin');}
@@ -2920,6 +2921,21 @@ async function auditLog(azione,sezione,dettaglio=''){
   try{await sbFetch('/rest/v1/audit_log','POST',{utente_email:currentUser.email,utente_nome:currentUser.nome,azione,sezione,dettaglio});}catch(e){}
 }
 
+// --- AUTOSALVATAGGIO CLOUD (silenzioso, dopo ogni modifica) ---
+let _autoSaveTimers={}, _suppressAutoSave=false;
+async function saveToCloudSilent(sezione,dati){
+  if(!currentUser)return false;
+  try{
+    const res=await sbFetch('/rest/v1/dati_progetto?on_conflict=sezione','POST',{sezione,dati,aggiornato_da:currentUser.nome,updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=representation'});
+    return !!(res&&(!Array.isArray(res)||res.length));
+  }catch(e){console.warn('autosave',sezione,e);return false;}
+}
+function scheduleCloudSave(sezione,buildPayload){
+  if(_suppressAutoSave||!currentUser)return;
+  clearTimeout(_autoSaveTimers[sezione]);
+  _autoSaveTimers[sezione]=setTimeout(()=>{saveToCloudSilent(sezione,buildPayload());},1500);
+}
+
 async function saveToCloud(sezione,dati){
   if(!currentUser)return false;
   try{
@@ -2934,30 +2950,93 @@ async function loadFromCloud(sezione){try{const r=await sbFetch('/rest/v1/dati_p
 
 async function loadAllFromCloud(){
   if(!currentUser)return;
+  _suppressAutoSave=true;
+  // Fusione: unisce i record di cloud e locale per id, così un cloud non aggiornato
+  // non può più cancellare dati inseriti in locale (e viceversa).
+  const fondiCloudELocale=(datiCloud,chiaveCloud,arrayLocale)=>{
+    const daCloud=(datiCloud&&Array.isArray(datiCloud[chiaveCloud]))?datiCloud[chiaveCloud]:[];
+    const daLocale=Array.isArray(arrayLocale)?arrayLocale:[];
+    if(!daLocale.length)return {valore:daCloud,daRisalire:false};
+    if(!daCloud.length)return {valore:daLocale,daRisalire:true};
+    const perId=new Map();
+    daCloud.forEach(r=>{const k=(r&&r.id!==undefined)?String(r.id):JSON.stringify(r);perId.set(k,r);});
+    let aggiunti=0;
+    daLocale.forEach(r=>{
+      const k=(r&&r.id!==undefined)?String(r.id):JSON.stringify(r);
+      if(!perId.has(k)){perId.set(k,r);aggiunti++;}
+    });
+    return {valore:[...perId.values()],daRisalire:aggiunti>0};
+  };
+  const usaCloudOppureLocale=fondiCloudELocale;
   try{
     for(const p of['charter','fase0','fase1','fase2','fase3','fase4','fase5','fase6']){
       const d=await loadFromCloud(p);if(!d)continue;
       Object.entries(d).forEach(([id,val])=>{const el=document.getElementById(id);if(!el)return;if(el.type==='checkbox'){el.checked=val;const it=el.closest('.check-item');if(it)it.classList.toggle('checked',val);}else el.value=val;});
     }
+    let daRisalire=new Set();
+
     const mezziDati=await loadFromCloud('mezzi-registro');
-    if(mezziDati){mezziDB=mezziDati.mezzi||[];interventiDB=mezziDati.interventi||[];kmLogDB=mezziDati.kmLog||[];saveMezziDB();}
+    let r=usaCloudOppureLocale(mezziDati,'mezzi',mezziDB); mezziDB=r.valore; if(r.daRisalire)daRisalire.add('mezzi');
+    r=usaCloudOppureLocale(mezziDati,'interventi',interventiDB); interventiDB=r.valore; if(r.daRisalire)daRisalire.add('mezzi');
+    r=usaCloudOppureLocale(mezziDati,'kmLog',kmLogDB); kmLogDB=r.valore; if(r.daRisalire)daRisalire.add('mezzi');
+    saveMezziDB();
+
     const assegnazioniDati=await loadFromCloud('assegnazioni-registro');
-    if(assegnazioniDati){assegnazioniDB=assegnazioniDati.assegnazioni||[];saveAssegnazioniDB();}
+    r=usaCloudOppureLocale(assegnazioniDati,'assegnazioni',assegnazioniDB); assegnazioniDB=r.valore; if(r.daRisalire)daRisalire.add('assegnazioni');
+    saveAssegnazioniDB();
+
     const scorte=await loadFromCloud('fase2-scorte');
-    if(scorte){
-      saldatoriDB=scorte.saldatori||[];consumiOfficDB=scorte.consumiOffic||[];squadreDB=scorte.squadre||[];consumiSqDB=scorte.consumiSq||[];dotazioniSqDB=scorte.dotazioniSq||[];dotazioniSaldDB=scorte.dotazioniSald||[];
-      saveScorteDB();
-    }
+    r=usaCloudOppureLocale(scorte,'saldatori',saldatoriDB); saldatoriDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    r=usaCloudOppureLocale(scorte,'consumiOffic',consumiOfficDB); consumiOfficDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    r=usaCloudOppureLocale(scorte,'squadre',squadreDB); squadreDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    r=usaCloudOppureLocale(scorte,'consumiSq',consumiSqDB); consumiSqDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    r=usaCloudOppureLocale(scorte,'dotazioniSq',dotazioniSqDB); dotazioniSqDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    r=usaCloudOppureLocale(scorte,'dotazioniSald',dotazioniSaldDB); dotazioniSaldDB=r.valore; if(r.daRisalire)daRisalire.add('scorte');
+    saveScorteDB();
+
+    const attrDati=await loadFromCloud('attrezzature-registro');
+    r=usaCloudOppureLocale(attrDati,'attrezzature',attrezzatureDB); attrezzatureDB=r.valore; if(r.daRisalire)daRisalire.add('attrezzature');
+    r=usaCloudOppureLocale(attrDati,'manutenzioni',manutenzioniDB); manutenzioniDB=r.valore; if(r.daRisalire)daRisalire.add('attrezzature');
+    saveAttrDB();
+
+    const agendaDati=await loadFromCloud('agenda-voci');
+    r=usaCloudOppureLocale(agendaDati,'voci',agendaDB); agendaDB=r.valore; if(r.daRisalire)daRisalire.add('agenda');
+    saveAgendaDB();
+
     const permessi=await loadFromCloud('permessi-fornitori');
     fornitoriAuthorizedIds=(permessi&&permessi.ids)?permessi.ids:[];
+
     const fornDati=await loadFromCloud('fornitori');
-    if(fornDati){fornitoriDB=fornDati.fornitori||[];acquistiDB=fornDati.acquisti||[];saveFornitoriDB();}
+    r=usaCloudOppureLocale(fornDati,'fornitori',fornitoriDB); fornitoriDB=r.valore; if(r.daRisalire)daRisalire.add('fornitori');
+    r=usaCloudOppureLocale(fornDati,'acquisti',acquistiDB); acquistiDB=r.valore; if(r.daRisalire)daRisalire.add('fornitori');
+    saveFornitoriDB();
     applyFornitoriVisibility();
+
     const matDati=await loadFromCloud('materiali-registro');
-    if(matDati){materialiDB=matDati.materiali||[];cantieriDB=matDati.cantieri||[];previstoDB=matDati.previsto||[];consegneDB=matDati.consegne||[];if(matDati.articoli&&matDati.articoli.length)articoliDB=matDati.articoli;if(matDati.clienti&&matDati.clienti.length)clientiDB=matDati.clienti;saveMaterialiDB();saveArticoliDB();saveClientiDB();}
+    r=usaCloudOppureLocale(matDati,'materiali',materialiDB); materialiDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    r=usaCloudOppureLocale(matDati,'cantieri',cantieriDB); cantieriDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    r=usaCloudOppureLocale(matDati,'previsto',previstoDB); previstoDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    r=usaCloudOppureLocale(matDati,'consegne',consegneDB); consegneDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    r=usaCloudOppureLocale(matDati,'articoli',articoliDB); articoliDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    r=usaCloudOppureLocale(matDati,'clienti',clientiDB); clientiDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
+    saveMaterialiDB();saveArticoliDB();saveClientiDB();
+
     seedArticoliIniziali();
-    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();migraClientiDaCantieriEsistenti();aggiornaSelectClienti();updateDashboardStats();},100);
-  }catch(e){console.warn(e);}
+    _suppressAutoSave=false;
+
+    // Dati locali più ricchi del cloud: li spingo subito in cloud per allinearli
+    if(daRisalire.size){
+      if(daRisalire.has('mezzi'))saveToCloudSilent('mezzi-registro',{mezzi:mezziDB,interventi:interventiDB,kmLog:kmLogDB});
+      if(daRisalire.has('assegnazioni'))saveToCloudSilent('assegnazioni-registro',{assegnazioni:assegnazioniDB});
+      if(daRisalire.has('scorte'))saveToCloudSilent('fase2-scorte',{saldatori:saldatoriDB,consumiOffic:consumiOfficDB,squadre:squadreDB,consumiSq:consumiSqDB,dotazioniSq:dotazioniSqDB,dotazioniSald:dotazioniSaldDB});
+      if(daRisalire.has('attrezzature'))saveToCloudSilent('attrezzature-registro',{attrezzature:attrezzatureDB,manutenzioni:manutenzioniDB});
+      if(daRisalire.has('agenda'))saveToCloudSilent('agenda-voci',{voci:agendaDB});
+      if(daRisalire.has('fornitori'))saveToCloudSilent('fornitori',{fornitori:fornitoriDB,acquisti:acquistiDB});
+      if(daRisalire.has('materiali'))saveToCloudSilent('materiali-registro',{materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB,clienti:clientiDB});
+      console.info('Dati locali allineati al cloud:',[...daRisalire].join(', '));
+    }
+    setTimeout(()=>{calcF0();calcF1();calcF2();calcF3();calcF4();calcF5();calcF6();renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();renderConsumiOfficina();renderConsumiSquadre();renderAttrezzature();renderFornitori();updateAcquistoFornitoreSelect();renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();migraClientiDaCantieriEsistenti();aggiornaSelectClienti();updateDashboardStats();},100);
+  }catch(e){console.warn(e);_suppressAutoSave=false;}
 }
 
 async function showAuditLog(){
@@ -2974,7 +3053,7 @@ function closeAuditModal(){document.getElementById('audit-modal').style.display=
 
 // ============ ATTREZZATURE ============
 let attrezzatureDB=[], manutenzioniDB=[], editingAttrId=null;
-function saveAttrDB(){try{localStorage.setItem('dce-attrezzature',JSON.stringify(attrezzatureDB));localStorage.setItem('dce-manutenzioni',JSON.stringify(manutenzioniDB));}catch(e){}}
+function saveAttrDB(){try{localStorage.setItem('dce-attrezzature',JSON.stringify(attrezzatureDB));localStorage.setItem('dce-manutenzioni',JSON.stringify(manutenzioniDB));}catch(e){}scheduleCloudSave('attrezzature-registro',()=>({attrezzature:attrezzatureDB,manutenzioni:manutenzioniDB}));}
 function loadAttrDB(){try{attrezzatureDB=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');manutenzioniDB=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){attrezzatureDB=[];manutenzioniDB=[];}}
 function getTipo(){const s=document.getElementById('at-tipo').value,c=document.getElementById('at-tipo-custom').value.trim();return(s==='Altro (specifica nelle note)'&&c)?c:s;}
 function getMarca(){const s=document.getElementById('at-marca').value,c=document.getElementById('at-marca-custom').value.trim();return(s==='Altra marca'&&c)?c:s;}
@@ -3100,7 +3179,7 @@ function applyFornitoriVisibility(){
   if(!hasFornitoriAccess()){const mod=document.getElementById('mod-fornitori');if(mod&&mod.classList.contains('active'))showModule('dashboard');}
 }
 
-function saveFornitoriDB(){try{localStorage.setItem('dce-fornitori',JSON.stringify(fornitoriDB));localStorage.setItem('dce-acquisti',JSON.stringify(acquistiDB));}catch(e){}}
+function saveFornitoriDB(){try{localStorage.setItem('dce-fornitori',JSON.stringify(fornitoriDB));localStorage.setItem('dce-acquisti',JSON.stringify(acquistiDB));}catch(e){}scheduleCloudSave('fornitori',()=>({fornitori:fornitoriDB,acquisti:acquistiDB}));}
 function loadFornitoriDB(){try{fornitoriDB=JSON.parse(localStorage.getItem('dce-fornitori')||'[]');acquistiDB=JSON.parse(localStorage.getItem('dce-acquisti')||'[]');}catch(e){fornitoriDB=[];acquistiDB=[];}}
 
 function addFornitore(){
@@ -3307,7 +3386,7 @@ function mostraDettaglioMagazzino(i){
 let agendaDB=[];
 let agendaViewMode='settimana';
 let agendaViewDate=new Date();
-function saveAgendaDB(){try{localStorage.setItem('dce-agenda',JSON.stringify(agendaDB));}catch(e){}}
+function saveAgendaDB(){try{localStorage.setItem('dce-agenda',JSON.stringify(agendaDB));}catch(e){}scheduleCloudSave('agenda-voci',()=>({voci:agendaDB}));}
 function loadAgendaDB(){try{agendaDB=JSON.parse(localStorage.getItem('dce-agenda')||'[]');}catch(e){agendaDB=[];}}
 
 const MESI_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
@@ -3627,7 +3706,7 @@ function seedArticoliIniziali(){
   seed.forEach(([categoria,nome])=>articoliDB.push({id:Date.now()+Math.floor(Math.random()*100000),categoria,nome}));
   saveArticoliDB();
 }
-function saveArticoliDB(){try{localStorage.setItem('dce-articoli',JSON.stringify(articoliDB));}catch(e){}}
+function saveArticoliDB(){try{localStorage.setItem('dce-articoli',JSON.stringify(articoliDB));}catch(e){}scheduleCloudSave('materiali-registro',()=>({materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB,clienti:clientiDB}));}
 function loadArticoliDB(){try{articoliDB=JSON.parse(localStorage.getItem('dce-articoli')||'[]');}catch(e){articoliDB=[];}}
 
 function registraArticolo(categoria,nome){
@@ -3710,6 +3789,7 @@ function saveMaterialiDB(){
     localStorage.setItem('dce-previsto',JSON.stringify(previstoDB));
     localStorage.setItem('dce-consegne',JSON.stringify(consegneDB));
   }catch(e){}
+  scheduleCloudSave('materiali-registro',()=>({materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB,clienti:clientiDB}));
 }
 function loadMaterialiDB(){
   try{
@@ -3820,7 +3900,7 @@ function renderMateriali(){
 
 // --- CLIENTI ---
 let clientiDB=[], editingClienteId=null;
-function saveClientiDB(){try{localStorage.setItem('dce-clienti',JSON.stringify(clientiDB));}catch(e){}}
+function saveClientiDB(){try{localStorage.setItem('dce-clienti',JSON.stringify(clientiDB));}catch(e){}scheduleCloudSave('materiali-registro',()=>({materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB,clienti:clientiDB}));}
 function loadClientiDB(){try{clientiDB=JSON.parse(localStorage.getItem('dce-clienti')||'[]');}catch(e){clientiDB=[];}}
 
 function migraClientiDaCantieriEsistenti(){
