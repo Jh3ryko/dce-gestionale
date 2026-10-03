@@ -1249,37 +1249,10 @@
         <div class="form-card-title" id="attr-form-title">Aggiungi / Modifica attrezzatura</div>
         <div class="form-grid cols-3">
           <div class="form-group"><label>Tipo attrezzatura</label>
-            <select id="at-tipo">
+            <select id="at-tipo" onchange="if(this.value==='__nuovo__')apriArticoloModal('Attrezzi','at-tipo')">
               <option value="">— seleziona —</option>
-              <optgroup label="Taglio e abrasione">
-                <option>Smerigliatrice angolare (flessibile)</option><option>Smerigliatrice diritta</option>
-                <option>Troncatrice</option><option>Seghetto alternativo</option><option>Sega circolare</option><option>Cesoia elettrica</option>
-              </optgroup>
-              <optgroup label="Foratura e avvitatura">
-                <option>Trapano a percussione</option><option>Trapano combinato (tassellatore)</option><option>Trapano a colonna</option>
-                <option>Avvitatore a impulsi</option><option>Avvitatore a batteria</option><option>Cacciavite elettrico</option><option>Rivettatore</option>
-              </optgroup>
-              <optgroup label="Levigatura e finitura">
-                <option>Levigatrice orbitale</option><option>Levigatrice a nastro</option><option>Levigatrice delta</option><option>Lucidatrice</option><option>Sabbiatrice</option>
-              </optgroup>
-              <optgroup label="Misura e tracciatura">
-                <option>Laser di misura (distanziometro)</option><option>Livella laser</option><option>Laser a croce</option>
-                <option>Laser rotante</option><option>Metro laser</option><option>Calibro digitale</option><option>Micrometro</option><option>Squadra di precisione</option>
-              </optgroup>
-              <optgroup label="Saldatura e termici">
-                <option>Saldatrice MIG/MAG portatile</option><option>Saldatrice TIG portatile</option>
-                <option>Saldatrice elettrica (inverter)</option><option>Cannello ossiacetilenico</option><option>Pistola aria calda</option>
-              </optgroup>
-              <optgroup label="Pneumatici e idraulici">
-                <option>Compressore d'aria</option><option>Pistola sparachiodi</option><option>Pistola pneumatica</option><option>Cricco idraulico</option>
-              </optgroup>
-              <optgroup label="Contenitori">
-                <option>Valigetta attrezzi</option><option>Cassetta utensili</option><option>Carrello porta attrezzi</option><option>Armadio porta attrezzi</option>
-              </optgroup>
-              <option>Altro (specifica nelle note)</option>
             </select>
           </div>
-          <div class="form-group"><label>Tipo personalizzato</label><input type="text" id="at-tipo-custom" placeholder="es. Piegatrice manuale"></div>
           <div class="form-group"><label>Marca</label>
             <select id="at-marca">
               <option value="">— seleziona —</option>
@@ -1657,6 +1630,7 @@ function showModule(id) {
   if(id==='dashboard')updateDashboardStats();
   if(id==='fornitori'){renderFornitori();updateAcquistoFornitoreSelect();if(currentUser&&currentUser.ruolo==='admin')loadFornitoriAdminPanel();}
   if(id==='fase2'){updateMaterialeSelects();refreshArticoliSelects();aggiornaSelectClienti();}
+  if(id==='attrezzature'){refreshArticoliSelects();}
   if(id==='fase1'){renderMateriali();renderCantieri();updateMaterialeSelects();renderConsegne();refreshArticoliSelects();renderClienti();aggiornaSelectClienti();applyMagazzinoPermessi();renderMagazzino();}
 }
 
@@ -3021,7 +2995,7 @@ async function loadAllFromCloud(){
     r=usaCloudOppureLocale(matDati,'clienti',clientiDB); clientiDB=r.valore; if(r.daRisalire)daRisalire.add('materiali');
     saveMaterialiDB();saveArticoliDB();saveClientiDB();
 
-    seedArticoliIniziali();
+    seedArticoliIniziali();seedArticoliAttrezzatura();migraArticoliDaAttrezzatureEsistenti();
     _suppressAutoSave=false;
 
     // Dati locali più ricchi del cloud: li spingo subito in cloud per allinearli
@@ -3055,7 +3029,7 @@ function closeAuditModal(){document.getElementById('audit-modal').style.display=
 let attrezzatureDB=[], manutenzioniDB=[], editingAttrId=null;
 function saveAttrDB(){try{localStorage.setItem('dce-attrezzature',JSON.stringify(attrezzatureDB));localStorage.setItem('dce-manutenzioni',JSON.stringify(manutenzioniDB));}catch(e){}scheduleCloudSave('attrezzature-registro',()=>({attrezzature:attrezzatureDB,manutenzioni:manutenzioniDB}));}
 function loadAttrDB(){try{attrezzatureDB=JSON.parse(localStorage.getItem('dce-attrezzature')||'[]');manutenzioniDB=JSON.parse(localStorage.getItem('dce-manutenzioni')||'[]');}catch(e){attrezzatureDB=[];manutenzioniDB=[];}}
-function getTipo(){const s=document.getElementById('at-tipo').value,c=document.getElementById('at-tipo-custom').value.trim();return(s==='Altro (specifica nelle note)'&&c)?c:s;}
+function getTipo(){return document.getElementById('at-tipo').value;}
 function getMarca(){const s=document.getElementById('at-marca').value,c=document.getElementById('at-marca-custom').value.trim();return(s==='Altra marca'&&c)?c:s;}
 let attrFotoTemp=null;
 function caricaFotoAttrezzo(event){
@@ -3078,8 +3052,6 @@ function caricaFotoAttrezzo(event){
 
 function addAttrezzo(){
   const tipo=getTipo();if(!tipo){showToast('Seleziona almeno il tipo');return;}
-  const isCustom=document.getElementById('at-tipo').value==='Altro (specifica nelle note)'&&document.getElementById('at-tipo-custom').value.trim();
-  if(isCustom)registraArticolo('Attrezzi',tipo);
   let seriale=document.getElementById('at-seriale').value.trim();if(!seriale)seriale='ATT-'+Date.now().toString().slice(-5);
   const d={id:editingAttrId||Date.now(),tipo,marca:getMarca(),modello:document.getElementById('at-modello').value.trim(),seriale,
     alim:document.getElementById('at-alim').value,anno:document.getElementById('at-anno').value,prop:document.getElementById('at-prop').value,
@@ -3093,8 +3065,9 @@ function addAttrezzo(){
 }
 function editAttrezzo(id){
   const a=attrezzatureDB.find(x=>x.id===id);if(!a)return;editingAttrId=id;
-  const ts=document.getElementById('at-tipo'),to=[...ts.options].map(o=>o.value);
-  if(to.includes(a.tipo)){ts.value=a.tipo;}else{ts.value='Altro (specifica nelle note)';document.getElementById('at-tipo-custom').value=a.tipo||'';}
+  const ts=document.getElementById('at-tipo');
+  if(a.tipo&&![...ts.options].some(o=>o.value===a.tipo)){registraArticolo('Attrezzi',a.tipo);}
+  ts.value=a.tipo||'';
   const ms=document.getElementById('at-marca'),mo=[...ms.options].map(o=>o.value);
   if(mo.includes(a.marca)){ms.value=a.marca;}else{ms.value='Altra marca';document.getElementById('at-marca-custom').value=a.marca||'';}
   ['modello','seriale','anno','codpos','dotazione','note'].forEach(k=>{const el=document.getElementById('at-'+k);if(el)el.value=a[k]||'';});
@@ -3109,7 +3082,7 @@ function editAttrezzo(id){
 function deleteAttrezzo(id){if(!confirm('Eliminare?'))return;attrezzatureDB=attrezzatureDB.filter(a=>a.id!==id);saveAttrDB();renderAttrezzature();showToast('Rimossa');}
 function clearAttrezzoForm(){
   editingAttrId=null;document.getElementById('btn-salva-attr').textContent='Aggiungi attrezzatura';document.getElementById('attr-form-title').textContent='Aggiungi / Modifica attrezzatura';
-  ['at-tipo','at-tipo-custom','at-marca','at-marca-custom','at-modello','at-seriale','at-alim','at-anno','at-posizione','at-codpos','at-dotazione','at-data-dot','at-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['at-tipo','at-marca','at-marca-custom','at-modello','at-seriale','at-alim','at-anno','at-posizione','at-codpos','at-dotazione','at-data-dot','at-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('at-prop').value='Proprieta aziendale';document.getElementById('at-stato').value='';
   attrFotoTemp=null;document.getElementById('at-foto-preview').innerHTML='';document.getElementById('at-foto').value='';
 }
@@ -3377,7 +3350,24 @@ function mostraDettaglioMagazzino(i){
     html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria: '+(m.categoria||'—')+'<br>Giacenza: '+(m.giacenza||'0')+' '+(m.um||'')+'<br>Scorta minima: '+(m.scortaMin||'0')+'<br>Prezzo: '+(m.prezzo?'€ '+m.prezzo:'—')+(m.note?'<br>Note: '+m.note:'')+'</div>';
     html+='<button onclick="showModule(\'fase1\');switchF1OuterTab(\'gestione\');switchF1Tab(\'catalogo\');editMateriale('+m.id+')" style="margin-top:12px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;font-size:12px;padding:6px 14px;border-radius:4px">Apri in Catalogo →</button>';
   }else{
-    html+='<div style="font-size:12px;color:var(--text2);line-height:1.8">Categoria catalogo: '+r.ref.categoria+'<br><span style="color:var(--text3)">Articolo generico — non ha una scheda propria, è usato come voce nelle tendine di Materiali/Dotazioni.</span></div>';
+    const art=r.ref;
+    html+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px">Categoria catalogo: '+art.categoria+'</div>';
+    if(art.categoria==='Attrezzi'||art.categoria==='Attrezzatura'){
+      const unita=attrezzatureDB.filter(a=>a.tipo&&a.tipo.toLowerCase()===art.nome.toLowerCase());
+      if(unita.length){
+        const disponibili=unita.filter(a=>a.stato==='Disponibile'||!a.dotazione).length;
+        html+='<div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:6px">'+unita.length+' unità fisich'+(unita.length===1?'a':'e')+' censite</div>';
+        html+='<div style="max-height:200px;overflow-y:auto">'+unita.map(a=>'<div onclick="showModule(\'attrezzature\');editAttrezzo('+a.id+')" style="cursor:pointer;padding:6px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-size:11px">'+
+          '<span style="color:var(--text)">'+(a.seriale||'s/n —')+'</span> — '+
+          '<span style="color:'+(a.stato==='Da riparare'||a.stato==='Fuori uso'?'var(--red)':'var(--text2)')+'">'+(a.stato||'—')+'</span>'+
+          (a.posizione?' · 📍 '+a.posizione:'')+(a.dotazione?' · 👤 '+a.dotazione:'')+
+          '</div>').join('')+'</div>';
+      }else{
+        html+='<div style="font-size:12px;color:var(--text3)">Nessuna unità fisica ancora censita in Attrezzature per questo articolo.</div>';
+      }
+    }else{
+      html+='<span style="font-size:12px;color:var(--text3)">Articolo generico — non ha una scheda propria, è usato come voce nelle tendine di Materiali/Dotazioni.</span>';
+    }
   }
   el.innerHTML=html;
 }
@@ -3692,9 +3682,7 @@ let articoloModalContext={targetSelectId:null,extraTargetId:null};
 function seedArticoliIniziali(){
   if(articoliDB.length)return;
   const seed=[
-    ['Attrezzi','Trapano a percussione'],['Attrezzi','Trapano combinato (tassellatore)'],['Attrezzi','Trapano a colonna'],
-    ['Attrezzi','Avvitatore a batteria'],['Attrezzi','Avvitatore a impulsi'],['Attrezzi','Livella laser'],['Attrezzi','Laser di misura (distanziometro)'],
-    ['Attrezzi','Valigetta multiuso'],['Attrezzi','Martello'],['Attrezzi','Metro 5mt'],['Attrezzi','Metro 10mt'],
+    ['Attrezzatura','Valigetta multiuso'],['Attrezzi','Martello'],['Attrezzi','Metro 5mt'],['Attrezzi','Metro 10mt'],
     ['Attrezzatura','Caschetto da cantiere'],['Attrezzatura','Imbragatura'],['Attrezzatura','Aspirapolvere'],
     ['Beni di consumo','Disco Lamellare (L)'],['Beni di consumo','Disco Piano/Sbavatura (P)'],['Beni di consumo','Disco da Taglio (T)'],
     ['Beni di consumo','Silicone / Sigillante'],['Beni di consumo','Chimico bicomponente'],
@@ -3705,6 +3693,37 @@ function seedArticoliIniziali(){
   ];
   seed.forEach(([categoria,nome])=>articoliDB.push({id:Date.now()+Math.floor(Math.random()*100000),categoria,nome}));
   saveArticoliDB();
+}
+function seedArticoliAttrezzatura(){
+  // Lista curata (ex-menu fisso di Attrezzature) — aggiunta idempotente: non duplica se già presente.
+  const seed=[
+    ['Attrezzi','Smerigliatrice angolare (flessibile)'],['Attrezzi','Smerigliatrice diritta'],['Attrezzi','Troncatrice'],
+    ['Attrezzi','Seghetto alternativo'],['Attrezzi','Sega circolare'],['Attrezzi','Cesoia elettrica'],
+    ['Attrezzi','Trapano a percussione'],['Attrezzi','Trapano combinato (tassellatore)'],['Attrezzi','Trapano a colonna'],
+    ['Attrezzi','Avvitatore a impulsi'],['Attrezzi','Avvitatore a batteria'],['Attrezzi','Cacciavite elettrico'],['Attrezzi','Rivettatore'],
+    ['Attrezzi','Levigatrice orbitale'],['Attrezzi','Levigatrice a nastro'],['Attrezzi','Levigatrice delta'],['Attrezzi','Lucidatrice'],['Attrezzi','Sabbiatrice'],
+    ['Attrezzi','Laser di misura (distanziometro)'],['Attrezzi','Livella laser'],['Attrezzi','Laser a croce'],
+    ['Attrezzi','Laser rotante'],['Attrezzi','Metro laser'],['Attrezzi','Calibro digitale'],['Attrezzi','Micrometro'],['Attrezzi','Squadra di precisione'],
+    ['Attrezzi','Saldatrice MIG/MAG portatile'],['Attrezzi','Saldatrice TIG portatile'],
+    ['Attrezzi','Saldatrice elettrica (inverter)'],['Attrezzi','Cannello ossiacetilenico'],['Attrezzi','Pistola aria calda'],
+    ['Attrezzi',"Compressore d'aria"],['Attrezzi','Pistola sparachiodi'],['Attrezzi','Pistola pneumatica'],['Attrezzi','Cricco idraulico'],
+    ['Attrezzatura','Valigetta attrezzi'],['Attrezzatura','Cassetta utensili'],['Attrezzatura','Carrello porta attrezzi'],['Attrezzatura','Armadio porta attrezzi']
+  ];
+  let aggiunti=0;
+  seed.forEach(([categoria,nome])=>{
+    const esiste=articoliDB.find(a=>a.nome.toLowerCase()===nome.toLowerCase()&&a.categoria===categoria);
+    if(!esiste){articoliDB.push({id:Date.now()+Math.floor(Math.random()*1000000),categoria,nome});aggiunti++;}
+  });
+  if(aggiunti)saveArticoliDB();
+}
+function migraArticoliDaAttrezzatureEsistenti(){
+  let aggiunti=0;
+  (attrezzatureDB||[]).forEach(a=>{
+    if(!a.tipo)return;
+    const esiste=articoliDB.find(x=>x.nome.toLowerCase()===a.tipo.toLowerCase());
+    if(!esiste){articoliDB.push({id:Date.now()+Math.floor(Math.random()*1000000),categoria:'Attrezzi',nome:a.tipo});aggiunti++;}
+  });
+  if(aggiunti)saveArticoliDB();
 }
 function saveArticoliDB(){try{localStorage.setItem('dce-articoli',JSON.stringify(articoliDB));}catch(e){}scheduleCloudSave('materiali-registro',()=>({materiali:materialiDB,cantieri:cantieriDB,previsto:previstoDB,consegne:consegneDB,articoli:articoliDB,clienti:clientiDB}));}
 function loadArticoliDB(){try{articoliDB=JSON.parse(localStorage.getItem('dce-articoli')||'[]');}catch(e){articoliDB=[];}}
@@ -3755,10 +3774,10 @@ function refreshArticoliSelects(){
   };
   const matSel=document.getElementById('mat-preset');
   if(matSel){matSel.innerHTML=buildOpts(['Beni di consumo'],'— scegli o scrivi sotto —');}
-  ['dot-sq-attr','dotsald-attr'].forEach(id=>{
+  ['dot-sq-attr','dotsald-attr','at-tipo'].forEach(id=>{
     const sel=document.getElementById(id);if(!sel)return;
     const cur=sel.value;
-    sel.innerHTML=buildOpts(['Attrezzi','Attrezzatura'],'— seleziona attrezzo/DPI —');
+    sel.innerHTML=buildOpts(['Attrezzi','Attrezzatura'],id==='at-tipo'?'— seleziona —':'— seleziona attrezzo/DPI —');
     if(cur&&cur!=='__nuovo__'){
       const exists=[...sel.options].some(o=>o.value===cur);
       if(!exists){const opt=document.createElement('option');opt.value=cur;opt.textContent=cur+' (non a catalogo)';sel.appendChild(opt);}
@@ -4350,7 +4369,7 @@ window.addEventListener('load',async()=>{
   loadCharter();
   ['fase0','fase1','fase2','fase3','fase4','fase5','fase6'].forEach(loadModule);
   updateDashAziendaLine();
-  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();loadArticoliDB();seedArticoliIniziali();loadAgendaDB();loadClientiDB();migraClientiDaCantieriEsistenti();
+  loadMezziDB();loadAssegnazioniDB();loadAttrDB();loadScorteDB();loadFornitoriDB();loadMaterialiDB();loadArticoliDB();seedArticoliIniziali();seedArticoliAttrezzatura();migraArticoliDaAttrezzatureEsistenti();loadAgendaDB();loadClientiDB();migraClientiDaCantieriEsistenti();
   renderMezzi();renderInterventi();renderAssegnazioni();renderAlerts();updateKmTargaSelect();
   renderAttrezzature();
   renderSaldatori();updateSaldSelect();renderSquadre();updateSqSelect();
